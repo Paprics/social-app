@@ -1,0 +1,252 @@
+<header class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+
+    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+
+        <!-- Logo -->
+
+        <a href="{% url 'core:index' %}" class="flex items-center gap-3">
+
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white">
+                S
+            </div>
+
+            <div class="hidden sm:block">
+
+                <h1 class="text-lg font-semibold text-slate-900">
+                    Social Network
+                </h1>
+
+                <p class="text-xs text-slate-500">
+                    Connect with people
+                </p>
+
+            </div>
+
+        </a>
+
+        <!-- Desktop Navigation -->
+
+        <nav class="hidden items-center gap-8 lg:flex">
+
+            <a href="{% url 'core:index' %}"
+               class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
+                Главная
+            </a>
+
+            <a href="#"
+               class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
+                Люди
+            </a>
+
+            <a href="{% url 'chat:chat_view' %}"
+               class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
+                Чат
+            </a>
+
+            <a href="#"
+               class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
+                Сообщения
+            </a>
+
+        </nav>
+
+        <!-- Right -->
+
+        <div class="flex items-center gap-3">
+
+            <!-- Search -->
+
+            <div class="hidden md:block">
+
+                <input
+                        type="text"
+                        name="search"
+                        autocomplete="off"
+                        placeholder="Поиск..."
+                        class="w-64 rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none transition focus:border-blue-600">
+
+            </div>
+
+            <!-- Notifications -->
+
+            <button
+                    type="button"
+                    class="rounded-xl p-2 text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
+
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     aria-hidden="true"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.8"
+                     stroke="currentColor"
+                     class="h-6 w-6">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M14.857 17.082A23.848 23.848 0 0018 17.25c1.355 0 2.67-.111 3.943-.321m-18.886 0A23.847 23.847 0 016 17.25c1.355 0 2.67-.111 3.943-.321m0 0a5.978 5.978 0 011.114-.104c.38 0 .754.035 1.114.104m-2.228 0a6 6 0 114.456 0m-4.456 0H9m4.456 0H15"/>
+
+                </svg>
+
+            </button>
+
+            <!-- User -->
+            <div class="relative">
+
+                <button
+                        type="button"
+                        id="profile-button"
+                        class="flex items-center gap-3 rounded-xl border border-slate-200 px-2 py-1 transition hover:bg-slate-100">
+
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 font-semibold text-white">
+                        U
+                    </div>
+
+                    <div class="hidden text-left lg:block">
+
+                        <p class="text-sm font-medium text-slate-900">
+                            Username
+                        </p>
+
+                        <p class="text-xs text-slate-500">
+                            Online
+                        </p>
+
+                    </div>
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         aria-hidden="true"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke-width="2"
+                         stroke="currentColor"
+                         class="h-4 w-4 text-slate-500">
+
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+
+                    </svg>
+
+                </button>
+
+                <!-- User Dropdown -->
+                <div
+                        id="profile-menu"
+                        class="absolute right-0 top-full z-50 mt-2 hidden w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+
+                    <div class="border-b border-slate-200 px-5 py-4">
+
+                        <p class="font-semibold text-slate-900">
+                            Username
+                        </p>
+
+                        <p class="text-sm text-slate-500">
+                            username@example.com
+                        </p>
+
+                    </div>
+
+                    <div class="py-2">
+
+                        <a href="#"
+                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            👤 Профиль
+                        </a>
+
+                        <a href="#"
+                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            ⚙️ Настройки
+                        </a>
+
+                        <a href="#"
+                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            🔒 Конфиденциальность
+                        </a>
+
+                        <a href="#"
+                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            ❓ Помощь
+                        </a>
+
+                        <hr class="my-2 border-slate-200">
+
+                        <a href="#"
+                           class="block px-5 py-3 text-red-600 transition hover:bg-red-50">
+                            Выйти
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Mobile Menu Button -->
+
+        <button
+                type="button"
+                id="mobile-menu-button"
+                class="rounded-xl p-2 transition hover:bg-slate-100 lg:hidden">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 aria-hidden="true"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke-width="2"
+                 stroke="currentColor"
+                 class="h-7 w-7">
+
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+
+            </svg>
+
+        </button>
+
+    </div>
+
+    </div>
+
+</header>
+<!-- ================= Mobile Menu ================= -->
+
+<div id="mobile-menu"
+     class="hidden border-b border-slate-200 bg-white lg:hidden">
+
+    <nav class="mx-auto flex max-w-7xl flex-col px-4 py-4">
+
+        <a href="#"
+           class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
+            Главная
+        </a>
+
+        <a href="#"
+           class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
+            Люди
+        </a>
+
+        <a href="#"
+           class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
+            Чат
+        </a>
+
+        <a href="#"
+           class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
+            Сообщения
+        </a>
+
+        <hr class="my-4 border-slate-200">
+
+        <input
+                type="text"
+                name="search"
+                autocomplete="off"
+                placeholder="Поиск..."
+                class="rounded-xl border border-slate-300 px-4 py-2 outline-none transition focus:border-blue-600">
+
+    </nav>
+
+</div>

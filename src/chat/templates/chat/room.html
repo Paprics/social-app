@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-950 text-white flex flex-col">
+
+  <!-- Статус -->
+  <div id="status" class="text-center py-3 bg-gray-900 text-sm text-gray-300 tracking-wide">
+    Подключение...
+  </div>
+
+  <!-- Видео + чат -->
+  <div class="flex flex-1 gap-4 p-4">
+
+    <!-- Видео блок -->
+    <div class="flex flex-col gap-4 flex-1">
+      <div class="flex gap-4">
+        <!-- Локальное видео -->
+        <div class="relative flex-1">
+          <video id="localVideo" autoplay muted playsinline
+                 class="w-full rounded-xl bg-gray-800 aspect-video object-cover"></video>
+          <span class="absolute bottom-2 left-2 text-xs bg-black/60 px-2 py-1 rounded">Ты</span>
+        </div>
+        <!-- Удалённое видео -->
+        <div class="relative flex-1">
+          <video id="remoteVideo" autoplay playsinline
+                 class="w-full rounded-xl bg-gray-800 aspect-video object-cover"></video>
+          <span class="absolute bottom-2 left-2 text-xs bg-black/60 px-2 py-1 rounded">Партнёр</span>
+        </div>
+      </div>
+
+      <!-- Кнопка Следующий -->
+      <button id="btnNext"
+              class="self-center px-8 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700
+                     rounded-xl font-semibold transition-colors text-sm">
+        Следующий →
+      </button>
+    </div>
+
+    <!-- Текстовый чат -->
+    <div class="w-72 flex flex-col bg-gray-900 rounded-xl overflow-hidden">
+      <div class="px-4 py-2 bg-gray-800 text-xs text-gray-400 font-medium uppercase tracking-widest">
+        Чат
+      </div>
+      <div id="chatMessages"
+           class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 text-sm">
+        <!-- сообщения добавляются сюда -->
+      </div>
+      <div class="flex border-t border-gray-800">
+        <input id="chatInput" type="text" placeholder="Сообщение..."
+               class="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder-gray-600"
+               maxlength="500" />
+        <button id="btnSend"
+                class="px-3 py-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm">
+          ↵
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Состояние ────────────────────────────────────────────────────────────────
+let ws, pc, localStream;
+let role = null;           // 'caller' | 'callee'
+let currentRoomId = null;
+let pcModerator = null;
+
+// ── DOM ──────────────────────────────────────────────────────────────────────
+const localVideo   = document.getElementById('localVideo');
+const remoteVideo  = document.getElementById('remoteVideo');
+const statusEl     = document.getElementById('status');
+const btnNext      = document.getElementById('btnNext');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput    = document.getElementById('chatInput');
+const btnSend      = document.getElementById('btnSend');
+
+// RTC_CONFIG
+// const RTC_CONFIG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; #Для dev
+const RTC_CONFIG = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" }
+    ]
+};
+
+// ── Старт ────────────────────────────────────────────────────────────────────
+async function start() {
+    setStatus('Получение камеры...');
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localVideo.srcObject = localStream;
+    } catch (err) {
+        setStatus('Ошибка доступа к камере: ' + err.message);
+        return;
+    }
+    connectWS();
+}
+
+// ── WebSocket ─────────────────────────────────────────────────────────────────
+function connectWS() {
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    ws = new WebSocket(`${proto}://${location.host}/ws/chat/`);
+
+    ws.onopen = () => console.log('[WS] открыт');
+
+    ws.onmessage = async (e) => {
+        const msg = JSON.parse(e.data);
+        console.log('[WS] RAW:', JSON.stringify(msg));
+
+        // ── Верхнеуровневые сообщения (type на верхнем уровне) ───────────────
+        switch (msg.type) {
+
+            case 'status':
+                setStatus('Ожидание собеседника...');
+                clearChat();
+                return;
+
+            case 'matched':
+              role = msg.role;
+              currentRoomId = msg.room_id;
+              const myRole = msg.role;  // ← сохраняем до await
+              console.log('[DEBUG] matched, role:', myRole);
+              clearChat();
+              setStatus('Собеседник найден, соединяемся...');
+              try {
+                await setupPeerConnection();
+                console.log('[DEBUG] setupPeerConnection done, myRole:', myRole);
+                if (myRole === 'callee') {
+                  console.log('[DEBUG] callee отправляет ready');
+                  wsSend({type: 'ready'});
+                }
+              } catch (e) {
+                console.error('[DEBUG] EXCEPTION in matched handler:', e);
+              }
+              return;
+
+            case 'partner_disconnected':
+                setStatus('Партнёр отключился. Нажмите "Следующий" для поиска нового.');
+                closePeer();
+                return;
+        }
+
+        // ── Сигналинг и чат приходят как { payload: { type, ... } } ──────────
+        // Бэкенд оборачивает все signaling.message события именно так.
+        if (msg.payload) {
+            await handlePayload(msg.payload);
+        }
+    };
+
+    ws.onclose = () => {
+        setStatus('WebSocket закрыт. Обновите страницу.');
+        closePeer();
+    };
+    ws.onerror = (err) => console.error('[WS] ошибка:', err);
+}
+
+// ── Обработка payload (WebRTC сигналинг + чат) ───────────────────────────────
+async function handlePayload(payload) {
+    console.log('[WS] payload:', payload.type, payload);
+
+    switch (payload.type) {
+
+        // ── Handshake ─────────────────────────────────────────────────────────
+        case 'ready_to_connect':
+            // Callee готов — теперь caller создаёт offer
+            if (role === 'caller') {
+                console.log('[RTC] callee готов, отправляем offer');
+                await sendOffer();
+            }
+            break;
+
+        // ── WebRTC SDP ────────────────────────────────────────────────────────
+        case 'offer':
+          if (payload.from_moderator) {
+            // Offer от модератора — отдельный pc, не трогаем основной
+            console.log('[RTC] offer от модератора');
+            if (!pcModerator) {
+              pcModerator = new RTCPeerConnection(RTC_CONFIG);
+              // Добавляем свои треки — модератор нас увидит
+              if (localStream) {
+                localStream.getTracks().forEach(t => pcModerator.addTrack(t, localStream));
+              }
+              pcModerator.onicecandidate = (e) => {
+                if (e.candidate) {
+                  wsSend({
+                    type: 'ice_candidate',
+                    candidate: e.candidate,
+                    from_moderator_reply: true,
+                    answering_channel: payload.target, // наш channel_name
+                  });
+                }
+              };
+            }
+            await pcModerator.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+            const modAnswer = await pcModerator.createAnswer();
+            await pcModerator.setLocalDescription(modAnswer);
+            wsSend({
+              type: 'answer',
+              sdp: pcModerator.localDescription,
+              from_moderator_reply: true,
+              answering_channel: payload.target,
+            });
+            break;
+          }
+          // Обычный offer от партнёра — старый код
+          if (!pc) return;
+          console.log('[RTC] получен offer, создаём answer');
+          await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+          const answer = await pc.createAnswer();
+          await pc.setLocalDescription(answer);
+          wsSend({type: 'answer', sdp: pc.localDescription});
+          break;
+
+        case 'answer':
+            if (!pc) return;
+            console.log('[RTC] получен answer');
+            await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+            break;
+
+        case 'ice_candidate':
+            if (!pc) return;
+            try {
+                await pc.addIceCandidate(new RTCIceCandidate(payload.candidate));
+            } catch (err) {
+                console.warn('[RTC] ошибка добавления ICE candidate:', err);
+            }
+            break;
+
+        // ── Текстовый чат ─────────────────────────────────────────────────────
+        case 'chat_message':
+            appendMessage(payload.text, 'partner');
+            break;
+    }
+}
+
+// ── WebRTC ───────────────────────────────────────────────────────────────────
+async function setupPeerConnection() {
+    console.log('[DEBUG] setupPeerConnection, localStream:', localStream);
+    closePeer();  // закрываем старое соединение если есть
+
+    pc = new RTCPeerConnection(RTC_CONFIG);
+
+    if (localStream) {  // ← оберни в проверку
+        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    } else {
+        console.warn('[DEBUG] localStream null — подключаемся без медиа');
+    }
+
+    // Удалённый стрим
+    pc.ontrack = (e) => {
+        console.log('[RTC] получен remote track');
+        remoteVideo.srcObject = e.streams[0];
+        setStatus('Подключено ✓');
+    };
+
+    // ICE кандидаты
+    pc.onicecandidate = (e) => {
+        if (e.candidate) {
+            console.log('[RTC] ICE candidate:', e.candidate.type);
+            wsSend({ type: 'ice_candidate', candidate: e.candidate });
+        }
+    };
+
+    // Состояние соединения
+    pc.onconnectionstatechange = () => {
+        console.log('[RTC] connectionState:', pc.connectionState);
+        if (pc.connectionState === 'connected') {
+            setStatus('Подключено ✓');
+        } else if (pc.connectionState === 'failed') {
+            setStatus('Соединение прервано');
+            closePeer();
+        } else if (pc.connectionState === 'disconnected') {
+            setStatus('Переподключение...');
+        }
+    };
+
+    pc.onicegatheringstatechange = () => {
+        console.log('[RTC] iceGatheringState:', pc.iceGatheringState);
+    };
+}
+
+async function sendOffer() {
+    if (!pc) {
+        console.error('[RTC] sendOffer: pc не инициализирован');
+        return;
+    }
+    try {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        console.log('[RTC] offer отправлен');
+        wsSend({ type: 'offer', sdp: pc.localDescription });
+    } catch (err) {
+        console.error('[RTC] ошибка создания offer:', err);
+    }
+}
+
+function closePeer() {
+    if (pc) { pc.close(); pc = null; }
+    if (pcModerator) { pcModerator.close(); pcModerator = null; }
+    remoteVideo.srcObject = null;
+    currentRoomId = null;
+}
+
+// ── Текстовый чат ─────────────────────────────────────────────────────────────
+function appendMessage(text, sender) {
+    const div = document.createElement('div');
+    div.className = sender === 'me'
+        ? 'self-end bg-indigo-600 text-white px-3 py-1.5 rounded-2xl rounded-br-sm max-w-[90%] break-words'
+        : 'self-start bg-gray-700 text-gray-100 px-3 py-1.5 rounded-2xl rounded-bl-sm max-w-[90%] break-words';
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function clearChat() {
+    chatMessages.innerHTML = '';
+}
+
+function sendChatMessage() {
+    const text = chatInput.value.trim();
+    if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+    wsSend({ type: 'chat_message', text });
+    appendMessage(text, 'me');
+    chatInput.value = '';
+}
+
+btnSend.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChatMessage();
+    }
+});
+
+// ── Кнопка Следующий ─────────────────────────────────────────────────────────
+// WS НЕ закрываем — только пересоздаём RTCPeerConnection
+btnNext.addEventListener('click', () => {
+    closePeer();
+    clearChat();
+    setStatus('Ищем следующего...');
+    wsSend({ type: 'next' });
+});
+
+// ── Утилиты ───────────────────────────────────────────────────────────────────
+function wsSend(data) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(data));
+    } else {
+        console.warn('[WS] не открыт, сообщение не отправлено:', data.type);
+    }
+}
+
+function setStatus(text) {
+    statusEl.textContent = text;
+    console.log('[STATUS]', text);
+}
+
+// ── Запуск ────────────────────────────────────────────────────────────────────
+start();
+</script>
+{% endblock %}

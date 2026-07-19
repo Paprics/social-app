@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Social Network{% endblock %}</title>
+
+    <meta name="description" content="{% block meta_description %}{% endblock %}">
+    <link rel="canonical" href="#">
+
+    <link rel="icon" href="#" sizes="any">
+
+    <!-- Tailwind CSS (Development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4"
+            integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
+            crossorigin="anonymous"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    {% include "layouts/header.html" %}
+
+    <main>
+        {% block content %}
+            {% block page %}{% endblock %}
+        {% endblock %}
+    </main>
+
+    <script src="{% static 'js/main.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>
