@@ -18,11 +18,13 @@ signaling.py — Главный WebSocket consumer для видеочата.
     7. После этого видео/аудио идут напрямую P2P, минуя сервер
 """
 
-import logging
 import json
+import logging
 import uuid
-from channels.generic.websocket import AsyncWebsocketConsumer
+
 from asgiref.sync import sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
+
 from chat.services.matchmaking import MatchmakingService
 from chat.services.room_storage import RoomStorage
 

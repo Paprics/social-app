@@ -25,8 +25,10 @@ moderator.py — WebSocket consumer для модератора.
 
 import json
 import logging
-from channels.generic.websocket import AsyncWebsocketConsumer
+
 from asgiref.sync import sync_to_async
+from channels.generic.websocket import AsyncWebsocketConsumer
+
 from chat.services.room_storage import RoomStorage
 
 logger = logging.getLogger(__name__)
@@ -90,7 +92,7 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
                 "callee": self.room_meta["callee"],
             }
         )
-        logger.error(f"[MOD] room_info отправлен")
+        logger.error("[MOD] room_info отправлен")
 
     async def disconnect(self, close_code):
         """Модератор закрыл вкладку.

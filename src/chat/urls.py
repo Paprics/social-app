@@ -1,4 +1,5 @@
 from django.urls import path
+
 from chat.views import ChatView, ModeratorListView, ModeratorRoomView
 
 app_name = "chat"

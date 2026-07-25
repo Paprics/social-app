@@ -1,0 +1,84 @@
+{% load i18n %}
+
+{# ===== ВАРИАНТ А: Каскадные селекты (страна → регион → город) ===== #}
+
+<div class="space-y-4">
+    {# Страна #}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{% trans "Country" %}</label>
+        <select name="country"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                hx-get="{% url 'geo:regions' %}"
+                hx-target="#id-region-select"
+                hx-trigger="change"
+                hx-include="[name='country']">
+            <option value="">{% trans "Select country" %}</option>
+            {% for country in countries %}
+            <option value="{{ country.pk }}"
+                    {% if selected_country == country.pk %}selected{% endif %}>
+                {{ country.get_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {# Регион — подгружается через HTMX #}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{% trans "Region" %}</label>
+        <select id="id-region-select"
+                name="region"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                hx-get="{% url 'geo:cities' %}"
+                hx-target="#id-city-select"
+                hx-trigger="change"
+                hx-include="[name='region']">
+            <option value="">{% trans "Select region" %}</option>
+        </select>
+    </div>
+
+    {# Город — подгружается через HTMX #}
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{% trans "City" %}</label>
+        <select id="id-city-select"
+                name="city"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <option value="">{% trans "Select city" %}</option>
+        </select>
+    </div>
+</div>
+
+
+{# ===== ВАРИАНТ Б: Автокомплит (поиск по вводу) ===== #}
+{#
+<div class="relative">
+    <label class="block text-sm font-medium text-gray-700 mb-1">{% trans "City" %}</label>
+    
+    {# Скрытое поле — хранит выбранный city.pk для отправки формы #}
+    <input type="hidden" name="city" id="id-city-hidden" data-js-autocomplete-value>
+    
+    {# Видимый инпут для ввода #}
+    <input type="text"
+           id="id-city-input"
+           placeholder="{% trans 'Start typing city name...' %}"
+           autocomplete="off"
+           class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+           hx-get="{% url 'geo:autocomplete' %}"
+           hx-target="#id-autocomplete-results"
+           hx-trigger="input changed delay:300ms"
+           hx-include="[name='country']"
+           name="q">
+    
+    <div id="id-autocomplete-results" class="relative"></div>
+</div>
+
+<script>
+// Выбор из автокомплита — вешаем делегацию на контейнер результатов
+document.addEventListener('click', function(e) {
+    const item = e.target.closest('[data-js-autocomplete-item]');
+    if (!item) return;
+    document.getElementById('id-city-input').value = item.dataset.cityName;
+    document.querySelector('[data-js-autocomplete-value]').value = item.dataset.cityId;
+    document.getElementById('id-autocomplete-results').innerHTML = '';
+});
+</script>
+#}

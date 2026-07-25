@@ -1,78 +1,75 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const profileButton = document.getElementById("profile-button");
-    const profileMenu = document.getElementById("profile-menu");
+// main.js — точка входа для глобальных скриптов
+// Импортируем модуль авторизации (модалки, дропдауны, мобильное меню)
+import "./accounts.js";
 
-    const mobileButton = document.getElementById("mobile-menu-button");
-    const mobileMenu = document.getElementById("mobile-menu");
+console.log("[main] scripts loaded");
 
-    /**
-     * Profile menu
-     */
+// ==================== DROPDOWNS ====================
+document.querySelectorAll("[data-dropdown-button]").forEach((button) => {
+    button.addEventListener("click", (e) => {
+        e.stopPropagation();
 
-    if (profileButton && profileMenu) {
+        const menu = document.getElementById(button.dataset.dropdownButton);
 
-        profileButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            profileMenu.classList.toggle("hidden");
+        if (!menu) return;
+
+        document.querySelectorAll("[data-dropdown]").forEach((dropdown) => {
+            if (dropdown !== menu) {
+                dropdown.classList.add("hidden");
+            }
         });
 
-        profileMenu.addEventListener("click", (event) => {
-            event.stopPropagation();
+        menu.classList.toggle("hidden");
+    });
+});
+
+document.addEventListener("click", () => {
+    document.querySelectorAll("[data-dropdown]").forEach((dropdown) => {
+        dropdown.classList.add("hidden");
+    });
+});
+
+// ==================== MOBILE MENU ====================
+const mobileMenuButton = document.getElementById("mobile-menu-button");
+const mobileMenu = document.getElementById("mobile-menu");
+
+if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+    });
+}
+
+// Модальные окна: data-modal-open="id", data-modal-close="id", data-modal-backdrop
+document.addEventListener("DOMContentLoaded", function () {
+    // Открытие
+    document.querySelectorAll("[data-modal-open]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const id = btn.getAttribute("data-modal-open");
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.remove("hidden");
+            modal.classList.add("flex");
         });
-
-    }
-
-    /**
-     * Mobile menu
-     */
-
-    if (mobileButton && mobileMenu) {
-
-        mobileButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            mobileMenu.classList.toggle("hidden");
-        });
-
-        mobileMenu.addEventListener("click", (event) => {
-            event.stopPropagation();
-        });
-
-    }
-
-    /**
-     * Close menus by clicking outside
-     */
-
-    document.addEventListener("click", () => {
-
-        if (profileMenu) {
-            profileMenu.classList.add("hidden");
-        }
-
-        if (mobileMenu) {
-            mobileMenu.classList.add("hidden");
-        }
-
     });
 
-    /**
-     * Close menus with Escape
-     */
-
-    document.addEventListener("keydown", (event) => {
-
-        if (event.key === "Escape") {
-
-            if (profileMenu) {
-                profileMenu.classList.add("hidden");
-            }
-
-            if (mobileMenu) {
-                mobileMenu.classList.add("hidden");
-            }
-
-        }
-
+    // Закрытие кнопкой
+    document.querySelectorAll("[data-modal-close]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const id = btn.getAttribute("data-modal-close");
+            const modal = document.getElementById(id);
+            if (!modal) return;
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        });
     });
 
+    // Закрытие по backdrop
+    document.querySelectorAll("[data-modal-backdrop]").forEach(function (backdrop) {
+        backdrop.addEventListener("click", function () {
+            const modal = backdrop.closest("[data-modal]");
+            if (!modal) return;
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        });
+    });
 });

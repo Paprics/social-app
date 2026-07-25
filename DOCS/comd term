@@ -1,0 +1,19 @@
+tree -L 5 \
+-I '__pycache__|*.pyc|.git|.venv|venv|env|node_modules|media|staticfiles|logs|.pytest_cache|.mypy_cache|.ruff_cache|htmlcov|.idea|.vscode|postgres_data|redis_data|nginx|certbot'
+
+tree -L 6 \
+-I "__pycache__|*.pyc|.git|.idea|.vscode|.venv|venv|env|node_modules|migrations|media|staticfiles|locale|*.mo|*.sqlite3|db.sqlite3|*.log|DOCS|*.md"
+
+tree -L 6 \
+-I "__pycache__|*.pyc|.git|.venv|venv|env|node_modules|media|staticfiles|logs|.pytest_cache|.mypy_cache|.ruff_cache|htmlcov|.idea|.vscode|postgres_data|redis_data|nginx|certbot|migrations|*.sqlite3|db.sqlite3|*.log|*.mo"
+
+python src/manage.py makemessages --all
+python src/manage.py makemessages -a
+
+django-admin makemessages -l en
+django-admin makemessages -l ru
+django-admin makemessages -l uk
+
+python src/manage.py compilemessages
+
+

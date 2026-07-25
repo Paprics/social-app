@@ -2,8 +2,8 @@
 # Утилита для получения RTC_CONFIG из переменных окружения.
 # Используется во views чтобы передать TURN настройки в шаблон.
 
-import os
 import json
+import os
 
 
 def get_rtc_config() -> str:

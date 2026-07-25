@@ -8,9 +8,11 @@ views.py — Django views для чата и панели модератора.
 """
 
 import time
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.views.generic import View
+
 from chat.services.room_storage import RoomStorage
 from chat.services.rtc_config import get_rtc_config
 

@@ -21,6 +21,7 @@ room_storage.py — Хранение активных комнат в Redis.
 import json
 import os
 import time
+
 import redis as redis_lib
 
 # Ключ в Redis где хранится словарь всех активных комнат

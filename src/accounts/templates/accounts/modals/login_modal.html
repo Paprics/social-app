@@ -1,0 +1,127 @@
+{% load i18n %}
+
+<!-- ================= Login Modal ================= -->
+<div
+    id="login-modal"
+    data-modal
+    class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+
+    <div data-modal-backdrop class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+
+    <div class="relative w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 shadow-xl">
+
+        <button
+            type="button"
+            data-modal-close="login-modal"
+            class="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <h2 class="mb-6 text-xl font-semibold text-slate-900">{% trans "Sign in" %}</h2>
+
+        <form method="post" action="{% url 'accounts:login' %}">
+            {% csrf_token %}
+
+            <div class="flex flex-col gap-4">
+
+                <!-- Общие ошибки формы (неверный пароль и т.п.) -->
+                {% if login_form.non_field_errors %}
+                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                        {% for error in login_form.non_field_errors %}
+                            <p class="text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Username / Email -->
+                <div>
+                    <label for="login-username" class="mb-1.5 block text-sm font-medium text-slate-700">
+                        {% trans "Username" %}
+                    </label>
+                    {% if login_form %}
+                        {{ login_form.username }}
+                        {% if login_form.username.errors %}
+                            <p class="mt-1 text-xs text-red-600">{{ login_form.username.errors.0 }}</p>
+                        {% endif %}
+                    {% else %}
+                        <input
+                            id="login-username"
+                            type="text"
+                            name="username"
+                            autocomplete="username"
+                            required
+                            placeholder="{% trans 'Enter email or username' %}"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                    {% endif %}
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="login-password" class="mb-1.5 block text-sm font-medium text-slate-700">
+                        {% trans "Password" %}
+                    </label>
+                    {% if login_form %}
+                        {{ login_form.password }}
+                        {% if login_form.password.errors %}
+                            <p class="mt-1 text-xs text-red-600">{{ login_form.password.errors.0 }}</p>
+                        {% endif %}
+                    {% else %}
+                        <input
+                            id="login-password"
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            required
+                            placeholder="{% trans 'Enter password' %}"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                    {% endif %}
+                </div>
+
+                <button
+                    type="submit"
+                    class="mt-1 w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+                    {% trans "Sign in" %}
+                </button>
+
+            </div>
+        </form>
+
+        <div class="mt-4 text-center">
+            <!-- Открывает модалку восстановления пароля -->
+            <button
+                type="button"
+                data-modal-close="login-modal"
+                data-modal-open="reset-modal"
+                class="text-sm text-blue-600 transition hover:text-blue-700 hover:underline">
+                {% trans "Forgot password?" %}
+            </button>
+        </div>
+
+        <hr class="my-6 border-slate-200">
+
+        <div class="text-center">
+            <p class="mb-3 text-sm text-slate-500">{% trans "Don't have an account?" %}</p>
+            <!-- Переключает на модалку регистрации -->
+            <button
+                type="button"
+                data-modal-close="login-modal"
+                data-modal-open="register-modal"
+                class="inline-block rounded-xl border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:border-slate-400 hover:bg-slate-50">
+                {% trans "Create account" %}
+            </button>
+        </div>
+
+    </div>
+</div>
+
+{% if open_login_modal %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("login-modal");
+        if (modal) { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+    });
+</script>
+{% endif %}

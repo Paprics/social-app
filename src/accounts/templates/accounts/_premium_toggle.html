@@ -1,0 +1,11 @@
+{% load i18n %}
+<div class="flex items-center justify-between gap-4 py-3 border-b border-slate-100 last:border-0">
+  <div>
+    <p class="text-sm font-medium text-slate-800">{{ label }}</p>
+    <p class="text-xs text-slate-500 mt-0.5">{{ desc }}</p>
+  </div>
+  <label class="toggle-switch">
+    <input type="checkbox" name="{{ name }}" {% if checked %}checked{% endif %}>
+    <span class="toggle-track"></span>
+  </label>
+</div>

@@ -34,7 +34,12 @@
         {% endblock %}
     </main>
 
-    <script src="{% static 'js/main.js' %}"></script>
+    <!-- Глобальные модалки авторизации — доступны на всех страницах -->
+    {% include "accounts/modals/login_modal.html" %}
+    {% include "accounts/modals/register_modal.html" %}
+    {% include "accounts/modals/reset_modal.html" %}
+
+    <script type="module" src="{% static 'js/main.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 

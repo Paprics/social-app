@@ -1,0 +1,660 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Settings" %} — Social Network{% endblock %}
+
+{% block extra_head %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; }
+</style>
+{% endblock %}
+
+{% block page %}
+<div class="bg-white min-h-screen">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-semibold text-slate-900">{% trans "Settings" %}</h1>
+      <p class="mt-1 text-sm text-slate-500">{% trans "Manage your account, privacy and notification preferences." %}</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+
+      <!-- Sidebar Navigation -->
+      <aside class="lg:w-56 shrink-0">
+        <nav class="sticky top-8 space-y-1" id="settings-nav">
+          <a href="#account"       class="settings-nav-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition duration-200">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+            {% trans "Account" %}
+          </a>
+          <a href="#profile"       class="settings-nav-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition duration-200">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm0 0c0 1.657 1.007 3 2.25 3S21 13.657 21 12a9 9 0 10-2.636 6.364M16.5 12V8.25"/></svg>
+            {% trans "Profile" %}
+          </a>
+          <a href="#privacy"       class="settings-nav-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition duration-200">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            {% trans "Privacy" %}
+          </a>
+          <a href="#communication" class="settings-nav-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition duration-200">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 01.778-.332 48.294 48.294 0 005.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/></svg>
+            {% trans "Communication" %}
+          </a>
+          <a href="#notifications" class="settings-nav-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition duration-200">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+            {% trans "Notifications" %}
+          </a>
+          <a href="#localization"  class="settings-nav-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition duration-200">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+            {% trans "Language" %}
+          </a>
+          <div class="pt-2 mt-2 border-t border-slate-100">
+            <a href="#premium"     class="settings-nav-link flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-amber-600 hover:bg-amber-50 hover:text-amber-700 transition duration-200">
+              <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+              {% trans "Premium" %}
+            </a>
+          </div>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="flex-1 min-w-0 space-y-6">
+
+        <!-- HTMX global messages -->
+        <div id="settings-toast" class="hidden fixed top-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border shadow text-sm font-medium transition duration-200"></div>
+
+        <!-- ===================== ACCOUNT ===================== -->
+        <section id="account" class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100">
+            <h2 class="text-base font-semibold text-slate-900">{% trans "Account" %}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">{% trans "Your login credentials and personal data." %}</p>
+          </div>
+          <form hx-post="{% url 'users:account' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-swap="none"
+                hx-on::after-request="settingsToast(event)"
+                class="px-6 py-5 space-y-5">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <!-- Username -->
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">{% trans "Username" %}</label>
+                <input type="text" name="username" value="{{ user.username }}" autocomplete="username"
+                       class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200">
+                <p class="mt-1 text-xs text-slate-400">{% trans "Letters, digits and underscores only." %}</p>
+              </div>
+
+              <!-- Birth date -->
+              <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">{% trans "Date of birth" %}</label>
+                <input type="date" name="birth_date"
+                       value="{{ request.user.profile.birth_date|date:'Y-m-d' }}"
+                       class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200">
+              </div>
+            </div>
+
+            <!-- Change password link -->
+            <div class="pt-1">
+              <a href="{% url 'accounts:change_password' %}" class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                {% trans "Change password" %}
+              </a>
+            </div>
+
+            <!-- Change password link -->
+            <div class="pt-1">
+              <a href="#"
+                 class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                </svg>
+                {% trans "Change email" %}
+              </a>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-100">
+              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                {% trans "Save changes" %}
+              </button>
+            </div>
+          </form>
+        </section>
+
+       <!-- ===================== PROFILE ===================== -->
+<section id="profile" class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+  <div class="px-6 py-4 border-b border-slate-100">
+    <h2 class="text-base font-semibold text-slate-900">{% trans "Profile" %}</h2>
+    <p class="text-sm text-slate-500 mt-0.5">{% trans "What other users see on your public profile." %}</p>
+  </div>
+
+  <form hx-post="{% url 'users:profile' pk=request.user.pk %}"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-encoding="multipart/form-data"
+        hx-swap="none"
+        hx-on::after-request="settingsToast(event)"
+        class="px-6 py-5 space-y-5">
+    {% csrf_token %}
+
+    <!-- Avatar -->
+
+    <div class="flex items-center gap-4">
+      <div class="relative shrink-0">
+        {% if request.user.profile.avatar_photo %}
+          <img id="avatar-preview"
+               src="{{ request.user.profile.avatar_photo.file.url }}"
+               alt=""
+               class="w-16 h-16 rounded-full object-cover border border-slate-200">
+          <div id="avatar-placeholder" class="hidden"></div>
+        {% else %}
+          <div id="avatar-placeholder" class="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
+            <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+            </svg>
+          </div>
+          <img id="avatar-preview" src="" alt=""
+               class="w-16 h-16 rounded-full object-cover border border-slate-200 hidden">
+        {% endif %}
+      </div>
+      <div>
+        <label class="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer transition duration-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+          </svg>
+          {% if request.user.profile.avatar_photo %}
+            {% trans "Change photo" %}
+          {% else %}
+            {% trans "Upload photo" %}
+          {% endif %}
+          <input type="file" name="avatar" accept="image/*" class="sr-only"
+                 onchange="previewAvatar(this)">
+        </label>
+        <p class="mt-1.5 text-xs text-slate-400">{% trans "JPG, PNG or WebP. Max 5 MB." %}</p>
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1.5">{% trans "Bio" %}</label>
+      <textarea name="bio" rows="3" maxlength="500"
+                placeholder="{% trans 'Tell something about yourself…' %}"
+                class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent resize-none transition duration-200">{{ request.user.profile.bio }}</textarea>
+      <p class="mt-1 text-xs text-slate-400">
+        <span id="bio-count">{{ request.user.profile.bio|length }}</span>/500
+      </p>
+    </div>
+
+    <!-- Gender -->
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1.5">{% trans "Gender" %}</label>
+      <select name="gender"
+              class="w-full sm:w-64 px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none">
+        <option value="">{% trans "Not specified" %}</option>
+        <option value="male"       {% if request.user.profile.gender == 'male' %}selected{% endif %}>{% trans "Male" %}</option>
+        <option value="female"     {% if request.user.profile.gender == 'female' %}selected{% endif %}>{% trans "Female" %}</option>
+        <option value="couple"     {% if request.user.profile.gender == 'couple' %}selected{% endif %}>{% trans "Couple" %}</option>
+        <option value="non_binary" {% if request.user.profile.gender == 'non_binary' %}selected{% endif %}>{% trans "Non-binary" %}</option>
+      </select>
+    </div>
+
+    <!-- Looking for -->
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-2">{% trans "Looking for" %}</label>
+      <div class="flex flex-wrap gap-x-5 gap-y-2">
+        {% for val, label in profile_gender_choices %}
+          <label class="inline-flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" name="looking_for" value="{{ val }}"
+                   {% if val in request.user.profile.looking_for %}checked{% endif %}
+                   class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600 focus:ring-offset-0">
+            <span class="text-sm text-slate-700">{{ label }}</span>
+          </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-3">{% trans "Location" %}</label>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+        <!-- Country — при смене подгружает регионы через HTMX -->
+
+        <select name="country" id="country-select"
+                hx-get="{% url 'geo:regions' %}"
+                hx-trigger="change"
+                hx-target="#region-select"
+                hx-swap="innerHTML"
+                hx-include="this"
+                class="px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none">
+          <option value="">{% trans "Country" %}</option>
+          {% for c in countries %}
+            <option value="{{ c.id }}" {% if request.user.profile.country_id == c.id %}selected{% endif %}>
+              {{ c.get_name }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <!-- Region — при смене подгружает города через HTMX -->
+        <select name="region" id="region-select"
+                hx-get="{% url 'geo:cities' %}"
+                hx-trigger="change"
+                hx-target="#city-select"
+                hx-swap="innerHTML"
+                hx-include="this"
+                class="px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none">
+          <option value="">{% trans "Region" %}</option>
+          {% for r in regions %}
+            <option value="{{ r.id }}" {% if request.user.profile.region_id == r.id %}selected{% endif %}>
+              {{ r.get_name }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <!-- City -->
+        <select name="city" id="city-select"
+                class="px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none">
+          <option value="">{% trans "City" %}</option>
+          {% for c in cities %}
+            <option value="{{ c.id }}" {% if request.user.profile.city_id == c.id %}selected{% endif %}>
+              {{ c.get_name }}
+            </option>
+          {% endfor %}
+        </select>
+
+      </div>
+    </div>
+
+    <!-- Save -->
+    <div class="flex justify-end pt-2 border-t border-slate-100">
+      <button type="submit"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition duration-200">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+        </svg>
+        {% trans "Save changes" %}
+      </button>
+    </div>
+
+  </form>
+</section>
+
+        <!-- ===================== PRIVACY ===================== -->
+        <section id="privacy" class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100">
+            <h2 class="text-base font-semibold text-slate-900">{% trans "Privacy" %}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">{% trans "Control who can see your profile and activity." %}</p>
+          </div>
+          <form hx-post="{% url 'users:privacy' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-swap="none"
+                hx-on::after-request="settingsToast(event)"
+                class="px-6 py-5 space-y-5">
+            {% csrf_token %}
+
+            <!-- Row helper macro -->
+            {% with s=request.user.settings %}
+
+            <div class="space-y-4">
+              <!-- Profile visibility -->
+              <div class="flex items-center justify-between gap-4 py-3 border-b border-slate-100">
+                <div>
+                  <p class="text-sm font-medium text-slate-800">{% trans "Profile visibility" %}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{% trans "Who can view your profile page." %}</p>
+                </div>
+                <select name="profile_visibility" class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none min-w-[140px]">
+                  <option value="public"  {% if s.profile_visibility == 'public'  %}selected{% endif %}>{% trans "Everyone" %}</option>
+                  <option value="friends" {% if s.profile_visibility == 'friends' %}selected{% endif %}>{% trans "Friends only" %}</option>
+                  <option value="private" {% if s.profile_visibility == 'private' %}selected{% endif %}>{% trans "Only me" %}</option>
+                </select>
+              </div>
+
+              <!-- Friends visibility -->
+              <div class="flex items-center justify-between gap-4 py-3 border-b border-slate-100">
+                <div>
+                  <p class="text-sm font-medium text-slate-800">{% trans "Friends list" %}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{% trans "Who can see your friends list." %}</p>
+                </div>
+                <select name="friends_visibility" class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none min-w-[140px]">
+                  <option value="public"  {% if s.friends_visibility == 'public'  %}selected{% endif %}>{% trans "Everyone" %}</option>
+                  <option value="friends" {% if s.friends_visibility == 'friends' %}selected{% endif %}>{% trans "Friends only" %}</option>
+                  <option value="private" {% if s.friends_visibility == 'private' %}selected{% endif %}>{% trans "Only me" %}</option>
+                </select>
+              </div>
+
+              <!-- Photo albums visibility -->
+              <div class="flex items-center justify-between gap-4 py-3 border-b border-slate-100">
+                <div>
+                  <p class="text-sm font-medium text-slate-800">{% trans "Photo albums" %}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{% trans "Who can view your photos." %}</p>
+                </div>
+                <select name="photo_albums_visibility" class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none min-w-[140px]">
+                  <option value="public"  {% if s.photo_albums_visibility == 'public'  %}selected{% endif %}>{% trans "Everyone" %}</option>
+                  <option value="friends" {% if s.photo_albums_visibility == 'friends' %}selected{% endif %}>{% trans "Friends only" %}</option>
+                  <option value="private" {% if s.photo_albums_visibility == 'private' %}selected{% endif %}>{% trans "Only me" %}</option>
+                </select>
+              </div>
+
+              <!-- Show online status -->
+              <div class="flex items-center justify-between gap-4 py-3">
+                <div>
+                  <p class="text-sm font-medium text-slate-800">{% trans "Show online status" %}</p>
+                  <p class="text-xs text-slate-500 mt-0.5">{% trans "Let others see when you're active." %}</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="show_online_status" {% if s.show_online_status %}checked{% endif %}>
+                  <span class="toggle-track"></span>
+                </label>
+              </div>
+            </div>
+            {% endwith %}
+
+            <div class="flex justify-end pt-2 border-t border-slate-100">
+              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                {% trans "Save changes" %}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ===================== COMMUNICATION ===================== -->
+        <section id="communication" class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100">
+            <h2 class="text-base font-semibold text-slate-900">{% trans "Communication" %}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">{% trans "Control who can contact and interact with you." %}</p>
+          </div>
+          <form hx-post="{% url 'users:communication' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-swap="none"
+                hx-on::after-request="settingsToast(event)"
+                class="px-6 py-5 space-y-4">
+            {% csrf_token %}
+
+            {% with s=request.user.settings %}
+            {% for field_name, label, desc, current_value in communication_fields %}
+            <div class="flex items-center justify-between gap-4 py-3 {% if not forloop.last %}border-b border-slate-100{% endif %}">
+              <div>
+                <p class="text-sm font-medium text-slate-800">{{ label }}</p>
+                <p class="text-xs text-slate-500 mt-0.5">{{ desc }}</p>
+              </div>
+              <select name="{{ field_name }}"
+                      class="px-3 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none min-w-[140px]">
+                <option value="everyone" {% if current_value == 'everyone' %}selected{% endif %}>{% trans "Everyone" %}</option>
+                <option value="friends" {% if current_value == 'friends' %}selected{% endif %}>{% trans "Friends only" %}</option>
+                <option value="nobody" {% if current_value == 'nobody' %}selected{% endif %}>{% trans "Nobody" %}</option>
+              </select>
+            </div>
+            {% endfor %}
+            {% endwith %}
+
+            <div class="flex justify-end pt-2 border-t border-slate-100">
+              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                {% trans "Save changes" %}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ===================== NOTIFICATIONS ===================== -->
+        <section id="notifications" class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100">
+            <h2 class="text-base font-semibold text-slate-900">{% trans "Notifications" %}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">{% trans "Choose what you want to be notified about." %}</p>
+          </div>
+          <form hx-post="{% url 'users:notifications' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-swap="none"
+                hx-on::after-request="settingsToast(event)"
+                class="px-6 py-5 space-y-1">
+            {% csrf_token %}
+
+            <div class="flex justify-end pt-4 border-t border-slate-100">
+              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                {% trans "Save changes" %}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ===================== LOCALIZATION ===================== -->
+        <section id="localization" class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100">
+            <h2 class="text-base font-semibold text-slate-900">{% trans "Language & Region" %}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">{% trans "Set your preferred interface language." %}</p>
+          </div>
+          <form hx-post="{% url 'users:localization' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-swap="none"
+                hx-on::after-request="settingsToast(event)"
+                class="px-6 py-5">
+            {% csrf_token %}
+
+            <div class="max-w-xs">
+              <label class="block text-sm font-medium text-slate-700 mb-1.5">{% trans "Interface language" %}</label>
+              <select name="language" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 appearance-none">
+                {% get_available_languages as LANGUAGES %}
+                {% for lang_code, lang_name in LANGUAGES %}
+                  <option value="{{ lang_code }}" {% if request.user.settings.language == lang_code %}selected{% endif %}>{{ lang_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="flex justify-end mt-5 pt-4 border-t border-slate-100">
+              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                {% trans "Save changes" %}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ===================== PREMIUM UPSELL ===================== -->
+        <section id="premium" class="relative overflow-hidden rounded-xl border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+          <!-- Decorative background star -->
+          <div class="absolute -top-6 -right-6 text-amber-100 pointer-events-none select-none" aria-hidden="true">
+            <svg class="w-40 h-40" fill="currentColor" viewBox="0 0 24 24"><path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+          </div>
+
+          <div class="px-6 py-5">
+            <div class="flex items-start gap-3 mb-4">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold uppercase tracking-wide">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                Premium
+              </span>
+            </div>
+            <h2 class="text-lg font-semibold text-slate-900 mb-1">{% trans "Unlock all features" %}</h2>
+            <p class="text-sm text-slate-600 mb-6 max-w-lg">{% trans "Get incognito mode, HD video calls, advanced search, detailed profile statistics, and much more." %}</p>
+
+            <!-- Plans -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+              <!-- 1 day -->
+              <div class="relative flex flex-col bg-white border border-slate-200 rounded-xl px-4 py-4 cursor-pointer hover:border-amber-300 hover:shadow-sm transition duration-200 opacity-60 select-none" title="{% trans 'Coming soon' %}">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">{% trans "1 day" %}</p>
+                <p class="text-2xl font-bold text-slate-900">$0.99</p>
+                <p class="text-xs text-slate-400 mt-0.5">{% trans "Try it out" %}</p>
+              </div>
+              <!-- 1 week — highlighted -->
+              <div class="relative flex flex-col bg-white border-2 border-amber-400 rounded-xl px-4 py-4 cursor-pointer shadow-sm opacity-60 select-none" title="{% trans 'Coming soon' %}">
+                <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-amber-400 text-white text-xs font-semibold rounded-full whitespace-nowrap">{% trans "Most popular" %}</span>
+                <p class="text-xs font-medium text-amber-600 uppercase tracking-wide mb-1">{% trans "1 week" %}</p>
+                <p class="text-2xl font-bold text-slate-900">$3.99</p>
+                <p class="text-xs text-slate-400 mt-0.5">$0.57 / {% trans "day" %}</p>
+              </div>
+              <!-- 1 month -->
+              <div class="relative flex flex-col bg-white border border-slate-200 rounded-xl px-4 py-4 cursor-pointer hover:border-amber-300 hover:shadow-sm transition duration-200 opacity-60 select-none" title="{% trans 'Coming soon' %}">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">{% trans "1 month" %}</p>
+                <p class="text-2xl font-bold text-slate-900">$9.99</p>
+                <p class="text-xs text-slate-400 mt-0.5">$0.33 / {% trans "day" %}</p>
+              </div>
+            </div>
+
+            <button type="button" disabled class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-400 text-white text-sm font-semibold rounded-xl opacity-50 cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+              {% trans "Coming soon" %}
+            </button>
+          </div>
+        </section>
+
+        <!-- ===================== PREMIUM SETTINGS ===================== -->
+        <section class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-semibold text-slate-900">{% trans "Premium settings" %}</h2>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-xs font-semibold">
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  Premium
+                </span>
+              </div>
+              <p class="text-sm text-slate-500 mt-0.5">{% trans "Exclusive features available with an active Premium subscription." %}</p>
+            </div>
+          </div>
+
+          {# Premium feature form — all fields active now; add is_premium gate later #}
+          <form hx-post="{% url 'users:premium_features' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-swap="none"
+                hx-on::after-request="settingsToast(event)"
+                class="px-6 py-5 space-y-6">
+            {% csrf_token %}
+
+            {% with pf=request.user.premium_features %}
+
+            <!-- Privacy group -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{% trans "Privacy" %}</p>
+              <div class="space-y-1">
+                {% include "accounts/_premium_toggle.html" with name="incognito_mode" checked=pf.incognito_mode label=_("Incognito mode") desc=_("Browse profiles without appearing in visitors lists.") %}
+                {% include "accounts/_premium_toggle.html" with name="anonymous_profile_views" checked=pf.anonymous_profile_views label=_("Anonymous profile views") desc=_("Hide your visits from profile visit history.") %}
+                {% include "accounts/_premium_toggle.html" with name="hide_online_status_from_everyone" checked=pf.hide_online_status_from_everyone label=_("Hide online status from everyone") desc=_("No one sees when you're active.") %}
+              </div>
+            </div>
+
+            <!-- Random chat group -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{% trans "Random Chat" %}</p>
+              <div class="space-y-1">
+                {% include "accounts/_premium_toggle.html" with name="random_chat_gender_filter" checked=pf.random_chat_gender_filter label=_("Gender filter") desc=_("Match only with people of a specific gender.") %}
+                {% include "accounts/_premium_toggle.html" with name="random_chat_country_filter" checked=pf.random_chat_country_filter label=_("Country filter") desc=_("Match only with users from a selected country.") %}
+                {% include "accounts/_premium_toggle.html" with name="random_chat_language_filter" checked=pf.random_chat_language_filter label=_("Language filter") desc=_("Match only with users who speak your language.") %}
+                {% include "accounts/_premium_toggle.html" with name="random_chat_age_filter" checked=pf.random_chat_age_filter label=_("Age filter") desc=_("Set an age range for random chat matches.") %}
+                {% include "accounts/_premium_toggle.html" with name="priority_matching" checked=pf.priority_matching label=_("Priority matching") desc=_("Get matched faster in the chat queue.") %}
+              </div>
+            </div>
+
+            <!-- Search group -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{% trans "Search" %}</p>
+              <div class="space-y-1">
+                {% include "accounts/_premium_toggle.html" with name="advanced_search" checked=pf.advanced_search label=_("Advanced filters") desc=_("Filter search results by detailed criteria.") %}
+                {% include "accounts/_premium_toggle.html" with name="unlimited_search_radius" checked=pf.unlimited_search_radius label=_("Unlimited search radius") desc=_("Remove distance limitations from search.") %}
+              </div>
+            </div>
+
+            <!-- Video & Messaging group -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{% trans "Video & Messaging" %}</p>
+              <div class="space-y-1">
+                {% include "accounts/_premium_toggle.html" with name="hd_video" checked=pf.hd_video label=_("HD video calls") desc=_("Enable high-definition video quality.") %}
+                {% include "accounts/_premium_toggle.html" with name="unsend_messages" checked=pf.unsend_messages label=_("Unsend messages") desc=_("Delete sent messages from both sides.") %}
+                {% include "accounts/_premium_toggle.html" with name="scheduled_messages" checked=pf.scheduled_messages label=_("Schedule messages") desc=_("Send messages at a chosen time.") %}
+                {% include "accounts/_premium_toggle.html" with name="extended_message_editing" checked=pf.extended_message_editing label=_("Extended editing window") desc=_("Edit your messages longer after sending.") %}
+              </div>
+            </div>
+
+            <!-- Profile group -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{% trans "Profile appearance" %}</p>
+              <div class="space-y-1">
+                {% include "accounts/_premium_toggle.html" with name="custom_profile_theme" checked=pf.custom_profile_theme label=_("Custom profile theme") desc=_("Choose a unique look for your profile page.") %}
+                {% include "accounts/_premium_toggle.html" with name="animated_profile_badge" checked=pf.animated_profile_badge label=_("Animated badge") desc=_("Show an animated Premium badge on your profile.") %}
+                {% include "accounts/_premium_toggle.html" with name="profile_accent_color" checked=pf.profile_accent_color label=_("Accent color") desc=_("Pick a custom accent color for your profile.") %}
+              </div>
+            </div>
+
+            <!-- Analytics group -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{% trans "Analytics" %}</p>
+              <div class="space-y-1">
+                {% include "accounts/_premium_toggle.html" with name="profile_statistics" checked=pf.profile_statistics label=_("Profile statistics") desc=_("See detailed charts about your profile activity.") %}
+                {% include "accounts/_premium_toggle.html" with name="profile_visitors" checked=pf.profile_visitors label=_("Profile visitors") desc=_("See a list of who visited your profile.") %}
+              </div>
+            </div>
+
+            {% endwith %}
+
+            <div class="flex justify-end pt-2 border-t border-slate-100">
+              <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+                {% trans "Save changes" %}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Danger zone -->
+        <section class="bg-white border border-red-100 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-red-100">
+            <h2 class="text-base font-semibold text-red-700">{% trans "Danger zone" %}</h2>
+            <p class="text-sm text-slate-500 mt-0.5">{% trans "Irreversible and destructive actions." %}</p>
+          </div>
+          <div class="px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p class="text-sm font-medium text-slate-800">{% trans "Delete account" %}</p>
+              <p class="text-xs text-slate-500 mt-0.5">{% trans "Permanently remove your account and all associated data." %}</p>
+            </div>
+            <button type="button" onclick="confirmDeleteAccount()"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-white border border-red-300 text-red-600 hover:bg-red-50 text-sm font-medium rounded-xl transition duration-200 shrink-0">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+              {% trans "Delete my account" %}
+            </button>
+          </div>
+        </section>
+
+      </div><!-- /main content -->
+    </div><!-- /flex -->
+  </div><!-- /container -->
+</div>
+
+<!-- Toggle switch global styles -->
+<style>
+.toggle-switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
+.toggle-switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.toggle-track {
+  width: 44px; height: 24px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  transition: background 200ms;
+  display: block;
+  position: relative;
+}
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  border-radius: 9999px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,.15);
+  transition: transform 200ms;
+}
+.toggle-switch input:checked + .toggle-track { background: #2563eb; }
+.toggle-switch input:checked + .toggle-track::after { transform: translateX(20px); }
+.toggle-switch input:focus-visible + .toggle-track { outline: 2px solid #2563eb; outline-offset: 2px; }
+
+/* Active nav link */
+.settings-nav-link.is-active { background: #f1f5f9; color: #0f172a; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/settings.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% load i18n %}
+<option value="">{% trans "Select region" %}</option>
+{% for region in regions %}
+<option value="{{ region.pk }}">{{ region.name }}</option>
+{% endfor %}

@@ -1,11 +1,11 @@
 import os
+
 import redis as redis_lib
 
 QUEUE_KEY = "chat:queue"
 
 
 class MatchmakingService:
-
     def __init__(self):
         self.redis = redis_lib.from_url(
             os.environ.get("REDIS_URL", "redis://localhost:6379/0")

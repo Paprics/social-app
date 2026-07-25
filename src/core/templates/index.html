@@ -1,24 +1,118 @@
 {% extends "base.html" %}
+{% load i18n %}
 
-{% block title %}
-    Главная
-{% endblock %}
+{% block title %}{% trans "Welcome" %} — Social Network{% endblock %}
 
-{% block meta_description %}
-    Главная страница социальной сети.
-{% endblock %}
+{% block meta_description %}{% trans "Connect with people around the world." %}{% endblock %}
 
 {% block page %}
 
-<section class="mx-auto max-w-7xl px-4 py-10">
+<section class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col items-center justify-center gap-12 px-4 py-16 lg:flex-row lg:items-center lg:gap-20 lg:py-24">
 
-    <h1 class="text-4xl font-bold text-slate-900">
-        Главная страница
-    </h1>
+    <!-- Левая колонка: контент из БД -->
+    <div class="w-full max-w-lg shrink-0 text-center lg:text-left">
 
-    <p class="mt-4 text-slate-600">
-        Добро пожаловать в Social Network.
-    </p>
+        <div class="flex items-center justify-center gap-3 lg:justify-start">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
+                S
+            </div>
+            <span class="text-2xl font-semibold text-slate-900">Social Network</span>
+        </div>
+
+        {% if content %}
+            <div class="mt-8 prose-slate text-slate-700">
+                {{ content.content|safe }}
+            </div>
+        {% else %}
+            <!-- Заглушка, если контента в БД нет -->
+            <h2 class="mt-8 text-3xl font-semibold leading-snug text-slate-900 lg:text-4xl">
+                {% trans "Connect with friends and the world around you." %}
+            </h2>
+            <p class="mt-4 text-lg text-slate-500">
+                {% trans "Share moments, discover people, and stay in touch with the people who matter most." %}
+            </p>
+        {% endif %}
+
+    </div>
+
+    <!-- Правая колонка: форма входа -->
+    <div class="w-full max-w-sm shrink-0">
+
+        <div class="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+
+            <!-- Форма входа — заглушка, action и view подключаются отдельно -->
+            <form method="post" action='{% url "accounts:login" %}'>
+                {% csrf_token %}
+
+                <div class="flex flex-col gap-4">
+
+                    <!-- Email / Username -->
+                    <div>
+                        <label for="login-email" class="mb-1.5 block text-sm font-medium text-slate-700">
+                            {% trans "Username" %}
+                        </label>
+                        <input
+                            id="login-email"
+                            type="text"
+                            name="username"
+                            autocomplete="username"
+                            required
+                            placeholder="{% trans 'Enter email or username' %}"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <label for="login-password" class="mb-1.5 block text-sm font-medium text-slate-700">
+                            {% trans "Password" %}
+                        </label>
+                        <input
+                            id="login-password"
+                            type="password"
+                            name="password"
+                            autocomplete="current-password"
+                            required
+                            placeholder="{% trans 'Enter password' %}"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                    </div>
+
+                    <!-- Кнопка входа -->
+                    <button
+                            type="submit"
+                            class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700">
+                        {% trans "Log in" %}
+                    </button>
+
+                </div>
+
+            </form>
+
+            <!-- Забыл пароль -->
+            <div class="mt-4 text-center">
+                <a href="#"
+                   class="text-sm text-blue-600 transition hover:text-blue-700 hover:underline">
+                    {% trans "Forgot password?" %}
+                </a>
+            </div>
+
+            <hr class="my-6 border-slate-200">
+
+            <!-- Регистрация -->
+            <div class="text-center">
+                <p class="mb-3 text-sm text-slate-500">
+                    {% trans "Don't have an account?" %}
+                </p>
+                <button
+                        type="button"
+                        data-modal-open="register-modal"
+                        class="inline-block rounded-xl border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50 hover:border-slate-400">
+                    {% trans "Create account" %}
+                </button>
+            </div>
+
+        </div>
+
+    </div>
 
 </section>
 

@@ -1,0 +1,152 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-21 13:14+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
+#: .\src\_config\settings\base.py:107
+msgid "English"
+msgstr ""
+
+#: .\src\_config\settings\base.py:108
+msgid "Russian"
+msgstr ""
+
+#: .\src\_config\settings\base.py:109
+msgid "Ukrainian"
+msgstr ""
+
+#: .\src\accounts\models\profile.py:16
+msgid "Male"
+msgstr ""
+
+#: .\src\accounts\models\profile.py:17
+msgid "Female"
+msgstr ""
+
+#: .\src\accounts\models\profile.py:18
+msgid "Couple"
+msgstr ""
+
+#: .\src\accounts\models\profile.py:19
+msgid "Non-binary"
+msgstr ""
+
+#: .\src\accounts\models\profile.py:25
+msgid "The user account associated with this profile."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:30
+msgid "Indicates whether the user's identity has been verified."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:35
+msgid "Soft-delete flag. Deleted profiles remain in the database."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:40
+msgid "Indicates whether the profile has been banned by moderators."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:48
+msgid "Unique Telegram user ID linked to this account."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:54
+msgid "Cached Telegram profile data received during authentication."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:61
+msgid "Profile picture displayed to other users."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:68
+msgid "Short personal description displayed on the profile."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:75
+msgid "User's gender or profile type."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:85
+msgid "Profiles the user is interested in meeting."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:89
+msgid "User's date of birth."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:121
+msgid "Premium subscription expiration date and time."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:126
+msgid "Last recorded online activity."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:132
+msgid "Current online status."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:137
+msgid "Total number of profile views."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:142
+msgid "Date and time when the profile was created."
+msgstr ""
+
+#: .\src\accounts\models\profile.py:147
+msgid "Date and time when the profile was last updated."
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\autocomplete_results.html:18
+msgid "Nothing found"
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\cities_options.html:1
+#: .\src\geo\templates\geo\partials\location_fields.html:45
+msgid "Select city"
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\location_fields.html:8
+msgid "Country"
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\location_fields.html:15
+msgid "Select country"
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\location_fields.html:27
+msgid "Region"
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\location_fields.html:35
+#: .\src\geo\templates\geo\partials\regions_options.html:2
+msgid "Select region"
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\location_fields.html:41
+#: .\src\geo\templates\geo\partials\location_fields.html:54
+msgid "City"
+msgstr ""
+
+#: .\src\geo\templates\geo\partials\location_fields.html:62
+msgid "Start typing city name..."
+msgstr ""

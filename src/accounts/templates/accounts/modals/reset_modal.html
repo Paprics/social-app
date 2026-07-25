@@ -1,0 +1,312 @@
+{% load i18n static %}
+
+<!-- ================= Register Modal ================= -->
+
+<div
+    id="register-modal"
+    data-modal
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="register-modal-title"
+    class="fixed inset-0 z-[100] hidden">
+
+    <!-- Backdrop: фиксированный, не участвует в скролле -->
+    <div data-modal-backdrop aria-hidden="true" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+
+    <!-- Скроллящийся контейнер: центрирует карточку по вертикали и горизонтали -->
+    <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 sm:p-6">
+
+            <!-- Карточка -->
+            <div class="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white shadow-xl">
+
+                <!-- Шапка -->
+                <div class="sticky top-0 z-10 flex items-start justify-between rounded-t-2xl border-b border-slate-200 bg-white px-4 py-5 sm:px-8 sm:py-6">
+                    <div>
+                        <h2 id="register-modal-title" class="text-xl font-semibold text-slate-900">
+                            {% trans "Create account" %}
+                        </h2>
+                        <p class="mt-0.5 text-sm text-slate-500">{% trans "It's free. No credit card required." %}</p>
+                    </div>
+                    <button
+                        type="button"
+                        data-modal-close="register-modal"
+                        aria-label="{% trans 'Close' %}"
+                        class="ml-4 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="2" stroke="currentColor" class="h-5 w-5" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Тело -->
+                <div class="px-4 py-5 sm:px-8 sm:py-6">
+                    <form method="post" action="{% url 'accounts:register' %}" novalidate>
+                        {% csrf_token %}
+                        <div class="flex flex-col gap-5">
+
+                            {% if register_form.non_field_errors %}
+                                <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                                    {% for error in register_form.non_field_errors %}
+                                        <p class="text-sm text-red-600">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <!-- Email -->
+                            <div>
+                                <label for="id_email" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                    {% trans "Email" %} <span class="text-red-500" aria-hidden="true">*</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="id_email"
+                                    autocomplete="email"
+                                    required
+                                    value="{{ register_form.email.value|default:'' }}"
+                                    placeholder="{% trans 'Enter your email' %}"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100{% if register_form.email.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                {% if register_form.email.errors %}
+                                    <p class="mt-1 text-xs text-red-600">{{ register_form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Username -->
+                            <div>
+                                <label for="id_username" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                    {% trans "Username" %} <span class="text-red-500" aria-hidden="true">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    id="id_username"
+                                    autocomplete="username"
+                                    required
+                                    value="{{ register_form.username.value|default:'' }}"
+                                    placeholder="{% trans 'Choose a username' %}"
+                                    hx-get="{% url 'accounts:check_username' %}"
+                                    hx-trigger="input changed delay:500ms"
+                                    hx-target="#username-feedback"
+                                    hx-swap="innerHTML"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100{% if register_form.username.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                <div id="username-feedback">
+                                    {% if register_form.username.errors %}
+                                        <p class="mt-1 text-xs text-red-600">{{ register_form.username.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Password + Confirm -->
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="id_password1" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                        {% trans "Password" %} <span class="text-red-500" aria-hidden="true">*</span>
+                                    </label>
+                                    <input
+                                        type="password"
+                                        name="password1"
+                                        id="id_password1"
+                                        autocomplete="new-password"
+                                        required
+                                        placeholder="{% trans 'Min 8 characters' %}"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100{% if register_form.password1.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                    {% if register_form.password1.errors %}
+                                        <p class="mt-1 text-xs text-red-600">{{ register_form.password1.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="id_password2" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                        {% trans "Confirm password" %} <span class="text-red-500" aria-hidden="true">*</span>
+                                    </label>
+                                    <input
+                                        type="password"
+                                        name="password2"
+                                        id="id_password2"
+                                        autocomplete="new-password"
+                                        required
+                                        placeholder="{% trans 'Repeat password' %}"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100{% if register_form.password2.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                    {% if register_form.password2.errors %}
+                                        <p class="mt-1 text-xs text-red-600">{{ register_form.password2.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Gender + Date of birth -->
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="id_gender" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                        {% trans "Gender" %} <span class="text-red-500" aria-hidden="true">*</span>
+                                    </label>
+                                    <select
+                                        name="gender"
+                                        id="id_gender"
+                                        required
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100{% if register_form.gender.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                        <option value="">{% trans "Select gender" %}</option>
+                                        <option value="male"       {% if register_form.gender.value == "male"       %}selected{% endif %}>{% trans "Male" %}</option>
+                                        <option value="female"     {% if register_form.gender.value == "female"     %}selected{% endif %}>{% trans "Female" %}</option>
+                                        <option value="couple"     {% if register_form.gender.value == "couple"     %}selected{% endif %}>{% trans "Couple" %}</option>
+                                        <option value="non_binary" {% if register_form.gender.value == "non_binary" %}selected{% endif %}>{% trans "Non-binary" %}</option>
+                                    </select>
+                                    {% if register_form.gender.errors %}
+                                        <p class="mt-1 text-xs text-red-600">{{ register_form.gender.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="id_birth_date" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                        {% trans "Date of birth" %} <span class="text-red-500" aria-hidden="true">*</span>
+                                    </label>
+                                    <!-- data-language передаёт LANGUAGE_CODE в JS для локализации Flatpickr -->
+                                    <input
+                                        type="text"
+                                        name="birth_date"
+                                        id="id_birth_date"
+                                        required
+                                        autocomplete="bday"
+                                        data-language="{{ LANGUAGE_CODE }}"
+                                        value="{{ register_form.birth_date.value|default:'' }}"
+                                        placeholder="{% trans 'Select date' %}"
+                                        readonly
+                                        class="w-full cursor-pointer rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100{% if register_form.birth_date.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                    {% if register_form.birth_date.errors %}
+                                        <p class="mt-1 text-xs text-red-600">{{ register_form.birth_date.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Разделитель: Location -->
+                            <div class="relative">
+                                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                    <div class="w-full border-t border-slate-200"></div>
+                                </div>
+                                <div class="relative flex justify-center">
+                                    <span class="bg-white px-3 text-xs font-medium uppercase tracking-wider text-slate-400">
+                                        {% trans "Location" %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Country -->
+                            <div>
+                                <label for="id_country" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                    {% trans "Country" %}
+                                </label>
+                                <select
+                                    name="country"
+                                    id="id_country"
+                                    hx-get="{% url 'geo:regions' %}"
+                                    hx-target="#id_region_select"
+                                    hx-trigger="change"
+                                    hx-swap="innerHTML"
+                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                                    <option value="">{% trans "Select country" %}</option>
+                                    {% for country in countries %}
+                                        <option value="{{ country.pk }}"
+                                            {% if register_form.country.value == country.pk|stringformat:"s" %}selected{% endif %}>
+                                            {{ country.get_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if register_form.country.errors %}
+                                    <p class="mt-1 text-xs text-red-600">{{ register_form.country.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Region + City: disabled по умолчанию, JS (initGeoLogic) управляет состоянием -->
+                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <div>
+                                    <label for="id_region_select" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                        {% trans "Region" %}
+                                    </label>
+                                    <select
+                                        id="id_region_select"
+                                        name="region"
+                                        disabled
+                                        hx-get="{% url 'geo:cities' %}"
+                                        hx-target="#id_city_select"
+                                        hx-trigger="change"
+                                        hx-swap="innerHTML"
+                                        hx-include="this"
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400{% if register_form.region.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                        <option value="">{% trans "Select region" %}</option>
+                                        {% for region in regions %}
+                                            <option value="{{ region.pk }}"
+                                                {% if register_form.region.value == region.pk|stringformat:"s" %}selected{% endif %}>
+                                                {{ region.get_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if register_form.region.errors %}
+                                        <p class="mt-1 text-xs text-red-600">{{ register_form.region.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <label for="id_city_select" class="mb-1.5 block text-sm font-medium text-slate-700">
+                                        {% trans "City" %}
+                                    </label>
+                                    <select
+                                        id="id_city_select"
+                                        name="city"
+                                        disabled
+                                        class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition duration-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400{% if register_form.city.errors %} border-red-400 focus:border-red-500 focus:ring-red-100{% endif %}">
+                                        <option value="">{% trans "Select city" %}</option>
+                                        {% for city in cities %}
+                                            <option value="{{ city.pk }}"
+                                                {% if register_form.city.value == city.pk|stringformat:"s" %}selected{% endif %}>
+                                                {{ city.get_name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    {% if register_form.city.errors %}
+                                        <p class="mt-1 text-xs text-red-600">{{ register_form.city.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Submit -->
+                            <button
+                                type="submit"
+                                class="mt-1 w-full rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+                                {% trans "Create account" %}
+                            </button>
+
+                        </div>
+                    </form>
+
+                    <hr class="my-6 border-slate-200">
+
+                    <div class="text-center">
+                        <p class="mb-3 text-sm text-slate-500">{% trans "Already have an account?" %}</p>
+                        <button
+                            type="button"
+                            data-modal-close="register-modal"
+                            data-modal-open="login-modal"
+                            class="inline-block rounded-xl border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition duration-200 hover:border-slate-400 hover:bg-slate-50">
+                            {% trans "Sign in" %}
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if open_register_modal %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var modal = document.getElementById("register-modal");
+        if (modal) modal.classList.remove("hidden");
+    });
+</script>
+{% endif %}
+
+<!-- Flatpickr: перенеси в base.html если модалка доступна на всех страницах -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/index.js"></script>
+
+<script src="{% static 'js/register.js' %}"></script>
