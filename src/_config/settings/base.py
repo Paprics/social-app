@@ -50,6 +50,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
+                "users.context_processors.user_settings",
             ],
         },
     },
@@ -58,10 +59,11 @@ TEMPLATES = [
 WSGI_APPLICATION = "_config.wsgi.application"
 ASGI_APPLICATION = "_config.asgi.application"
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -150,12 +152,12 @@ EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 # Gallery
-GALLERY_MAX_PHOTOS = 10
-
 # Image processing
+GALLERY_MAX_PHOTOS = 10
 GALLERY_IMAGE_MAX_SIZE = 1200
 GALLERY_IMAGE_FORMAT = "WEBP"
 GALLERY_IMAGE_QUALITY = 82
 GALLERY_IMAGE_STRIP_METADATA = True
+MAX_PHOTO_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 GEO_ALLOWED_COUNTRIES = ["UA", "PL", "CZ", "DE", "RU"]

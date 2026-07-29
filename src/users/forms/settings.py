@@ -1,5 +1,5 @@
-# accounts/forms/registration_form.py
-from accounts.models import Profile, UserPremiumFeatures, UserSettings
+# accounts/forms/settings.py
+from users.models import Profile, UserPremiumFeatures, UserSettings
 from django import forms
 from django.conf import settings as django_settings
 from django.utils.translation import gettext_lazy as _
@@ -15,10 +15,7 @@ class AccountSettingsForm(forms.Form):
         label=_("Username"),
         widget=forms.TextInput(attrs={"autocomplete": "username"}),
     )
-    email = forms.EmailField(
-        label=_("Email address"),
-        widget=forms.EmailInput(attrs={"autocomplete": "email"}),
-    )
+
     birth_date = forms.DateField(
         label=_("Date of birth"),
         widget=forms.DateInput(attrs={"type": "date"}),
@@ -35,13 +32,6 @@ class AccountSettingsForm(forms.Form):
             raise forms.ValidationError(_("This username is already taken."))
         return username
 
-    def clean_email(self):
-        email = self.cleaned_data["email"].lower()
-        qs = type(self.user).objects.exclude(pk=self.user.pk).filter(email=email)
-        if qs.exists():
-            raise forms.ValidationError(_("This email address is already in use."))
-        return email
-
     def clean_birth_date(self):
         from datetime import date
 
@@ -49,16 +39,13 @@ class AccountSettingsForm(forms.Form):
         today = date.today()
         age = today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))
         if age < 18:
-            raise forms.ValidationError(
-                _("You must be at least 18 years old to use this service.")
-            )
+            raise forms.ValidationError(_("You must be at least 18 years old to use this service."))
         return bd
 
     def save(self):
         data = self.cleaned_data
         user = self.user
         user.username = data["username"]
-        user.email = data["email"]
         user.save(update_fields=["username", "email"])
 
         profile = user.profile
@@ -133,18 +120,10 @@ VISIBILITY_CHOICES = UserSettings.ProfileVisibility.choices
 
 
 class PrivacySettingsForm(forms.Form):
-    profile_visibility = forms.ChoiceField(
-        choices=VISIBILITY_CHOICES, label=_("Profile visibility")
-    )
-    friends_visibility = forms.ChoiceField(
-        choices=VISIBILITY_CHOICES, label=_("Friends list")
-    )
-    photo_albums_visibility = forms.ChoiceField(
-        choices=VISIBILITY_CHOICES, label=_("Photo albums")
-    )
-    show_online_status = forms.BooleanField(
-        required=False, label=_("Show online status")
-    )
+    profile_visibility = forms.ChoiceField(choices=VISIBILITY_CHOICES, label=_("Profile visibility"))
+    friends_visibility = forms.ChoiceField(choices=VISIBILITY_CHOICES, label=_("Friends list"))
+    photo_albums_visibility = forms.ChoiceField(choices=VISIBILITY_CHOICES, label=_("Photo albums"))
+    show_online_status = forms.BooleanField(required=False, label=_("Show online status"))
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -171,15 +150,9 @@ PERMISSION_CHOICES = UserSettings.PermissionLevel.choices
 
 
 class CommunicationSettingsForm(forms.Form):
-    private_message_permission = forms.ChoiceField(
-        choices=PERMISSION_CHOICES, label=_("Private messages")
-    )
-    comment_permission = forms.ChoiceField(
-        choices=PERMISSION_CHOICES, label=_("Comments")
-    )
-    wall_post_permission = forms.ChoiceField(
-        choices=PERMISSION_CHOICES, label=_("Wall posts")
-    )
+    private_message_permission = forms.ChoiceField(choices=PERMISSION_CHOICES, label=_("Private messages"))
+    comment_permission = forms.ChoiceField(choices=PERMISSION_CHOICES, label=_("Comments"))
+    wall_post_permission = forms.ChoiceField(choices=PERMISSION_CHOICES, label=_("Wall posts"))
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -200,9 +173,7 @@ class CommunicationSettingsForm(forms.Form):
 
 class NotificationsSettingsForm(forms.Form):
     notify_messages = forms.BooleanField(required=False, label=_("New messages"))
-    notify_friend_requests = forms.BooleanField(
-        required=False, label=_("Friend requests")
-    )
+    notify_friend_requests = forms.BooleanField(required=False, label=_("Friend requests"))
     notify_email = forms.BooleanField(required=False, label=_("Email notifications"))
 
     def __init__(self, *args, user=None, **kwargs):

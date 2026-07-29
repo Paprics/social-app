@@ -2,14 +2,28 @@
 import json
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils.translation import gettext as _
 from django.views import View
 
 from geo.models import City, Country, Region
 from users.models import Profile
+
+User = get_user_model()
+
+
+class SensitiveContentToggleView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        settings = request.user.settings
+
+        settings.blur_sensitive = "blur_sensitive" in request.POST
+        settings.save(update_fields=["blur_sensitive"])
+
+        return HttpResponse(status=204)
+
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -27,8 +41,7 @@ def _handle_form(request, form_class, success_msg=None, **form_kwargs):
         form.save()
         return _htmx_response(ok=True, message=success_msg or _("Changes saved."))
     errors = [
-        f"{field}: {', '.join(errs)}" if field != "__all__" else ", ".join(errs)
-        for field, errs in form.errors.items()
+        f"{field}: {', '.join(errs)}" if field != "__all__" else ", ".join(errs) for field, errs in form.errors.items()
     ]
     return _htmx_response(ok=False, message=errors[0] if errors else _("Invalid data."))
 
@@ -37,58 +50,34 @@ def _handle_form(request, form_class, success_msg=None, **form_kwargs):
 
 
 class SettingsPageView(LoginRequiredMixin, View):
+
     def get(self, request):
-        profile = request.user.profile
-        s = request.user.settings
 
-        country_id = profile.country_id
-        region_id = profile.region_id
+        user = User.objects.select_related(
+            "profile",
+            "settings",
+            "premium_features",
+        ).get(pk=request.user.pk)
 
-        countries = Country.objects.filter(
-            code2__in=settings.GEO_ALLOWED_COUNTRIES
-        ).order_by("name_en")
+        country_id = user.profile.country_id
+        region_id = user.profile.region_id
+        city_id = user.profile.city_id
 
-        regions = (
-            Region.objects.filter(country_id=country_id).order_by("name_en")
-            if country_id
-            else []
-        )
-        cities = (
-            City.objects.filter(region_id=region_id).order_by("-population", "name_en")
-            if region_id
-            else []
-        )
+        countries = Country.objects.filter(code2__in=settings.GEO_ALLOWED_COUNTRIES).order_by("name_en")
 
-        communication_fields = [
-            (
-                "private_message_permission",
-                _("Private messages"),
-                _("Who can send you direct messages."),
-                s.private_message_permission,
-            ),
-            (
-                "comment_permission",
-                _("Comments"),
-                _("Who can comment on your content."),
-                s.comment_permission,
-            ),
-            (
-                "wall_post_permission",
-                _("Wall posts"),
-                _("Who can post on your wall."),
-                s.wall_post_permission,
-            ),
-        ]
+        regions = Region.objects.filter(country_id=country_id).order_by("name_en") if country_id else []
+        cities = City.objects.filter(region_id=region_id).order_by("-population", "name_en") if region_id else []
 
         return render(
             request,
             "users/settings.html",
             {
+                "user": user,
                 "countries": countries,
                 "regions": regions,
+                "city_id": city_id,
                 "cities": cities,
-                "profile_gender_choices": Profile.Gender.choices,
-                "communication_fields": communication_fields,
+                "languages": settings.LANGUAGES,
             },
         )
 
@@ -97,30 +86,32 @@ class SettingsPageView(LoginRequiredMixin, View):
 
 
 class SettingsAccountView(LoginRequiredMixin, View):
-    def post(self, request):
-        from accounts.forms.settings_forms import AccountSettingsForm
 
-        return _handle_form(
-            request, AccountSettingsForm, success_msg=_("Account updated.")
-        )
+    def post(self, request):
+        from users.forms.settings import AccountSettingsForm
+
+        form = AccountSettingsForm(request.POST, user=request.user)
+
+        if form.is_valid():
+            form.save()
+
+            return JsonResponse({"message": _("Account updated.")})
+
+        return JsonResponse({"errors": form.errors}, status=400)
 
 
 class SettingsProfileView(LoginRequiredMixin, View):
     def post(self, request):
         from accounts.forms.settings_forms import ProfileSettingsForm
 
-        return _handle_form(
-            request, ProfileSettingsForm, success_msg=_("Profile updated.")
-        )
+        return _handle_form(request, ProfileSettingsForm, success_msg=_("Profile updated."))
 
 
 class SettingsPrivacyView(LoginRequiredMixin, View):
     def post(self, request):
         from accounts.forms.settings_forms import PrivacySettingsForm
 
-        return _handle_form(
-            request, PrivacySettingsForm, success_msg=_("Privacy settings saved.")
-        )
+        return _handle_form(request, PrivacySettingsForm, success_msg=_("Privacy settings saved."))
 
 
 class SettingsCommunicationView(LoginRequiredMixin, View):
@@ -149,15 +140,11 @@ class SettingsLocalizationView(LoginRequiredMixin, View):
     def post(self, request):
         from accounts.forms.settings_forms import LocalizationSettingsForm
 
-        return _handle_form(
-            request, LocalizationSettingsForm, success_msg=_("Language updated.")
-        )
+        return _handle_form(request, LocalizationSettingsForm, success_msg=_("Language updated."))
 
 
 class SettingsPremiumFeaturesView(LoginRequiredMixin, View):
     def post(self, request):
         from accounts.forms.settings_forms import PremiumFeaturesForm
 
-        return _handle_form(
-            request, PremiumFeaturesForm, success_msg=_("Premium settings saved.")
-        )
+        return _handle_form(request, PremiumFeaturesForm, success_msg=_("Premium settings saved."))

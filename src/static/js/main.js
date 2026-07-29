@@ -23,7 +23,8 @@ document.querySelectorAll("[data-dropdown-button]").forEach((button) => {
     });
 });
 
-document.addEventListener("click", () => {
+document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-keep-dropdown]")) return;
     document.querySelectorAll("[data-dropdown]").forEach((dropdown) => {
         dropdown.classList.add("hidden");
     });

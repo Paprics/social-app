@@ -1,0 +1,118 @@
+{% load i18n %}
+
+<div id="avatar-modal"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+
+  {% csrf_token %}
+
+  <div class="bg-white border border-slate-200 rounded-xl shadow-lg w-full max-w-xl max-h-[90vh] flex flex-col">
+
+    {# Шапка #}
+    <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200 shrink-0">
+      <h2 class="text-base font-semibold text-slate-900">
+        {% if current_avatar %}
+          {% trans "Change profile photo" %}
+        {% else %}
+          {% trans "Add profile photo" %}
+        {% endif %}
+      </h2>
+      <button type="button"
+              js-close-avatar-modal
+              class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    {# Тело #}
+    <div class="flex-1 overflow-y-auto p-5 space-y-4">
+
+      {# Кнопка загрузки нового фото #}
+      <div>
+        <label class="flex items-center justify-center gap-2 w-full px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+          </svg>
+          {% trans "Upload new photo" %}
+          <input type="file"
+                 id="avatar-file-input"
+                 accept="image/jpeg,image/png,image/webp"
+                 class="hidden">
+        </label>
+        {# Превью нового загруженного фото #}
+        <div id="avatar-upload-preview" class="hidden mt-3 flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+          <img id="avatar-upload-preview-img" src="" alt="" class="w-14 h-14 rounded-lg object-cover border border-slate-200 shrink-0">
+          <div class="flex-1 min-w-0">
+            <p id="avatar-upload-preview-name" class="text-sm font-medium text-slate-700 truncate"></p>
+            <p class="text-xs text-slate-500 mt-0.5">{% trans "Will be saved and set as avatar" %}</p>
+          </div>
+          <button type="button" id="avatar-upload-clear"
+                  class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {# Разделитель #}
+      <div class="flex items-center gap-3">
+        <div class="flex-1 h-px bg-slate-200"></div>
+        <span class="text-xs text-slate-400">{% trans "or choose from your photos" %}</span>
+        <div class="flex-1 h-px bg-slate-200"></div>
+      </div>
+
+      {# Сетка существующих фотографий #}
+      <div id="avatar-photo-grid">
+        {% if photos %}
+          <div class="grid grid-cols-4 sm:grid-cols-5 gap-2">
+            {% for photo in photos %}
+              <button type="button"
+                      class="avatar-photo-btn relative aspect-square bg-slate-100 rounded-lg overflow-hidden border-2 border-transparent hover:border-blue-400 transition"
+                      data-photo-id="{{ photo.pk }}"
+                      data-photo-url="{{ photo.image.url }}">
+                <img src="{{ photo.image.url }}"
+                     alt="{{ photo.title }}"
+                     loading="lazy"
+                     class="w-full h-full object-cover pointer-events-none">
+                {# Галочка при выборе #}
+                <span class="avatar-check hidden absolute inset-0 bg-blue-600/30 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-white drop-shadow" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                  </svg>
+                </span>
+              </button>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-8">
+            <svg class="mx-auto h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <p class="mt-2 text-sm text-slate-500">{% trans "No photos yet — upload one above." %}</p>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+    {# Подвал #}
+    <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-end gap-3 shrink-0">
+      <button type="button"
+              js-close-avatar-modal
+              class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition">
+        {% trans "Cancel" %}
+      </button>
+      <button type="button"
+              id="avatar-set-btn"
+              disabled
+              data-set-url="{% url 'users:avatar_set' %}"
+              data-upload-url="{% url 'users:avatar_upload' %}"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed">
+        {% trans "Set as profile photo" %}
+      </button>
+    </div>
+
+  </div>
+</div>

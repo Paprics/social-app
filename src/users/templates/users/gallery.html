@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "Photos" %} — {{ profile_user.username }}{% endblock %}
+
+{% block page %}
+<div class="bg-slate-50 min-h-screen py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="mb-6">
+      <a href="{% url 'users:profile' profile.user.pk %}"
+         class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        {% trans "Back to profile" %}
+      </a>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+      {# ── ЛЕВАЯ КОЛОНКА ─────────────────────────────────── #}
+      <aside class="lg:w-72 shrink-0 space-y-4">
+
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+          <div class="flex items-center gap-4">
+            <div class="shrink-0">
+              {% if profile_user.profile.avatar %}
+                <img src="{{ profile_user.profile.avatar.url }}"
+                     alt="{{ profile_user.username }}"
+                     class="w-16 h-16 rounded-full object-cover border border-slate-200">
+              {% else %}
+                <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold text-white select-none">
+                  {{ profile_user.username|first|upper }}
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-slate-900">{{ profile_user.username }}</h2>
+              <p class="text-sm text-slate-500">{{ profile_user.profile.status|default:_("No status") }}</p>
+            </div>
+          </div>
+
+          <div class="mt-4 border-t border-slate-100 pt-4
+                      {% if is_owner %}grid grid-cols-3{% else %}grid grid-cols-2{% endif %}
+                      gap-2 text-center text-sm">
+            <div>
+              <span class="block text-lg font-bold text-slate-900">{{ albums_count }}</span>
+              <span class="text-xs text-slate-500">{% trans "Albums" %}</span>
+            </div>
+            <div>
+              <span class="block text-lg font-bold text-slate-900">{{ photos_count }}</span>
+              <span class="text-xs text-slate-500">{% trans "Photos" %}</span>
+            </div>
+            {% if is_owner %}
+            <div>
+              <span class="block text-lg font-bold text-slate-900">{{ remaining_slots }}</span>
+              <span class="text-xs text-slate-500">{% trans "Free" %}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        {# Прогресс-бар — только владельцу #}
+        {% if is_owner %}
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <div class="flex items-center justify-between text-xs text-slate-500 mb-2">
+            <span>{% trans "Storage" %}</span>
+            <span>{{ photos_count }} / {{ max_photos }}</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-1.5">
+            <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                 style="width: {% widthratio photos_count max_photos 100 %}%"></div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if is_owner %}
+        <div class="space-y-2">
+          {# Create album — disabled, на перспективу #}
+          <button type="button"
+                  disabled
+                  title="{% trans 'Coming soon' %}"
+                  class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white border border-slate-200 text-slate-400 text-sm font-medium rounded-xl cursor-not-allowed select-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            {% trans "Create album" %}
+          </button>
+
+          {# Upload photos #}
+          {% if remaining_slots > 0 %}
+            <button type="button"
+                    js-open-upload-modal
+                    class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+              </svg>
+              {% trans "Upload photos" %}
+            </button>
+          {% else %}
+            <div class="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-400 text-sm font-medium rounded-xl cursor-not-allowed select-none">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+              </svg>
+              {% trans "Limit reached" %}
+            </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+      </aside>
+
+      {# ── ПРАВАЯ КОЛОНКА ────────────────────────────────── #}
+      <div class="flex-1 min-w-0">
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+
+          <div class="border-b border-slate-200 px-5 py-3 flex items-center gap-6">
+            <button class="tab-btn text-sm font-medium pb-1 border-b-2 -mb-px"
+                    data-tab="albums">
+              {% trans "Albums" %}
+            </button>
+            <button class="tab-btn text-sm font-medium pb-1 border-b-2 -mb-px"
+                    data-tab="photos">
+              {% trans "All photos" %}
+            </button>
+          </div>
+
+          <div class="p-5">
+
+            {# ── Альбомы ── #}
+            <div id="tab-albums" class="tab-content">
+              {% if albums %}
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  {% for album in albums %}
+                    <a href="{% url 'users:album_detail' profile.user.pk album.pk %}"
+                       class="group block bg-slate-50 border border-slate-200 rounded-xl overflow-hidden hover:shadow-md transition">
+                      <div class="aspect-square bg-slate-100 flex items-center justify-center text-slate-300">
+                        {% with cover=album.photos.first %}
+                          {% if cover %}
+                            <img src="{{ cover.image.url }}" alt="{{ album.title }}" class="w-full h-full object-cover">
+                          {% else %}
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                          {% endif %}
+                        {% endwith %}
+                      </div>
+                      <div class="px-3 py-2">
+                        <p class="text-sm font-medium text-slate-800 truncate">{{ album.title }}</p>
+                        <p class="text-xs text-slate-500">{{ album.photos.count }} {% trans "photos" %}</p>
+                      </div>
+                    </a>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="text-center py-10">
+                  <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <p class="mt-2 text-sm text-slate-500">{% trans "No albums yet." %}</p>
+                </div>
+              {% endif %}
+            </div>
+
+            {# ── Все фотографии ── #}
+            <div id="tab-photos" class="tab-content hidden">
+              {% if photos %}
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="photo-grid">
+                  {% for photo in photos %}
+                    <button type="button"
+                            class="photo-thumb block aspect-square bg-slate-100 rounded-lg overflow-hidden border border-slate-200 hover:opacity-80 transition w-full"
+                            data-photo-index="{{ forloop.counter0 }}"
+                            data-photo-url="{{ photo.image.url }}"
+                            data-photo-title="{{ photo.title|default:'' }}"
+                            data-photo-id="{{ photo.pk }}">
+                      <img src="{{ photo.image.url }}"
+                           alt="{{ photo.title }}"
+                           loading="lazy"
+                           class="w-full h-full object-cover pointer-events-none">
+                    </button>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="text-center py-10">
+                  <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  <p class="mt-2 text-sm text-slate-500">{% trans "No photos uploaded yet." %}</p>
+                  {% if is_owner and remaining_slots > 0 %}
+                    <button type="button" js-open-upload-modal
+                            class="mt-3 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 transition">
+                      {% trans "Upload your first photo" %}
+                    </button>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{# Lightbox #}
+{% include "users/partials/lightbox.html" %}
+
+{# Модальное окно загрузки #}
+{% if is_owner %}
+  {% include "users/partials/photo_upload_modal.html" %}
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/gallery.js' %}"></script>
+{% endblock %}

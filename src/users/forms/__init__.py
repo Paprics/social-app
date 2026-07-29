@@ -1,1 +1,2 @@
-from .settings_forms import *
+from .settings import *
+from .gallery import *

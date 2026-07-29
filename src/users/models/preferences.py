@@ -28,6 +28,11 @@ class UserSettings(models.Model):
 
     # -------- Privacy --------
 
+    blur_sensitive = models.BooleanField(
+        default=False,
+        help_text="Blur images and media marked as sensitive until you choose to reveal them.",
+    )
+
     profile_visibility = models.CharField(
         max_length=16,
         choices=ProfileVisibility.choices,
@@ -54,9 +59,14 @@ class UserSettings(models.Model):
         help_text="Controls who can view photo albums.",
     )
 
+    wall_enabled = models.BooleanField(
+        default=True,
+        help_text="Enable the wall on the user's profile.",
+    )
+
     # -------- Communication --------
 
-    private_message_permission = models.CharField(
+    message_permission = models.CharField(
         max_length=16,
         choices=PermissionLevel.choices,
         default=PermissionLevel.EVERYONE,
@@ -78,21 +88,16 @@ class UserSettings(models.Model):
     )
 
     # -------- Notifications --------
-
-    notify_messages = models.BooleanField(
-        default=True,
-        help_text="Receive notifications about new messages.",
-    )
-
-    notify_friend_requests = models.BooleanField(
-        default=True,
-        help_text="Receive notifications about friend requests.",
-    )
-
-    notify_email = models.BooleanField(
-        default=False,
-        help_text="Receive important notifications by email.",
-    )
+    #
+    # notify_messages = models.BooleanField(
+    #     default=True,
+    #     help_text="Receive notifications about new messages.",
+    # )
+    #
+    # notify_friend_requests = models.BooleanField(
+    #     default=True,
+    #     help_text="Receive notifications about friend requests.",
+    # )
 
     # -------- Localization --------
 

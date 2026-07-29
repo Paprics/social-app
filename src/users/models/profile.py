@@ -1,3 +1,4 @@
+# profile.py
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
@@ -93,6 +94,10 @@ class Profile(models.Model):
         help_text=_("Profiles the user is interested in meeting."),
     )
 
+    open_to_gifts = models.BooleanField(
+        default=False, help_text=_("Open to dating where gifts or financial support may be part of the relationship.")
+    )
+
     birth_date = models.DateField(
         null=True,
         blank=True,
@@ -135,12 +140,6 @@ class Profile(models.Model):
         default=timezone.now,
         db_index=True,
         help_text=_("Last recorded online activity."),
-    )
-
-    is_online = models.BooleanField(
-        default=False,
-        db_index=True,
-        help_text=_("Current online status."),
     )
 
     profile_views = models.PositiveIntegerField(

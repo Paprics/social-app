@@ -1,0 +1,13 @@
+{% load i18n %}
+
+{% if profile_user.profile.avatar_photo %}
+  <img src="{{ profile_user.profile.avatar_photo.image.url }}"
+       alt="{{ profile_user.username }}"
+       class="avatar-img w-full aspect-[4/5] sm:aspect-[3/4]">
+{% else %}
+  <div class="flex w-full aspect-[4/5] sm:aspect-[3/4] items-center justify-center bg-slate-100">
+    <div class="flex h-24 w-24 items-center justify-center rounded-full bg-blue-600 text-4xl font-bold text-white select-none">
+      {{ profile_user.username|first|upper|default:"U" }}
+    </div>
+  </div>
+{% endif %}

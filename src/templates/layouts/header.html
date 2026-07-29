@@ -5,237 +5,172 @@
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
 
         <!-- Logo -->
-
         <a href="{% url 'core:index' %}" class="flex items-center gap-3">
-
             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white">
                 S
             </div>
-
             <div class="hidden sm:block">
-
                 <h1 class="text-lg font-semibold text-slate-900">
                     Social Network
                 </h1>
-
                 <p class="text-xs text-slate-500">
                     {% trans "Connect with people" %}
                 </p>
-
             </div>
-
         </a>
 
         <!-- Desktop Navigation -->
-
         <nav class="hidden items-center gap-8 lg:flex">
-
             <a href="{% url 'core:index' %}"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "Home" %}
             </a>
-
             <a href="#"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "People" %}
             </a>
-
             <a href="{% url 'chat:chat_view' %}"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "VideoChat" %}
             </a>
-
             <a href="#"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "Messages" %}
             </a>
-
             <a href="#"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "SexShop" %}
             </a>
 
             <!-- More -->
-
             <div class="relative">
-
                 <button
                         type="button"
                         data-dropdown-button="more-menu"
                         class="flex items-center gap-1 text-sm font-medium text-slate-700 transition hover:text-blue-600">
-
                     {% trans "More" %}
-
                     <svg xmlns="http://www.w3.org/2000/svg"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke-width="2"
                          stroke="currentColor"
                          class="h-4 w-4">
-
                         <path stroke-linecap="round"
                               stroke-linejoin="round"
                               d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-
                     </svg>
-
                 </button>
-
                 <div
                         id="more-menu"
                         data-dropdown
                         class="absolute left-0 top-full z-50 mt-2 hidden w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-
                     <div class="py-2">
-
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Marketplace" %}
                         </a>
-
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Groups" %}
                         </a>
-
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Events" %}
                         </a>
-
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Games" %}
                         </a>
-
                         <hr class="my-2 border-slate-200">
-
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Coming soon" %}
                         </a>
-
                     </div>
-
                 </div>
-
             </div>
-
         </nav>
 
         <!-- Right -->
-
         <div class="flex items-center gap-3">
 
-            <!-- Language -->
+            <!-- Language (для неавторизованных) -->
             {% if not user.is_authenticated %}
             <div class="relative">
-
                 <button
                         type="button"
                         data-dropdown-button="lang-menu"
                         class="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
-
                     <svg xmlns="http://www.w3.org/2000/svg"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke-width="1.8"
                          stroke="currentColor"
                          class="h-4 w-4">
-
                         <path stroke-linecap="round"
                               stroke-linejoin="round"
                               d="M3 12h18M12 3c2.5 2.7 4 6.2 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6.2-4-9s1.5-6.3 4-9z"/>
-
                         <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
-
                     </svg>
-
                     <span class="font-medium uppercase">{{ LANGUAGE_CODE }}</span>
-
                     <svg xmlns="http://www.w3.org/2000/svg"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke-width="2"
                          stroke="currentColor"
                          class="h-3 w-3 text-slate-400">
-
                         <path stroke-linecap="round"
                               stroke-linejoin="round"
                               d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-
                     </svg>
-
                 </button>
-
                 <div
                         id="lang-menu"
                         data-dropdown
                         class="absolute right-0 top-full z-50 mt-2 hidden w-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-
                     <form action="{% url 'set_language' %}" method="post">
-
                         {% csrf_token %}
-
                         <input type="hidden" name="next" value="{{ request.path }}">
-
                         {% get_available_languages as LANGUAGES %}
                         {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
-
                         {% for lang in LANGUAGE_INFO_LIST %}
-
                         <button
                                 type="submit"
                                 name="language"
                                 value="{{ lang.code }}"
                                 class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition hover:bg-slate-100 {% if lang.code == LANGUAGE_CODE %}font-medium text-blue-600{% else %}text-slate-700{% endif %}">
-
                             <span class="font-mono text-xs uppercase text-slate-400">
                                 {{ lang.code }}
                             </span>
-
                             <span>
                                 {{ lang.name_local|capfirst }}
                             </span>
-
                         </button>
-
                         {% endfor %}
-
                     </form>
-
                 </div>
-
             </div>
             {% endif %}
-
 
             <!-- User -->
             {% if user.is_authenticated %}
             <div class="relative">
-
                 <button
                         type="button"
                         id="profile-button"
                         data-dropdown-button="profile-menu"
                         class="flex items-center gap-3 rounded-xl border border-slate-200 px-2 py-1 transition hover:bg-slate-100">
-
                     <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 font-semibold text-white">
                         U
                     </div>
-
                     <div class="hidden text-left lg:block">
-
                         <p class="text-sm font-medium text-slate-900">
                             {{ user.username|slice:":25" }}
                         </p>
-
                         <p class="text-xs text-slate-500">
                             {% trans "Online" %}
                         </p>
-
                     </div>
-
                     <svg xmlns="http://www.w3.org/2000/svg"
                          fill="none"
                          viewBox="0 0 24 24"
@@ -246,50 +181,113 @@
                               stroke-linejoin="round"
                               d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
                     </svg>
-
                 </button>
 
+                <!-- =========================================================== -->
+                <!--  ВЫПАДАЮЩЕЕ МЕНЮ ПРОФИЛЯ  (исправлено)                      -->
+                <!-- =========================================================== -->
                 <div
                         id="profile-menu"
                         data-dropdown
                         class="absolute right-0 top-full z-50 mt-2 hidden w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
 
                     <div class="border-b border-slate-200 px-5 py-4">
-
                         <p class="font-semibold text-slate-900">
                             {{ user.username|slice:":35" }}
                         </p>
-
                         <p class="text-sm text-slate-500">
                             {{ user.email }}
                         </p>
-
                     </div>
 
                     <div class="py-2">
-
+                        <!-- Profile -->
                         <a href="#"
-                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            👤 {% trans "Profile" %}
+                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                            </svg>
+                            {% trans "Profile" %}
                         </a>
 
+                        <!-- Account Center -->
+                        <a href="{% url 'users:account_center' %}"
+                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {% trans "Account Center" %}
+                        </a>
+
+                        <!-- Settings -->
                         <a href="{% url 'users:settings' %}"
-                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            ⚙️ {% trans "Settings" %}
+                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/>
+                            </svg>
+                            {% trans "Settings" %}
                         </a>
 
+                        <!-- Privacy -->
                         <a href="#"
-                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            🔒 {% trans "Privacy" %}
+                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                            </svg>
+                            {% trans "Privacy" %}
                         </a>
 
+                        <!-- Help -->
                         <a href="#"
-                           class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            ❓ {% trans "Help" %}
+                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+                            </svg>
+                            {% trans "Help" %}
                         </a>
 
                         <hr class="my-2 border-slate-200">
 
+                        <!-- Sensitive content toggle -->
+                        <div class="flex items-center justify-between px-5 py-3" data-keep-dropdown>
+                            <div class="pr-4">
+                                <p class="text-sm font-medium text-slate-900">
+                                    {% trans "Sensitive content" %}
+                                </p>
+                                <p class="text-xs text-slate-500">
+                                    {% trans "Show sensitive media and profiles" %}
+                                </p>
+                            </div>
+                            <form
+                                    hx-post="{% url 'users:toggle_sensitive_content' %}"
+                                    hx-trigger="change from:input"
+                                    hx-swap="none"
+                                    hx-disabled-elt="input"
+                                    onclick="event.stopPropagation()"
+                            >
+                                {% csrf_token %}
+                                <label class="relative inline-flex cursor-pointer items-center">
+                                    <input
+                                            type="checkbox"
+                                            name="blur_sensitive"
+                                            class="peer sr-only"
+                                            {% if user_settings.blur_sensitive %}checked{% endif %}
+                                    >
+                                    <div class="h-6 w-11 rounded-full bg-slate-300 transition
+                                                peer-checked:bg-blue-600
+                                                after:absolute after:left-[2px] after:top-[2px]
+                                                after:h-5 after:w-5 after:rounded-full
+                                                after:bg-white after:transition-all
+                                                peer-checked:after:translate-x-5">
+                                    </div>
+                                </label>
+                            </form>
+                        </div>
+
+                        <hr class="my-2 border-slate-200">
+
+                        <!-- Language switcher (внутри меню) -->
                         <div class="px-5 py-3">
                             <form action="{% url 'set_language' %}" method="post" class="flex items-center gap-2">
                                 {% csrf_token %}
@@ -310,112 +308,104 @@
 
                         <hr class="my-2 border-slate-200">
 
+                        <!-- ====== НОВЫЙ ПУНКТ: PREMIUM (неактивен, заглушка) ====== -->
+                        <div class="px-5 py-3 opacity-60 pointer-events-none select-none">
+                            <div class="flex items-center gap-2.5 text-amber-600">
+                                <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                <span class="text-sm font-medium">{% trans "Premium" %}</span>
+                                <span class="ml-auto text-[10px] font-semibold uppercase tracking-wider text-amber-400 border border-amber-200 rounded-full px-2 py-0.5">{% trans "Soon" %}</span>
+                            </div>
+                        </div>
+
+                        <hr class="my-2 border-slate-200">
+
+                        <!-- Sign out -->
                         <form method="post" action="{% url 'accounts:logout' %}">
                             {% csrf_token %}
-
                             <button
                                     type="submit"
-                                    class="block w-full px-5 py-3 text-left text-red-600 transition hover:bg-red-50">
+                                    class="flex w-full items-center gap-2.5 px-5 py-3 text-left text-red-600 transition hover:bg-red-50">
+                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+                                </svg>
                                 {% trans "Sign out" %}
                             </button>
-
                         </form>
-
                     </div>
-
                 </div>
+                <!-- ====== КОНЕЦ МЕНЮ ПРОФИЛЯ ====== -->
 
             </div>
 
             {% else %}
-
+            <!-- Кнопка входа для неавторизованных -->
             <button
                     type="button"
                     data-modal-open="login-modal"
                     class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700">
                 {% trans "Log in" %}
             </button>
-
             {% endif %}
 
-        </div>
-
-
+        </div><!-- /right -->
 
     </div>
 
 </header>
 
-<!-- ================= Mobile Menu ================= -->
-
+<!-- Mobile Menu (без изменений) -->
 <div id="mobile-menu"
      class="hidden border-b border-slate-200 bg-white lg:hidden">
-
     <nav class="mx-auto flex max-w-7xl flex-col px-4 py-4">
-
         <a href="{% url 'core:index' %}"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Home" %}
         </a>
-
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "People" %}
         </a>
-
         <a href="{% url 'chat:chat_view' %}"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "VideoChat" %}
         </a>
-
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Messages" %}
         </a>
-
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "SexShop" %}
         </a>
-
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Marketplace" %}
         </a>
-
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Groups" %}
         </a>
-
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Events" %}
         </a>
-
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Games" %}
         </a>
-
         <hr class="my-4 border-slate-200">
-
         <div class="px-4 py-2">
-
             <p class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
                 {% trans "Language" %}
             </p>
-
             <form action="{% url 'set_language' %}" method="post" class="flex flex-wrap gap-2">
-
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{{ request.path }}">
-
                 {% get_available_languages as LANGUAGES %}
                 {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
-
                 {% for lang in LANGUAGE_INFO_LIST %}
-
                 <button
                         type="submit"
                         name="language"
@@ -423,13 +413,8 @@
                         class="rounded-lg border px-3 py-1.5 text-sm transition {% if lang.code == LANGUAGE_CODE %}border-blue-600 bg-blue-50 font-medium text-blue-600{% else %}border-slate-200 text-slate-600 hover:bg-slate-100{% endif %}">
                     {{ lang.name_local|capfirst }}
                 </button>
-
                 {% endfor %}
-
             </form>
-
         </div>
-
     </nav>
-
 </div>

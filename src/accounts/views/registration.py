@@ -22,7 +22,7 @@ from accounts.forms import (
     UserRegistrationForm,
 )
 from accounts.tokens import verify_email_token, verify_password_reset_token
-from users.models import Profile
+from users.models import Profile, UserSettings, UserPremiumFeatures
 
 # from accounts.tasks import send_verification_email_task, send_password_reset_email_task
 
@@ -62,6 +62,8 @@ class RegisterView(CreateView):
             region=form.cleaned_data["region"],
             city=form.cleaned_data["city"],
         )
+
+        UserPremiumFeatures.objects.create(user=user)
 
         send_email_verification(user, request=self.request)
 
@@ -116,9 +118,7 @@ class EmailVerificationView(View):
             user = User.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             logger.warning("EmailVerificationView: invalid uid=%s", uidb64)
-            return render(
-                request, "accounts/email_verification_invalid.html", status=400
-            )
+            return render(request, "accounts/email_verification_invalid.html", status=400)
 
         if user.is_active:
             # Уже активирован — просто редиректим на логин
@@ -167,9 +167,7 @@ class LoginView(View):
             # Попробуем найти по email
             try:
                 user_obj = User.objects.get(email=username)
-                user = authenticate(
-                    request, username=user_obj.username, password=password
-                )
+                user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
                 pass
 
@@ -227,9 +225,7 @@ class PasswordResetRequestView(View):
             send_password_reset_email(user, request=request)
             logger.info("PasswordResetRequestView: email sent to user=%s", user.pk)
         except User.DoesNotExist:
-            logger.info(
-                "PasswordResetRequestView: email=%s not found, silent skip", email
-            )
+            logger.info("PasswordResetRequestView: email=%s not found, silent skip", email)
 
         return redirect("accounts:password_reset_sent")
 
@@ -270,9 +266,7 @@ class PasswordResetConfirmView(View):
         form = SetNewPasswordForm(user, request.POST)
         if form.is_valid():
             form.save()
-            logger.info(
-                "PasswordResetConfirmView: password changed for user=%s", user.pk
-            )
+            logger.info("PasswordResetConfirmView: password changed for user=%s", user.pk)
             return redirect("accounts:password_reset_complete")
 
         return render(
@@ -303,9 +297,7 @@ class ChangePasswordView(LoginRequiredMixin, View):
         form = ChangePasswordForm(user=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            logger.info(
-                "ChangePasswordView: password changed for user=%s", request.user.pk
-            )
+            logger.info("ChangePasswordView: password changed for user=%s", request.user.pk)
             # После смены пароля сессия инвалидируется — редиректим на логин
             return redirect("accounts:password_changed")
 
@@ -335,15 +327,9 @@ class CheckUsernameView(View):
             return HttpResponse("")
 
         if len(username) < 3:
-            return HttpResponse(
-                '<p class="mt-1 text-xs text-amber-600">Minimum 3 characters.</p>'
-            )
+            return HttpResponse('<p class="mt-1 text-xs text-amber-600">Minimum 3 characters.</p>')
 
         if User.objects.filter(username=username).exists():
-            return HttpResponse(
-                '<p class="mt-1 text-xs text-red-600">This username is already taken.</p>'
-            )
+            return HttpResponse('<p class="mt-1 text-xs text-red-600">This username is already taken.</p>')
 
-        return HttpResponse(
-            '<p class="mt-1 text-xs text-green-600">Username is available.</p>'
-        )
+        return HttpResponse('<p class="mt-1 text-xs text-green-600">Username is available.</p>')

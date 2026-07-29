@@ -125,3 +125,62 @@ window.confirmDeleteAccount = function () {
 // ─── Geo cascade: country → regions (через HTMX — обрабатывается автоматически) ──
 // HTMX сам слушает change на #country-select и #region-select — дополнительный
 // JS для этого НЕ нужен. Старый fetch-код удалён.
+
+// ─── Avatar preview (js-атрибут вместо onchange) ─────────────────────────────
+
+const avatarInput = document.querySelector('[js-avatar-input]');
+if (avatarInput) {
+  avatarInput.addEventListener('change', function () {
+    if (!this.files || !this.files[0]) return;
+    const file = this.files[0];
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File is too large. Maximum size is 5 MB.');
+      this.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview     = document.getElementById('avatar-preview');
+      const placeholder = document.getElementById('avatar-placeholder');
+      if (preview) { preview.src = e.target.result; preview.classList.remove('hidden'); }
+      if (placeholder) { placeholder.classList.add('hidden'); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── Delete account (js-атрибут вместо onclick) ──────────────────────────────
+
+const deleteBtn = document.querySelector('[js-delete-account]');
+if (deleteBtn) {
+  deleteBtn.addEventListener('click', () => {
+    if (window.confirm('Are you sure you want to permanently delete your account? This action cannot be undone.')) {
+      window.location.href = '/settings/delete-account/';
+    }
+  });
+}
+
+// ─── Flatpickr — date of birth ────────────────────────────────────────────────
+// Flatpickr грузится как обычный <script> в extra_head, поэтому window.flatpickr доступен.
+// Максимальная дата — 18 лет назад от сегодня.
+
+const birthInput = document.getElementById('birth-date-picker');
+if (birthInput && typeof flatpickr !== 'undefined') {
+  const today = new Date();
+  const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+
+  flatpickr(birthInput, {
+    dateFormat: 'Y-m-d',       // формат, который ждёт Django (birth_date field)
+    maxDate: maxDate,           // нельзя выбрать дату моложе 18 лет
+    defaultDate: birthInput.value || null,
+    disableMobile: false,       // на мобильных показывает нативный picker
+    allowInput: false,          // только через календарь, не руками
+    locale: {
+      firstDayOfWeek: 1,        // неделя с понедельника
+    },
+  });
+} else if (birthInput) {
+  // Flatpickr не загрузился — fallback: обычный date input
+  console.warn('settings.js: flatpickr not loaded, falling back to native date input');
+  birthInput.type = 'date';
+}

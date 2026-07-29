@@ -12,25 +12,23 @@ class Friendship(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         ACCEPTED = "accepted", "Accepted"
-        DECLINED = "declined", "Declined"
-        BLOCKED = "blocked", "Blocked"
 
     from_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="sent_friend_requests",
+        related_name="initiated_friendships",
         help_text="The user who initiated the friendship request.",
     )
 
     to_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="received_friend_requests",
+        related_name="received_friendships",
         help_text="The user who received the friendship request.",
     )
 
     status = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=Status.choices,
         default=Status.PENDING,
         help_text="Current status of the friendship request.",
@@ -59,6 +57,11 @@ class Friendship(models.Model):
                 name="prevent_self_friendship",
             ),
         ]
+        indexes = [
+            models.Index(fields=["to_user"]),
+            models.Index(fields=["from_user", "status"]),
+            models.Index(fields=["to_user", "status"]),
+        ]
 
     def __str__(self):
-        return f"{self.from_user} → {self.to_user} ({self.get_status_display()})"
+        return f"{self.from_user} -> {self.to_user} " f"({self.get_status_display()})"
