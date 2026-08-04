@@ -1,0 +1,43 @@
+{% load i18n %}
+
+{# ============================================================ #}
+{#  БАННЕР / ИНФОРМАЦИОННЫЙ БЛОК САЙТА (Profile Banner)        #}
+{#  Находится в правой колонке, напротив аватара                #}
+{# ============================================================ #}
+<div class="relative overflow-hidden rounded-xl group cursor-not-allowed">
+    {# Основной блок с полупрозрачным фоном #}
+    <div class="bg-blue-100/50 p-6 flex flex-col items-center text-center min-h-[160px] justify-center border border-slate-200 shadow-sm">
+        <!-- Иконка -->
+        <div class="mb-3 rounded-full bg-white/70 p-2.5 shadow-sm">
+            <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+            </svg>
+        </div>
+
+        <h3 class="text-sm font-semibold text-slate-700">{% trans "Announcement" %}</h3>
+        <p class="mt-1 text-xs text-slate-500 max-w-xs">
+            {% trans "Site news or promotions will be displayed here." %}
+        </p>
+        <p class="mt-0.5 text-[11px] text-slate-400">
+            {% trans "Stay tuned!" %}
+        </p>
+
+        {# Декоративная линия #}
+        <div class="mt-3 w-12 border-t border-slate-300/40"></div>
+
+        {# Плейсхолдер баннера #}
+        <div class="mt-3 w-full rounded-lg border border-slate-300/40 bg-white/40 px-4 py-2">
+            <p class="text-xs text-slate-400">{% trans "Your banner here" %}</p>
+            <p class="text-[10px] text-slate-300">728 × 90</p>
+        </div>
+    </div>
+
+    {# Оверлей (появляется при наведении) #}
+    <div class="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none rounded-xl">
+        <svg class="w-12 h-12 text-slate-400 mb-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2zm10-10V7a4 4 0 0 0-8 0v4h8z" />
+        </svg>
+        <span class="text-sm font-medium text-slate-600">{% trans "Under development" %}</span>
+        <span class="text-xs text-slate-500 mt-1">{% trans "Will be available soon" %}</span>
+    </div>
+</div>

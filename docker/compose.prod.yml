@@ -1,0 +1,116 @@
+# compose.prod.yml — production
+#
+# Отличия от dev:
+#   - Daphne вместо runserver (держит WebSocket соединения под нагрузкой)
+#   - Код скопирован в образ при билде (нет volumes с кодом)
+#   - Нет проброса портов наружу — nginx подключается через внешнюю сеть
+#   - collectstatic при старте
+#
+# Nginx и coturn живут в infrastructure/ — они общие для всех сайтов сервера.
+# Этот compose подключается к внешней сети frontend_network которую создаёт nginx.
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: sn-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # Порт наружу не пробрасываем — только внутри compose сети
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: sn-redis
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    container_name: sn-web
+    restart: always
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             daphne -b 0.0.0.0 -p 8000 _config.asgi:application"
+    # expose — виден только внутри сетей, не пробрасывается на хост
+    expose:
+      - "8000"
+    env_file:
+      - ../.env.prod
+    environment:
+      DJANGO_SETTINGS_MODULE: _config.settings.prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+      - frontend_network
+
+  celery-worker:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    container_name: sn-celery-worker
+    restart: always
+    command: celery -A _config worker --loglevel=info
+    env_file:
+      - ../.env.prod
+    environment:
+      DJANGO_SETTINGS_MODULE: _config.settings.prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+
+  celery-beat:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.prod
+    container_name: sn-celery-beat
+    restart: always
+    command: celery -A _config beat --loglevel=info
+    env_file:
+      - ../.env.prod
+    environment:
+      DJANGO_SETTINGS_MODULE: _config.settings.prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      celery-worker:
+        condition: service_started
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+
+networks:
+  internal:
+    # Внутренняя сеть проекта — postgres, redis, celery не видны снаружи
+    driver: bridge
+  frontend_network:
+    # Внешняя сеть — создаётся nginx compose, здесь только подключаемся
+    external: true

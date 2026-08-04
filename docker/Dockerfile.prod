@@ -1,0 +1,24 @@
+# Dockerfile.prod — самодостаточный образ для production
+#
+# Принцип: код копируется внутрь образа при билде (COPY src/ .).
+# Никаких volumes с кодом на проде — образ содержит всё что нужно.
+
+FROM python:3.12-slim
+
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Зависимости — отдельный слой, кешируется
+COPY requirements-prod.txt .
+RUN pip install --no-cache-dir -r requirements-prod.txt
+
+# Код приложения
+COPY src/ .
+
+# Непривилегированный пользователь — не запускаем от root
+RUN useradd -m appuser && chown -R appuser:appuser /app
+USER appuser

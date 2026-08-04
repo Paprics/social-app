@@ -1,0 +1,30 @@
+{% load i18n %}
+
+<section
+    id="statistics"
+    class="bg-white border border-slate-200 rounded-xl overflow-hidden scroll-mt-20">
+
+    <div class="px-6 py-4 border-b border-slate-100">
+        <h2 class="text-base font-semibold text-slate-900">
+            {% trans "Statistics" %}
+        </h2>
+
+        <p class="mt-1 text-sm text-slate-500">
+            {% trans "Your account activity at a glance." %}
+        </p>
+    </div>
+
+    <div
+        id="statistics-content"
+        hx-get="{% url 'users:account_center_statistics' %}"
+        hx-trigger="revealed once"
+        hx-target="this"
+        hx-swap="innerHTML">
+
+        <div class="px-6 py-8 text-center text-slate-400">
+            {% trans "Loading statistics..." %}
+        </div>
+
+    </div>
+
+</section>

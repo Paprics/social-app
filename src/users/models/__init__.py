@@ -5,3 +5,5 @@ from .premium import PremiumPurchase
 from .profile import *
 from .user_data import UserData
 from .visit import ProfileVisit
+from .favorite import Favorite
+from .user_block import *

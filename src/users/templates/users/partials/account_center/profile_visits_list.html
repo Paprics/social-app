@@ -1,0 +1,63 @@
+{% load static i18n %}
+
+{% if visits %}
+    <div class="space-y-2.5">
+        {% for visit in visits %}
+            <div class="flex items-center gap-3.5 p-3 bg-slate-50 hover:bg-slate-100/80 transition rounded-xl">
+
+                {# Аватар пользователя #}
+                <a href="{% url 'users:profile' visit.visitor.pk %}">
+                    {% if visit.visitor.profile.avatar_photo %}
+                        <img
+                            src="{{ visit.visitor.profile.avatar_photo.image.url }}"
+                            class="w-10 h-10 rounded-full object-cover"
+                            alt="{{ visit.visitor.username }}">
+                    {% else %}
+                        <img
+                                src="{% static 'images/default-avatar.svg' %}"
+                                alt="{% trans 'Default avatar' %}"
+                                class="w-full h-full object-cover">
+                    {% endif %}
+                </a>
+
+                {# Информация о посетителе #}
+                <div class="flex-1 min-w-0">
+                    <a
+                        href="{% url 'users:profile' visit.visitor.pk %}"
+                        class="block text-sm font-medium text-slate-900 truncate"
+                    >
+                        {{ visit.visitor.username }}
+                    </a>
+                    <p class="text-xs text-slate-500">
+                        {{ visit.visited_at }}
+                    </p>
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+
+    {# Пагинация и Premium-защита #}
+    {% if page_obj.has_next %}
+        {% if is_premium %}
+            <div
+                hx-get="?page={{ page_obj.next_page_number }}"
+                hx-trigger="revealed"
+                hx-target="#profile-visits-content"
+                hx-swap="beforeend"
+                class="py-4 text-center text-sm text-slate-400"
+            >
+                {% trans "Loading more..." %}
+            </div>
+        {% else %}
+            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700">
+                {% trans "Detailed visitor list is a Premium feature." %}
+            </div>
+        {% endif %}
+    {% endif %}
+
+{% else %}
+    <p class="text-sm text-slate-500">
+        {% trans "No profile visits yet." %}
+    </p>
+{% endif %}

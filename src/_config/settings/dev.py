@@ -1,3 +1,4 @@
+# src/_config/settings/dev.py
 from .base import *
 
 DEBUG = True
@@ -5,18 +6,27 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
-    "+default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    },
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": env("POSTGRES_DB"),
         "USER": env("POSTGRES_USER"),
         "PASSWORD": env("POSTGRES_PASSWORD"),
-        "HOST": env("POSTGRES_HOST", default="localhost"),
-        "PORT": env.int("POSTGRES_PORT", default=5432),
-    },
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env.int("POSTGRES_PORT"),
+    }
 }
 
+INSTALLED_APPS += [
+    "debug_toolbar",
+]
+
+MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+] + MIDDLEWARE
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+# На dev письма пишутся в консоль, не отправляются реально
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

@@ -1,6 +1,7 @@
 # preferences.py
 from django.conf import settings
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class UserSettings(models.Model):
@@ -9,15 +10,10 @@ class UserSettings(models.Model):
     notifications, and localization options.
     """
 
-    class ProfileVisibility(models.TextChoices):
-        PUBLIC = "public", "Public"
-        FRIENDS = "friends", "Friends only"
-        PRIVATE = "private", "Private"
-
-    class PermissionLevel(models.TextChoices):
-        EVERYONE = "everyone", "Everyone"
-        FRIENDS = "friends", "Friends only"
-        NOBODY = "nobody", "Nobody"
+    class AccessLevel(models.TextChoices):
+        EVERYONE = "everyone", _("Everyone")
+        FRIENDS = "friends", _("Friends only")
+        ONLY_ME = "only_me", _("Only me")
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -28,34 +24,24 @@ class UserSettings(models.Model):
 
     # -------- Privacy --------
 
-    blur_sensitive = models.BooleanField(
-        default=False,
-        help_text="Blur images and media marked as sensitive until you choose to reveal them.",
-    )
-
     profile_visibility = models.CharField(
         max_length=16,
-        choices=ProfileVisibility.choices,
-        default=ProfileVisibility.PUBLIC,
+        choices=AccessLevel.choices,
+        default=AccessLevel.EVERYONE,
         help_text="Controls who can view the user's profile.",
-    )
-
-    show_online_status = models.BooleanField(
-        default=True,
-        help_text="Display online status to other users.",
     )
 
     friends_visibility = models.CharField(
         max_length=16,
-        choices=ProfileVisibility.choices,
-        default=ProfileVisibility.PUBLIC,
+        choices=AccessLevel.choices,
+        default=AccessLevel.EVERYONE,
         help_text="Controls who can view the friends list.",
     )
 
     photo_albums_visibility = models.CharField(
         max_length=16,
-        choices=ProfileVisibility.choices,
-        default=ProfileVisibility.PUBLIC,
+        choices=AccessLevel.choices,
+        default=AccessLevel.EVERYONE,
         help_text="Controls who can view photo albums.",
     )
 
@@ -64,26 +50,36 @@ class UserSettings(models.Model):
         help_text="Enable the wall on the user's profile.",
     )
 
+    show_online_status = models.BooleanField(
+        default=True,
+        help_text="Display online status to other users.",
+    )
+
+    blur_media = models.BooleanField(
+        default=False,
+        help_text="Blur all images, avatars, videos, and other media across the site until you choose to reveal them.",
+    )
+
     # -------- Communication --------
 
     message_permission = models.CharField(
         max_length=16,
-        choices=PermissionLevel.choices,
-        default=PermissionLevel.EVERYONE,
+        choices=AccessLevel.choices,
+        default=AccessLevel.EVERYONE,
         help_text="Controls who can send private messages.",
     )
 
     comment_permission = models.CharField(
         max_length=16,
-        choices=PermissionLevel.choices,
-        default=PermissionLevel.EVERYONE,
+        choices=AccessLevel.choices,
+        default=AccessLevel.EVERYONE,
         help_text="Controls who can leave comments.",
     )
 
     wall_post_permission = models.CharField(
         max_length=16,
-        choices=PermissionLevel.choices,
-        default=PermissionLevel.FRIENDS,
+        choices=AccessLevel.choices,
+        default=AccessLevel.EVERYONE,
         help_text="Controls who can publish posts on the user's wall.",
     )
 
@@ -98,15 +94,6 @@ class UserSettings(models.Model):
     #     default=True,
     #     help_text="Receive notifications about friend requests.",
     # )
-
-    # -------- Localization --------
-
-    language = models.CharField(
-        max_length=2,
-        choices=settings.LANGUAGES,
-        default="en",
-        help_text="Preferred interface language.",
-    )
 
     # -------- Other --------
 
@@ -125,7 +112,7 @@ class UserSettings(models.Model):
         verbose_name_plural = "User Settings"
 
     def __str__(self):
-        return f"Settings ({self.user})"
+        return f"Settings ({self.user_id})"
 
 
 class UserPremiumFeatures(models.Model):
@@ -165,21 +152,6 @@ class UserPremiumFeatures(models.Model):
     random_chat_gender_filter = models.BooleanField(
         default=False,
         help_text="Enable gender filtering in random chat.",
-    )
-
-    random_chat_country_filter = models.BooleanField(
-        default=False,
-        help_text="Enable country filtering in random chat.",
-    )
-
-    random_chat_language_filter = models.BooleanField(
-        default=False,
-        help_text="Enable language filtering in random chat.",
-    )
-
-    random_chat_age_filter = models.BooleanField(
-        default=False,
-        help_text="Enable age filtering in random chat.",
     )
 
     priority_matching = models.BooleanField(

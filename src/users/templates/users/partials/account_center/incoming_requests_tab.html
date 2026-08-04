@@ -1,0 +1,59 @@
+{% load static i18n %}
+
+<div class="divide-y divide-slate-100">
+    {% for friendship in friend_requests %}
+        <div class="flex items-center gap-4 px-6 py-4">
+
+            <a
+                href="{% url 'users:profile' friendship.from_user.pk %}"
+                class="flex flex-1 items-center gap-4 rounded-lg hover:bg-slate-50 transition p-2 -m-2">
+
+                <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-200 shrink-0">
+                    {% if friendship.from_user.profile.avatar_photo %}
+                        <img
+                            src="{{ friendship.from_user.profile.avatar_photo.image.url }}"
+                            alt="{{ friendship.from_user.username }}"
+                            class="w-full h-full object-cover">
+                    {% else %}
+                        <img
+                            src="{% static 'images/default-avatar.svg' %}"
+                            alt="{% trans 'Default avatar' %}"
+                            class="w-full h-full object-cover">
+                    {% endif %}
+                </div>
+
+                <div class="flex-1">
+                    <div class="font-medium">
+                        {{ friendship.from_user.username }}
+                    </div>
+
+                    <div class="text-sm text-slate-500">
+                        {{ friendship.created_at|date:"d.m.Y H:i" }}
+                    </div>
+                </div>
+
+            </a>
+
+            <div class="flex gap-2 shrink-0">
+                <button
+                    type="button"
+                    class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm">
+                    {% trans "Accept" %}
+                </button>
+
+                <button
+                    type="button"
+                    class="px-3 py-2 rounded-lg border text-sm">
+                    {% trans "Decline" %}
+                </button>
+            </div>
+
+        </div>
+    {% empty %}
+        <div class="p-8 text-center text-slate-500">
+            {% trans "No incoming friend requests." %}
+        </div>
+    {% endfor %}
+</div>
+
+{% include "users/partials/pagination.html" %}

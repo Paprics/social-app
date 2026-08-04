@@ -5,8 +5,6 @@ from users.views import (
     ProfileView,
     SettingsAccountView,
     SettingsCommunicationView,
-    SettingsLocalizationView,
-    SettingsNotificationsView,
     SettingsPageView,
     SettingsPremiumFeaturesView,
     SettingsPrivacyView,
@@ -26,23 +24,43 @@ from users.views import (
     FriendRemoveView,
     #
     AccountCenterView,
+    AccountCenterIncomingFriendRequestsView,
+    AccountCenterOutgoingFriendRequestsView,
+    AccountCenterFriendsListView,
+    AccountCenterStatisticsView,
+    AccountCenterProfileVisitsView,
     #
     AvatarModalView,
     AvatarSetView,
     AvatarUploadView,
+    #
+    PhotoFavoriteToggleView,
+    UserFavoriteToggleView,
+    #
+    UserBlockCreateView,
+    UserBlockDeleteView,
+    #
+    ProfileExploreView,
+    ProfileExplorePhotosView,
+    ProfileExploreAlbumsView,
+    ProfileExploreFriendsView,
+    ProfileExploreMutualFriendsView,
+    ProfileExplorePostsView,
+    ProfileExploreVideosView,
 )
 
 app_name = "users"
 
-settings_urlpatterns = [
+core_urlpatterns = [
     path("<int:pk>/", ProfileView.as_view(), name="profile"),
     path("settings/", SettingsPageView.as_view(), name="settings"),
+]
+
+settings_urlpatterns = [
     path("settings/account/", SettingsAccountView.as_view(), name="account"),
     path("settings/profile/", SettingsProfileView.as_view(), name="settings_profile"),
     path("settings/privacy/", SettingsPrivacyView.as_view(), name="privacy"),
     path("settings/communication/", SettingsCommunicationView.as_view(), name="communication"),
-    path("settings/notifications/", SettingsNotificationsView.as_view(), name="notifications"),
-    path("settings/localization/", SettingsLocalizationView.as_view(), name="localization"),
     path("settings/premium-features/", SettingsPremiumFeaturesView.as_view(), name="premium_features"),
     path(
         "settings/preferences/sensitive-content/", SensitiveContentToggleView.as_view(), name="toggle_sensitive_content"
@@ -69,6 +87,25 @@ friendship_urlpatterns = [
 
 account_center_urlpatterns = [
     path("account-center/", AccountCenterView.as_view(), name="account_center"),
+    path(
+        "account-center/friends/incoming/",
+        AccountCenterIncomingFriendRequestsView.as_view(),
+        name="account_center_friends_incoming",
+    ),
+    path(
+        "account-center/friends/outgoing/",
+        AccountCenterOutgoingFriendRequestsView.as_view(),
+        name="account_center_friends_outgoing",
+    ),
+    path("account-center/friends/list/", AccountCenterFriendsListView.as_view(), name="account_center_friends_list"),
+    path("account-center/statistics/", AccountCenterStatisticsView.as_view(), name="account_center_statistics"),
+    path(
+        "account-center/profile-visits/", AccountCenterProfileVisitsView.as_view(), name="account_center_profile_visits"
+    ),
+    # path("account-center/favorites/", AccountCenterFavoritesSectionView.as_view(), name="account_center_favorites_section"),
+    # path("account-center/blacklist/", AccountCenterBlacklistSectionView.as_view(), name="account_center_blacklist_section"),
+    # path("account-center/gifts/", AccountCenterGiftsSectionView.as_view(), name="account_center_gifts_section"),
+    # path("account-center/premium-history/", AccountCenterPremiumHistorySectionView.as_view(), name="account_center_premium_history_section"),
 ]
 
 avatar_urlpatterns = [
@@ -77,10 +114,43 @@ avatar_urlpatterns = [
     path("profile/avatar/upload/", AvatarUploadView.as_view(), name="avatar_upload"),
 ]
 
+favorite_urlpatterns = [
+    path(
+        "users/<int:pk>/favorite/toggle/",
+        UserFavoriteToggleView.as_view(),
+        name="user_favorite_toggle",
+    ),
+    path(
+        "photos/<int:pk>/favorite/toggle/",
+        PhotoFavoriteToggleView.as_view(),
+        name="photo_favorite_toggle",
+    ),
+]
+
+block_urlpatterns = [
+    path("<int:pk>/block/", UserBlockCreateView.as_view(), name="block"),
+    path("<int:pk>/unblock/", UserBlockDeleteView.as_view(), name="unblock"),
+    # path("blocked-users/", BlockedUsersListView.as_view(), name="blocked_users"),
+]
+
+explore_urlpatterns = [
+    path("<int:pk>/explore/", ProfileExploreView.as_view(), name="profile_explore"),
+    path("<int:pk>/explore/photos/", ProfileExplorePhotosView.as_view(), name="profile_explore_photos"),
+    path("<int:pk>/explore/albums/", ProfileExploreAlbumsView.as_view(), name="profile_explore_albums"),
+    path("<int:pk>/explore/friends/", ProfileExploreFriendsView.as_view(), name="profile_explore_friends"),
+    path("<int:pk>/explore/mutual/", ProfileExploreMutualFriendsView.as_view(), name="profile_explore_mutual_friends"),
+    path("<int:pk>/explore/posts/", ProfileExplorePostsView.as_view(), name="profile_explore_posts"),
+    path("<int:pk>/explore/videos/", ProfileExploreVideosView.as_view(), name="profile_explore_videos"),
+]
+
 urlpatterns = [
+    *core_urlpatterns,
     *settings_urlpatterns,
     *gallery_urlpatterns,
     *friendship_urlpatterns,
     *account_center_urlpatterns,
     *avatar_urlpatterns,
+    *favorite_urlpatterns,
+    *block_urlpatterns,
+    *explore_urlpatterns,
 ]

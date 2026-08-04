@@ -1,6 +1,8 @@
 # src/users/views/__init__.py
 from .block import *
 from .settings import *
+from .favorite import *
+from .block import *
 
 from .gallery import (
     GalleryView,
@@ -19,6 +21,11 @@ from .friendship import (
 
 from .account_center import (
     AccountCenterView,
+    AccountCenterIncomingFriendRequestsView,
+    AccountCenterOutgoingFriendRequestsView,
+    AccountCenterFriendsListView,
+    AccountCenterStatisticsView,
+    AccountCenterProfileVisitsView,
 )
 
 from .profile import (
@@ -26,4 +33,14 @@ from .profile import (
     AvatarModalView,
     AvatarSetView,
     AvatarUploadView,
+)
+
+from .profile_explore import (
+    ProfileExploreView,
+    ProfileExplorePhotosView,
+    ProfileExploreAlbumsView,
+    ProfileExploreFriendsView,
+    ProfileExploreMutualFriendsView,
+    ProfileExplorePostsView,
+    ProfileExploreVideosView,
 )

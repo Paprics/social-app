@@ -1,0 +1,163 @@
+{% load i18n %}
+
+<div class="p-6">
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+
+        <!-- Registration -->
+
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+
+            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-blue-100">
+
+                <svg class="h-6 w-6 text-blue-600"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M8 7V3m8 4V3M5 11h14M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>
+
+                </svg>
+
+            </div>
+
+            <div class="text-xl font-semibold text-slate-900">
+                {{ registration_date|date:"d.m.Y" }}
+            </div>
+
+            <div class="mt-1 text-sm text-slate-500">
+                {% trans "Registration date" %}
+            </div>
+
+        </div>
+
+        <!-- Friends -->
+
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+
+            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-green-100">
+
+                <svg class="h-6 w-6 text-green-600"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zm13 10v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+
+                </svg>
+
+            </div>
+
+            <div class="text-3xl font-bold text-slate-900">
+                {{ friends_count }}
+            </div>
+
+            <div class="mt-1 text-sm text-slate-500">
+                {% trans "Friends" %}
+            </div>
+
+        </div>
+
+        <!-- Profile views -->
+
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+
+            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-violet-100">
+
+                <svg class="h-6 w-6 text-violet-600"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+
+                </svg>
+
+            </div>
+
+            <div class="text-3xl font-bold text-slate-900">
+                {{ profile_views }}
+            </div>
+
+            <div class="mt-1 text-sm text-slate-500">
+                {% trans "Profile views" %}
+            </div>
+
+        </div>
+
+        <!-- Favorites -->
+
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+
+            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-rose-100">
+
+                <svg class="h-6 w-6 text-rose-600"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+
+                </svg>
+
+            </div>
+
+            <div class="text-3xl font-bold text-slate-900">
+                {{ favorites_count }}
+            </div>
+
+            <div class="mt-1 text-sm text-slate-500">
+                {% trans "Favorites" %}
+            </div>
+
+        </div>
+
+        <!-- Gifts -->
+
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+
+            <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-amber-100">
+
+                <svg class="h-6 w-6 text-amber-600"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7m16 0H4m16 0V8a2 2 0 00-2-2h-3.382a2 2 0 01-1.789-1.106L12 3l-.829 1.894A2 2 0 019.382 6H6a2 2 0 00-2 2v4"/>
+
+                </svg>
+
+            </div>
+
+            <div class="text-3xl font-bold text-slate-900">
+                {{ gifts_received }}
+            </div>
+
+            <div class="mt-1 text-sm text-slate-500">
+                {% trans "Gifts received" %}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

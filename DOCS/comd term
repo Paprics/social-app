@@ -16,4 +16,6 @@ django-admin makemessages -l uk
 
 python src/manage.py compilemessages
 
+{% include "users/partials/photo_favorite_button.html" with favorite_url=photo.favorite_url is_favorite=photo.is_favorite %}
 
+http://127.0.0.1:8000/en/account-center/?friends_tab=incoming#friendsk

@@ -55,16 +55,22 @@ function showToast(el, ok, message) {
   }, 3000);
 }
 
-// ─── Bio counter ──────────────────────────────────────────────────────────────
+// ─── Bio, STATUS counter ──────────────────────────────────────────────────────────────
 
-const bioTextarea = document.querySelector('textarea[name="bio"]');
-const bioCount    = document.getElementById('bio-count');
+document.querySelectorAll("[data-counter]").forEach(field => {
+    const counter = document.getElementById(field.dataset.counter);
 
-if (bioTextarea && bioCount) {
-  bioTextarea.addEventListener('input', () => {
-    bioCount.textContent = bioTextarea.value.length;
-  });
-}
+    if (!counter) return;
+
+    const updateCounter = () => {
+        counter.textContent = field.value.length;
+    };
+
+    field.addEventListener("input", updateCounter);
+
+    // Обновить при загрузке страницы
+    updateCounter();
+});
 
 // ─── Avatar preview ───────────────────────────────────────────────────────────
 // БАГ #5 ИСПРАВЛЕН: одна функция, правильные ID, проверка размера

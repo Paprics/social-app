@@ -1,5 +1,4 @@
-import dj_database_url
-
+# src/_config/settings/prod.py
 from .base import *
 
 DEBUG = False
@@ -7,14 +6,20 @@ DEBUG = False
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 DATABASES = {
-    "default": dj_database_url.parse(
-        env("DATABASE_URL"),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("POSTGRES_DB"),
+        "USER": env("POSTGRES_USER"),
+        "PASSWORD": env("POSTGRES_PASSWORD"),
+        "HOST": env("POSTGRES_HOST"),
+        "PORT": env.int("POSTGRES_PORT"),
+        "CONN_MAX_AGE": 600,
+        "OPTIONS": {
+            "connect_timeout": 10,
+        },
+    }
 }
 
-# ── HTTPS / Security ─────────────────────────────────────────────────────────
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True

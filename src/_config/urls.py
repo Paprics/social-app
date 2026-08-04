@@ -17,9 +17,14 @@ urlpatterns += i18n_patterns(
     path("", include("accounts.urls")),
     path("", include("cms.urls")),
     path("geo/", include("geo.urls", namespace="geo")),
+    path("posts/", include("posts.urls")),
 )
 
 if settings.DEBUG:
+    urlpatterns += [
+        path("__debug__/", include("debug_toolbar.urls")),
+    ]
+
     urlpatterns += static(
         settings.STATIC_URL,
         document_root=settings.STATIC_ROOT,

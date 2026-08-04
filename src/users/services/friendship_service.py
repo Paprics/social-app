@@ -1,7 +1,12 @@
+from django.db.models.functions import Random
+
+from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Q
 
 from users.models.friendship import Friendship
+
+User = get_user_model()
 
 
 class FriendshipService:
@@ -154,6 +159,108 @@ class FriendshipService:
 
         friendship.delete()
 
+    @classmethod
+    def get_incoming_requests(cls, user):
+        return (
+            Friendship.objects.filter(
+                to_user=user,
+                status=Friendship.Status.PENDING,
+            )
+            .select_related("from_user")
+            .order_by("-created_at")
+        )
+
+    @classmethod
+    def get_outgoing_requests(cls, user):
+        return (
+            Friendship.objects.filter(
+                from_user=user,
+                status=Friendship.Status.PENDING,
+            )
+            .select_related("to_user")
+            .order_by("-created_at")
+        )
+
+    @classmethod
+    def get_friends(cls, user):
+        """Возвращает список друзей пользователя."""
+        return (
+            Friendship.objects.filter(
+                Q(from_user=user) | Q(to_user=user),
+                status=Friendship.Status.ACCEPTED,
+            )
+            .select_related("from_user", "to_user")
+            .order_by("-updated_at")
+        )
+
+    @staticmethod
+    def get_friends_count(profile_user):
+        """Возвращает количество друзей."""
+
+        return Friendship.objects.filter(
+            Q(from_user=profile_user) | Q(to_user=profile_user),
+            status=Friendship.Status.ACCEPTED,
+        ).count()
+
+    @staticmethod
+    def get_mutual_friends(user1, user2):
+        """Возвращает QuerySet общих друзей двух пользователей."""
+
+        user1_friends = Friendship.objects.filter(
+            Q(from_user=user1) | Q(to_user=user1),
+            status=Friendship.Status.ACCEPTED,
+        )
+
+        user2_friends = Friendship.objects.filter(
+            Q(from_user=user2) | Q(to_user=user2),
+            status=Friendship.Status.ACCEPTED,
+        )
+
+        user1_ids = {
+            friendship.to_user_id if friendship.from_user_id == user1.id else friendship.from_user_id
+            for friendship in user1_friends
+        }
+
+        user2_ids = {
+            friendship.to_user_id if friendship.from_user_id == user2.id else friendship.from_user_id
+            for friendship in user2_friends
+        }
+
+        mutual_ids = user1_ids & user2_ids
+
+        return User.objects.filter(pk__in=mutual_ids).select_related("profile")
+
+    @staticmethod
+    def get_incoming_requests_count(user) -> int:
+        """
+        Возвращает количество входящих заявок в друзья.
+        """
+        return Friendship.objects.filter(
+            to_user=user,
+            status=Friendship.Status.PENDING,
+        ).count()
+
+    @classmethod
+    def get_friends_preview(cls, user, limit=5):
+        """Return a random preview of the user's friends."""
+
+        friendships = (
+            Friendship.objects.filter(
+                Q(from_user=user) | Q(to_user=user),
+                status=Friendship.Status.ACCEPTED,
+            )
+            .select_related(
+                "from_user__profile__avatar_photo",
+                "to_user__profile__avatar_photo",
+            )
+            .order_by(Random())[:limit]
+        )
+
+        return [
+            friendship.to_user if friendship.from_user_id == user.id else friendship.from_user
+            for friendship in friendships
+        ]
+
 
 # -------------------------------------------------------------------------
 # Friendship status
@@ -172,30 +279,12 @@ class FriendshipService:
 # Friend lists
 # -------------------------------------------------------------------------
 
-# FriendshipService.get_friends(user)
-# Возвращает список друзей пользователя.
-
-# FriendshipService.get_mutual_friends(user1, user2)
-# Возвращает список общих друзей двух пользователей.
-
-# FriendshipService.get_friends_count(user)
-# Возвращает количество друзей.
-
 # FriendshipService.get_mutual_friends_count(user1, user2)
 # Возвращает количество общих друзей.
 
 # -------------------------------------------------------------------------
 # Friend requests
 # -------------------------------------------------------------------------
-
-# FriendshipService.get_incoming_requests(user)
-# Возвращает входящие заявки.
-
-# FriendshipService.get_outgoing_requests(user)
-# Возвращает исходящие заявки.
-
-# FriendshipService.get_incoming_requests_count(user)
-# Возвращает количество входящих заявок.
 
 # FriendshipService.get_outgoing_requests_count(user)
 # Возвращает количество исходящих заявок.

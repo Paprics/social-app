@@ -25,15 +25,20 @@
         <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
           <div class="flex items-center gap-4">
             <div class="shrink-0">
-              {% if profile_user.profile.avatar %}
-                <img src="{{ profile_user.profile.avatar.url }}"
-                     alt="{{ profile_user.username }}"
-                     class="w-16 h-16 rounded-full object-cover border border-slate-200">
+              {% if profile_user.profile.avatar_photo %}
+              <img
+                      src="{{ profile_user.profile.avatar_photo.image.url }}"
+                      alt="{{ profile_user.username }}"
+                      class="w-16 h-16 rounded-full object-cover border border-slate-200"
+              >
               {% else %}
-                <div class="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold text-white select-none">
-                  {{ profile_user.username|first|upper }}
-                </div>
+              <img
+                      src="{% static 'images/default-avatar.svg' %}"
+                      alt="{% trans 'Default avatar' %}"
+                      class="w-16 h-16 rounded-full object-cover border border-slate-200"
+              >
               {% endif %}
+
             </div>
             <div>
               <h2 class="text-base font-semibold text-slate-900">{{ profile_user.username }}</h2>

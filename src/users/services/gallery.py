@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from users.models.gallery import Photo, UserAlbum
-from users.services.PhotoService import process_image
+from users.services.photo_service import process_image
 
 DEFAULT_ALBUM_TITLE = "My Photos"
 DEFAULT_ALBUM_SLUG = "my-photos"

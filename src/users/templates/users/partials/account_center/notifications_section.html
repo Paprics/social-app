@@ -1,0 +1,86 @@
+{% load i18n %}
+
+<section id="notifications" class="bg-white border border-slate-200 rounded-xl overflow-hidden scroll-mt-20">
+
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+            <h2 class="text-base font-semibold text-slate-900">
+                {% trans "Notifications" %}
+            </h2>
+            <p class="mt-1 text-sm text-slate-500">
+                {% trans "Your recent activity and alerts." %}
+            </p>
+        </div>
+
+        <button
+                {# hx-post="#" #}
+                {# hx-swap="none" #}
+                class="text-xs text-blue-600 hover:text-blue-800 font-medium transition">
+            {% trans "Mark all as read" %}
+        </button>
+    </div>
+
+    <div class="border-b border-slate-100 px-6 pt-3">
+        <div class="flex gap-6 text-sm font-medium" data-account-tabs>
+
+            <button
+                    data-account-tab
+                    class="pb-2 border-b-2 border-blue-600 text-blue-600"
+                    {# hx-get="#" #}
+                    {# hx-target="#notifications-content" #}
+                    {# hx-swap="innerHTML" #}>
+                {% trans "All" %}
+            </button>
+
+            <button
+                    data-account-tab
+                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                    {# hx-get="#" #}
+                    {# hx-target="#notifications-content" #}
+                    {# hx-swap="innerHTML" #}>
+                {% trans "Likes" %}
+            </button>
+
+            <button
+                    data-account-tab
+                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                    {# hx-get="#" #}
+                    {# hx-target="#notifications-content" #}
+                    {# hx-swap="innerHTML" #}>
+                {% trans "Comments" %}
+            </button>
+
+            <button
+                    data-account-tab
+                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                    {# hx-get="#" #}
+                    {# hx-target="#notifications-content" #}
+                    {# hx-swap="innerHTML" #}>
+                {% trans "Gifts" %}
+            </button>
+
+            <button
+                    data-account-tab
+                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                    {# hx-get="#" #}
+                    {# hx-target="#notifications-content" #}
+                    {# hx-swap="innerHTML" #}>
+                {% trans "System" %}
+            </button>
+
+        </div>
+    </div>
+
+    <div id="notifications-content">
+
+        {# hx-get="#" #}
+        {# hx-trigger="revealed once" #}
+        {# hx-swap="innerHTML" #}
+
+        <div class="p-6 text-center text-slate-400">
+            {% trans "Loading..." %}
+        </div>
+
+    </div>
+
+</section>

@@ -1,0 +1,36 @@
+{% load i18n %}
+
+<section
+    id="profile-visits"
+    class="bg-white border border-slate-200 rounded-xl overflow-hidden scroll-mt-20"
+
+    hx-get="{% url 'users:account_center_profile_visits' %}"
+    hx-trigger="revealed"
+    hx-target="#profile-visits-content"
+    hx-swap="innerHTML"
+>
+
+    <div class="px-6 py-4 border-b border-slate-100">
+
+        <h2 class="text-base font-semibold text-slate-900">
+            {% trans "Profile Visits" %}
+        </h2>
+
+        <p class="text-sm text-slate-500 mt-0.5">
+            {% trans "Who has viewed your profile recently." %}
+        </p>
+
+    </div>
+
+
+    <div
+        id="profile-visits-content"
+        class="px-6 py-5"
+    >
+        <p class="text-sm text-slate-400">
+            {% trans "Loading..." %}
+        </p>
+    </div>
+
+
+</section>

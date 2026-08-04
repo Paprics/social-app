@@ -1,3 +1,4 @@
+# src/users/models/visit.py
 from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
@@ -6,7 +7,9 @@ from django.db.models import F, Q
 class ProfileVisit(models.Model):
     """
     Stores the most recent profile visit between two users.
+
     Each visitor can have only one visit record per profile.
+    Repeated visits update the existing record instead of creating a new one.
     """
 
     visitor = models.ForeignKey(
@@ -24,7 +27,6 @@ class ProfileVisit(models.Model):
     )
 
     visited_at = models.DateTimeField(
-        auto_now=True,
         help_text="Date and time of the most recent profile visit.",
     )
 
@@ -44,8 +46,14 @@ class ProfileVisit(models.Model):
         ]
 
         indexes = [
-            models.Index(fields=["profile", "-visited_at"]),
-            models.Index(fields=["visitor"]),
+            models.Index(
+                fields=["profile", "-visited_at"],
+                name="profile_visit_profile_idx",
+            ),
+            models.Index(
+                fields=["visitor"],
+                name="profile_visit_visitor_idx",
+            ),
         ]
 
     def __str__(self):

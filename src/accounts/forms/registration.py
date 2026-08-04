@@ -5,6 +5,7 @@ from datetime import date
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import SetPasswordForm, UserCreationForm
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils.translation import gettext_lazy as _
 
 from geo.models import City, Country, Region
@@ -15,6 +16,12 @@ User = get_user_model()
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
+
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        validators=[UnicodeUsernameValidator()],
+    )
 
     gender = forms.ChoiceField(
         required=True,
@@ -59,28 +66,34 @@ class UserRegistrationForm(UserCreationForm):
 
     def clean_username(self):
         username = self.cleaned_data["username"].strip()
+
         if User.objects.filter(username=username).exists():
             raise forms.ValidationError(_("A user with this username already exists."))
+
         return username
 
     def clean_birth_date(self):
         bd = self.cleaned_data.get("birth_date")
         if not bd:
             raise forms.ValidationError(_("Please enter your date of birth."))
+
         today = date.today()
         age = today.year - bd.year - ((today.month, today.day) < (bd.month, bd.day))
+
         if age < 18:
-            raise forms.ValidationError(
-                _("You must be at least 18 years old to register.")
-            )
-        if age > 120:
+            raise forms.ValidationError(_("You must be at least 18 years old to register."))
+
+        if age > 80:
             raise forms.ValidationError(_("Please enter a valid date of birth."))
+
         return bd
 
     def clean_gender(self):
         gender = self.cleaned_data.get("gender")
+
         if not gender:
             raise forms.ValidationError(_("Please select your gender."))
+
         return gender
 
 
@@ -114,13 +127,9 @@ class SetNewPasswordForm(SetPasswordForm):
 
 
 class ChangePasswordForm(forms.Form):
-    old_password = forms.CharField(
-        label=_("Current password"), widget=forms.PasswordInput
-    )
+    old_password = forms.CharField(label=_("Current password"), widget=forms.PasswordInput)
     new_password1 = forms.CharField(label=_("New password"), widget=forms.PasswordInput)
-    new_password2 = forms.CharField(
-        label=_("Confirm new password"), widget=forms.PasswordInput
-    )
+    new_password2 = forms.CharField(label=_("Confirm new password"), widget=forms.PasswordInput)
 
     def __init__(self, user, *args, **kwargs):
         self.user = user

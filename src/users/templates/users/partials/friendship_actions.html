@@ -7,16 +7,16 @@
         {% if friendship.is_friend %}
 
             <form
-                hx-post="{% url 'users:friend_remove' profile_user.pk %}"
+                hx-post="{% url 'users:friend_remove' target_user.pk %}"
                 hx-target="#friendship-actions"
                 hx-swap="outerHTML">
 
                 <button
                     type="submit"
-                    class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50">
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 shadow-sm transition duration-200 hover:bg-slate-50">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-4 w-4 text-red-600 shrink-0"
+                         class="h-4 w-4 shrink-0 text-red-600"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke="currentColor"
@@ -35,16 +35,16 @@
         {% elif friendship.outgoing_request %}
 
             <form
-                hx-post="{% url 'users:friend_request_cancel' profile_user.pk %}"
+                hx-post="{% url 'users:friend_request_cancel' target_user.pk %}"
                 hx-target="#friendship-actions"
                 hx-swap="outerHTML">
 
                 <button
                     type="submit"
-                    class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50">
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-yellow-600 shadow-sm transition duration-200 hover:bg-slate-50">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-4 w-4 text-yellow-600 shrink-0"
+                         class="h-4 w-4 shrink-0 text-yellow-600"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke="currentColor"
@@ -63,16 +63,16 @@
         {% elif friendship.incoming_request %}
 
             <form
-                hx-post="{% url 'users:friend_request_accept' profile_user.pk %}"
+                hx-post="{% url 'users:friend_request_accept' target_user.pk %}"
                 hx-target="#friendship-actions"
                 hx-swap="outerHTML">
 
                 <button
                     type="submit"
-                    class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50">
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-green-600 shadow-sm transition duration-200 hover:bg-slate-50">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-4 w-4 text-green-600 shrink-0"
+                         class="h-4 w-4 shrink-0 text-green-600"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke="currentColor"
@@ -90,16 +90,16 @@
 
             <form
                 class="mt-2"
-                hx-post="{% url 'users:friend_request_decline' profile_user.pk %}"
+                hx-post="{% url 'users:friend_request_decline' target_user.pk %}"
                 hx-target="#friendship-actions"
                 hx-swap="outerHTML">
 
                 <button
                     type="submit"
-                    class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50">
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 shadow-sm transition duration-200 hover:bg-slate-50">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-4 w-4 text-red-600 shrink-0"
+                         class="h-4 w-4 shrink-0 text-red-600"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke="currentColor"
@@ -124,10 +124,10 @@
 
                 <button
                     type="submit"
-                    class="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 transition duration-200 hover:bg-slate-50">
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-blue-600 shadow-sm transition duration-200 hover:bg-slate-50">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
-                         class="h-4 w-4 text-blue-600 shrink-0"
+                         class="h-4 w-4 shrink-0 text-blue-600"
                          fill="none"
                          viewBox="0 0 24 24"
                          stroke="currentColor"

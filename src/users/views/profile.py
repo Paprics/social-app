@@ -1,36 +1,29 @@
 # src/users/views/profile.py
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views import View
 
 from users.models.gallery import Photo
 from users.models.profile import Profile
 from users.services.gallery import get_or_create_default_album, get_remaining_slots
-from users.services.PhotoService import process_image
+from users.services.photo_service import process_image
+from users.services.user_block import UserBlockService
 from users.validators.image import validate_uploaded_image
 from users.services.friendship_service import FriendshipService
+from users.services.favorite_service import FavoriteService
+from users.services.profile_page import ProfilePageService
+
+User = get_user_model()
 
 
 class ProfileView(View):
     template_name = "users/profile.html"
 
     def get(self, request, pk):
-        profile = get_object_or_404(Profile, user_id=pk)
-        profile_user = profile.user
-        albums = profile_user.galleries.filter(is_visible=True).prefetch_related("photos")
-
-        context = {
-            "profile": profile,
-            "profile_user": profile_user,
-            "is_owner": request.user == profile_user,
-            "albums": albums[:3],
-            "friendship": FriendshipService.get_relation(
-                request.user,
-                profile_user,
-            ),
-        }
-
+        context = ProfilePageService.profile(request, pk)
         return render(request, self.template_name, context)
 
 

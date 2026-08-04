@@ -1,4 +1,8 @@
+from django.contrib.auth import get_user_model
+
 from users.models import Profile, UserSettings
+
+User = get_user_model()
 
 
 def user_settings(request):

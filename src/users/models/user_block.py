@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from users.managers.user_block import UserBlockManager
 
 User = get_user_model()
 
@@ -7,24 +8,6 @@ User = get_user_model()
 class UserBlock(models.Model):
     """
     Stores information about users blocked by other users.
-
-    TODO:
-        - Create UserBlockManager.
-        - Assign objects = UserBlockManager().
-        - Create BlockService.
-        - Add admin registration.
-        - Implement block/unblock views.
-        - Add blocked users page.
-        - Hide blocked users from search.
-        - Prevent private messages.
-        - Prevent friend requests.
-        - Prevent video chat.
-        - Prevent profile viewing (according to privacy settings).
-        - Remove recommendations.
-        - Handle existing friendships after blocking.
-        - Handle existing dialogs after blocking.
-        - Add notifications if required.
-        - Add tests.
     """
 
     blocker = models.ForeignKey(
@@ -61,9 +44,10 @@ class UserBlock(models.Model):
         ]
 
         indexes = [
-            models.Index(fields=("blocker", "blocked")),
             models.Index(fields=("blocked",)),
         ]
 
+    objects = UserBlockManager()
+
     def __str__(self):
-        return f"{self.blocker} blocked {self.blocked}"
+        return f"{self.blocker} -> {self.blocked}"

@@ -6,6 +6,7 @@ from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from users.services.online import OnlineService
 
 
 class Profile(models.Model):
@@ -98,6 +99,11 @@ class Profile(models.Model):
         default=False, help_text=_("Open to dating where gifts or financial support may be part of the relationship.")
     )
 
+    financial_meetings_only = models.BooleanField(
+        default=False,
+        help_text=_("The user is interested only in meetings on a financial basis."),
+    )
+
     birth_date = models.DateField(
         null=True,
         blank=True,
@@ -174,6 +180,16 @@ class Profile(models.Model):
             years -= 1
 
         return years
+
+    @property
+    def looking_for_labels(self):
+        choices = dict(self.Gender.choices)
+        return [choices.get(value, value) for value in self.looking_for]
+
+    @property
+    def is_online(self) -> bool:
+        """Return whether the user is currently online."""
+        return OnlineService.is_online(self.user_id)
 
     def __str__(self) -> str:
         return f"{self.user.username} [{self.user.pk}]"

@@ -10,7 +10,12 @@ from django.utils.translation import gettext as _
 from django.views import View
 
 from geo.models import City, Country, Region
-from users.models import Profile
+from users.forms import (
+    ProfileSettingsForm,
+    PrivacySettingsForm,
+    CommunicationSettingsForm,
+)
+from users.models import Profile, UserSettings
 
 User = get_user_model()
 
@@ -19,8 +24,8 @@ class SensitiveContentToggleView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         settings = request.user.settings
 
-        settings.blur_sensitive = "blur_sensitive" in request.POST
-        settings.save(update_fields=["blur_sensitive"])
+        settings.blur_media = "blur_media" in request.POST
+        settings.save(update_fields=["blur_media"])
 
         return HttpResponse(status=204)
 
@@ -36,6 +41,25 @@ def _htmx_response(ok: bool, message: str) -> HttpResponse:
 
 
 def _handle_form(request, form_class, success_msg=None, **form_kwargs):
+    """
+    Обрабатывает POST-запрос с Django-формой.
+
+    Создаёт экземпляр формы, используя request.POST и request.FILES,
+    передаёт текущего аутентифицированного пользователя и дополнительные
+    именованные аргументы, выполняет валидацию данных, сохраняет форму
+    при успешной проверке и возвращает стандартизированный HTMX-ответ.
+
+    Args:
+        request: Текущий HTTP-запрос.
+        form_class: Класс Django Form или ModelForm для создания экземпляра формы.
+        success_msg: Необязательное сообщение, возвращаемое при успешном сохранении.
+        **form_kwargs: Дополнительные именованные аргументы, передаваемые
+            в конструктор формы (например, instance, initial).
+
+    Returns:
+        HttpResponse: HTMX-ответ, содержащий результат успешной обработки
+            или сообщение об ошибке.
+    """
     form = form_class(request.POST, request.FILES, user=request.user, **form_kwargs)
     if form.is_valid():
         form.save()
@@ -78,6 +102,8 @@ class SettingsPageView(LoginRequiredMixin, View):
                 "city_id": city_id,
                 "cities": cities,
                 "languages": settings.LANGUAGES,
+                "gender_choices": Profile.Gender.choices,
+                "access_level_choices": UserSettings.AccessLevel.choices,
             },
         )
 
@@ -101,46 +127,49 @@ class SettingsAccountView(LoginRequiredMixin, View):
 
 
 class SettingsProfileView(LoginRequiredMixin, View):
-    def post(self, request):
-        from accounts.forms.settings_forms import ProfileSettingsForm
 
-        return _handle_form(request, ProfileSettingsForm, success_msg=_("Profile updated."))
+    def post(self, request):
+        form = ProfileSettingsForm(
+            request.POST,
+            user=request.user,
+        )
+
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": _("Profile updated."),
+                }
+            )
+
+        return JsonResponse(
+            {
+                "success": False,
+                "errors": form.errors,
+            },
+            status=400,
+        )
 
 
 class SettingsPrivacyView(LoginRequiredMixin, View):
     def post(self, request):
-        from accounts.forms.settings_forms import PrivacySettingsForm
-
-        return _handle_form(request, PrivacySettingsForm, success_msg=_("Privacy settings saved."))
+        return _handle_form(
+            request,
+            PrivacySettingsForm,
+            instance=request.user.settings,
+            success_msg=_("Privacy settings saved."),
+        )
 
 
 class SettingsCommunicationView(LoginRequiredMixin, View):
     def post(self, request):
-        from accounts.forms.settings_forms import CommunicationSettingsForm
-
         return _handle_form(
             request,
             CommunicationSettingsForm,
+            instance=request.user.settings,
             success_msg=_("Communication settings saved."),
         )
-
-
-class SettingsNotificationsView(LoginRequiredMixin, View):
-    def post(self, request):
-        from accounts.forms.settings_forms import NotificationsSettingsForm
-
-        return _handle_form(
-            request,
-            NotificationsSettingsForm,
-            success_msg=_("Notification preferences saved."),
-        )
-
-
-class SettingsLocalizationView(LoginRequiredMixin, View):
-    def post(self, request):
-        from accounts.forms.settings_forms import LocalizationSettingsForm
-
-        return _handle_form(request, LocalizationSettingsForm, success_msg=_("Language updated."))
 
 
 class SettingsPremiumFeaturesView(LoginRequiredMixin, View):
