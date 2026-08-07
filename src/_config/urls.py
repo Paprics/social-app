@@ -18,6 +18,7 @@ urlpatterns += i18n_patterns(
     path("", include("cms.urls")),
     path("geo/", include("geo.urls", namespace="geo")),
     path("posts/", include("posts.urls")),
+    path("messenger/", include("messenger.urls")),
 )
 
 if settings.DEBUG:

@@ -1,0 +1,14 @@
+{# src/messenger/templates/messenger/partials/dialog/message_list.html #}
+
+<div
+    id="message-list"
+    class="min-h-0 flex-1 overflow-y-auto p-4 flex flex-col gap-4"
+>
+    {% for message in messages %}
+        {% include "messenger/partials/dialog/message_item.html" %}
+    {% empty %}
+        <div class="py-8 text-center text-gray-500">
+            Сообщений пока нет.
+        </div>
+    {% endfor %}
+</div>

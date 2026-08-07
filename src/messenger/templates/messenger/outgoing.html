@@ -1,0 +1,68 @@
+<div
+    id="message-{{ message.id }}"
+    class="flex justify-end"
+    data-message-id="{{ message.id }}"
+>
+
+    <div
+        class="
+            max-w-[75%]
+            rounded-2xl
+            bg-blue-600
+            px-4
+            py-2
+            text-white
+        "
+    >
+
+        <div>
+            {{ message.text|linebreaksbr }}
+        </div>
+
+        <div
+            class="
+                mt-1
+                flex
+                items-center
+                justify-end
+                gap-2
+                text-xs
+                opacity-70
+            "
+        >
+
+            <span>
+                {{ message.created_at|date:"H:i" }}
+            </span>
+
+            <span
+                class="message-status"
+                data-message-id="{{ message.id }}"
+            >
+                {% if dialog.current_participant.last_read_message_id and dialog.current_participant.last_read_message_id >= message.id %}
+                    ✓✓
+                {% else %}
+                    ✓
+                {% endif %}
+            </span>
+
+        </div>
+
+        <form
+            hx-post="{% url 'messenger:message_delete' message.id %}"
+            hx-swap="none"
+        >
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="mt-2 text-xs opacity-70 hover:opacity-100"
+            >
+                🗑
+            </button>
+
+        </form>
+
+    </div>
+
+</div>

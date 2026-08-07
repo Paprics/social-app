@@ -194,6 +194,18 @@ class FriendshipService:
         )
 
     @staticmethod
+    def are_friends(user1, user2) -> bool:
+        """Checks friendship status."""
+
+        if not user1.is_authenticated:
+            return False
+
+        return Friendship.objects.filter(
+            Q(from_user=user1, to_user=user2) | Q(from_user=user2, to_user=user1),
+            status=Friendship.Status.ACCEPTED,
+        ).exists()
+
+    @staticmethod
     def get_friends_count(profile_user):
         """Возвращает количество друзей."""
 

@@ -5,8 +5,9 @@ from django.urls import reverse
 
 from users.services.favorite_service import FavoriteService
 from users.services.friendship_service import FriendshipService
-from users.services.user_block import UserBlockService
+from users.services.profile_access import ProfileAccessService
 from users.services.profile_visits import ProfileVisitService
+from users.services.user_block import UserBlockService
 
 User = get_user_model()
 
@@ -45,13 +46,30 @@ class ProfilePageService:
     def _build_context(request, target_user):
 
         if request.user.is_authenticated:
-            friendship = FriendshipService.get_relation(request.user, target_user)
-            is_favorite = FavoriteService.is_favorite(request.user, target_user)
-            is_blocked = UserBlockService.is_blocked(request.user, target_user)
+            friendship = FriendshipService.get_relation(
+                request.user,
+                target_user,
+            )
+
+            is_favorite = FavoriteService.is_favorite(
+                request.user,
+                target_user,
+            )
+
+            is_blocked = UserBlockService.is_blocked(
+                request.user,
+                target_user,
+            )
         else:
             friendship = None
             is_favorite = False
             is_blocked = False
+
+        permissions = ProfileAccessService(
+            viewer=request.user,
+            target=target_user,
+            friendship=friendship,
+        )
 
         albums = target_user.galleries.filter(is_visible=True).prefetch_related("photos")
 
@@ -60,12 +78,18 @@ class ProfilePageService:
             "is_owner": request.user == target_user,
             "albums": albums[:3],
             "friendship": friendship,
+            "permissions": permissions,
             "favorite_url": reverse(
                 "users:user_favorite_toggle",
                 kwargs={"pk": target_user.pk},
             ),
             "is_favorite": is_favorite,
             "is_blocked": is_blocked,
-            "friends": FriendshipService.get_friends_preview(target_user, limit=6),
-            "friends_count": FriendshipService.get_friends_count(target_user),
+            "friends": FriendshipService.get_friends_preview(
+                target_user,
+                limit=6,
+            ),
+            "friends_count": FriendshipService.get_friends_count(
+                target_user,
+            ),
         }

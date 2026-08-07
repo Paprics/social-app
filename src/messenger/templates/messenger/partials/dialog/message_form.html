@@ -1,0 +1,70 @@
+{# src/messenger/templates/messenger/partials/dialog/message_form.html #}
+<form
+    id="message-form"
+    class="border-t bg-white p-4 pb-6 dark:bg-gray-900"
+    method="post"
+
+    {% if dialog %}
+        hx-post="{% url 'messenger:message_create' dialog.public_id %}"
+    {% else %}
+        hx-post="{% url 'messenger:conversation_send' other_user.id %}"
+    {% endif %}
+
+    hx-swap="none"
+
+    hx-on::after-request="
+        if(event.detail.successful){
+            this.reset();
+            document.getElementById('message-text').focus();
+        }
+    "
+>
+
+{% csrf_token %}
+
+<div class="flex items-start gap-3">
+
+<textarea
+    id="message-text"
+    name="text"
+    rows="2"
+    maxlength="5000"
+    required
+    placeholder="Введите сообщение..."
+    class="
+        flex-1
+        resize-none
+        rounded-xl
+        border
+        border-gray-300
+        bg-gray-50
+        px-4
+        py-3
+        outline-none
+
+        focus:border-blue-500
+
+        dark:border-gray-600
+        dark:bg-gray-800
+    "
+></textarea>
+
+
+<button
+    type="submit"
+    class="
+        rounded-xl
+        bg-blue-600
+        px-6
+        py-3
+        text-white
+        hover:bg-blue-700
+    "
+>
+Отправить
+</button>
+
+
+</div>
+
+</form>

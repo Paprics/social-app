@@ -1,0 +1,10 @@
+docker compose \
+  --env-file .env.dev \
+  -f docker/compose.dev.yml \
+  up -d
+
+
+Следить за логами в реальном времени:
+docker logs -f sn-web-dev
+Или через Compose:
+docker compose -f docker/compose.dev.yml logs web

@@ -1,0 +1,214 @@
+{# src/messenger/templates/messenger/partials/dialog_item.html #}
+
+<div
+    id="dialog-{{ dialog.public_id }}"
+    class="border-b"
+>
+    <div
+        class="
+            flex
+            items-center
+            gap-3
+            p-4
+            transition
+            hover:bg-base-200
+        "
+    >
+        <a
+            href="{% url 'messenger:dialog_detail' dialog.public_id %}"
+            class="
+                flex
+                min-w-0
+                flex-1
+                items-center
+                gap-3
+                focus:outline-none
+            "
+        >
+            <div class="shrink-0">
+
+                {% if dialog.is_private and dialog.other_user %}
+
+                    {% include "components/avatar.html" with profile=dialog.other_user.profile class="h-14 w-14 rounded-full object-cover" %}
+
+                {% else %}
+
+                    <div
+                        class="
+                            flex
+                            h-14
+                            w-14
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-base-300
+                            text-lg
+                            font-semibold
+                        "
+                    >
+                        👥
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+            <div class="min-w-0 flex-1">
+
+                <div
+                    class="
+                        flex
+                        items-center
+                        justify-between
+                        gap-2
+                    "
+                >
+                    <h3 class="min-w-0 flex-1 truncate font-semibold">
+
+                        {% if dialog.is_private and dialog.other_user %}
+
+                            {{ dialog.other_user.username }}
+
+                        {% else %}
+
+                            {{ dialog.title|default:"Групповой чат" }}
+
+                        {% endif %}
+
+                    </h3>
+
+                    {% if dialog.last_message %}
+
+                        <span
+                            class="
+                                shrink-0
+                                text-xs
+                                text-base-content/60
+                            "
+                        >
+                            {{ dialog.last_message.created_at|date:"H:i" }}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <div
+                    class="
+                        mt-1
+                        flex
+                        min-w-0
+                        items-center
+                        justify-between
+                        gap-2
+                    "
+                >
+                    {% if dialog.last_message %}
+
+                        <p
+                            class="
+                                min-w-0
+                                flex-1
+                                truncate
+                                text-sm
+                                text-base-content/70
+                            "
+                        >
+                            <span class="font-medium">
+                                {{ dialog.last_message.sender.username }}:
+                            </span>
+
+                            {{ dialog.last_message.text }}
+                        </p>
+
+                    {% else %}
+
+                        <p
+                            class="
+                                min-w-0
+                                flex-1
+                                text-sm
+                                text-base-content/50
+                            "
+                        >
+                            Сообщений пока нет
+                        </p>
+
+                    {% endif %}
+
+                    {% if dialog.current_participant.unread_count %}
+
+                        <span
+                            class="
+                                inline-flex
+                                h-6
+                                min-w-6
+                                shrink-0
+                                items-center
+                                justify-center
+                                rounded-full
+                                bg-blue-600
+                                px-1.5
+                                text-xs
+                                font-bold
+                                leading-none
+                                text-white
+                                shadow-sm
+                            "
+                        >
+                            {% if dialog.current_participant.unread_count > 99 %}
+                                99+
+                            {% else %}
+                                {{ dialog.current_participant.unread_count }}
+                            {% endif %}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+        </a>
+
+        <button
+            type="button"
+            data-delete-dialog="{% url 'messenger:dialog_delete' dialog.public_id %}"
+            class="
+                inline-flex
+                h-8
+                w-8
+                shrink-0
+                items-center
+                justify-center
+                rounded-md
+                text-base-content/50
+                transition
+                hover:bg-error/10
+                hover:text-error
+                focus:outline-none
+                focus:ring-2
+                focus:ring-error/30
+            "
+            title="Удалить диалог"
+            aria-label="Удалить диалог"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <path d="M3 6h18"></path>
+                <path d="M8 6V4h8v2"></path>
+                <path d="M19 6l-1 14H6L5 6"></path>
+                <path d="M10 11v5"></path>
+                <path d="M14 11v5"></path>
+            </svg>
+        </button>
+    </div>
+</div>

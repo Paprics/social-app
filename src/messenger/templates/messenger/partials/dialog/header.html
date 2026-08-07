@@ -1,0 +1,69 @@
+{# src/messenger/templates/messenger/partials/dialog/header.html #}
+
+{% load i18n %}
+
+<header class="flex items-center justify-between border-b px-6 py-4">
+
+    <div class="flex items-center gap-3">
+
+        {% if other_user %}
+
+            {% include "components/avatar.html" with profile=other_user.profile %}
+
+        {% endif %}
+
+        <div>
+
+            <h2 class="font-semibold">
+
+                {% if other_user %}
+
+                    {{ other_user.username }}
+
+                {% else %}
+
+                    {{ dialog.title|default:_("Dialog") }}
+
+                {% endif %}
+
+            </h2>
+
+            {% if show_online_status %}
+
+                <p class="text-sm text-base-content/70">
+
+                    {% if is_online %}
+
+                        <span class="font-medium text-green-600">
+                            ● {% trans "Online" %}
+                        </span>
+
+                    {% elif last_seen %}
+
+                        {% trans "Last seen" %}
+                        {{ last_seen|timesince }}
+                        {% trans "ago" %}
+
+                    {% else %}
+
+                        <span class="italic text-base-content/45">
+                            {% trans "Status unavailable" %}
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+            {% else %}
+
+                <p class="text-sm italic text-base-content/45">
+                    {% trans "Status hidden" %}
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</header>

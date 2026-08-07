@@ -7,6 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from users.services.online import OnlineService
+from django.templatetags.static import static
 
 
 class Profile(models.Model):
@@ -190,6 +191,20 @@ class Profile(models.Model):
     def is_online(self) -> bool:
         """Return whether the user is currently online."""
         return OnlineService.is_online(self.user_id)
+
+    @property
+    def avatar_url(self) -> str:
+        """
+        Возвращает URL аватара пользователя.
+
+        Если аватар не установлен, возвращает
+        путь к изображению по умолчанию.
+        """
+
+        if self.avatar_photo:
+            return self.avatar_photo.image.url
+
+        return static("images/default-avatar.svg")
 
     def __str__(self) -> str:
         return f"{self.user.username} [{self.user.pk}]"

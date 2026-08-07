@@ -1,0 +1,23 @@
+<!--{# src/messenger/templates/messenger/partials/dialog/message_item.html #}-->
+
+<!--{% if message.sender_id == current_user.id %}-->
+
+<!--    {% include "messenger/outgoing.html" %}-->
+
+<!--{% else %}-->
+
+<!--    {% include "messenger/incoming.html" %}-->
+
+<!--{% endif %}-->
+
+{# src/messenger/templates/messenger/partials/dialog/message_item.html #}
+
+{% if message.sender_id == request.user.id %}
+
+    {% include "messenger/outgoing.html" %}
+
+{% else %}
+
+    {% include "messenger/incoming.html" %}
+
+{% endif %}

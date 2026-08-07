@@ -1,0 +1,26 @@
+{% extends "messenger/layouts/messenger.html" %}
+{% load static %}
+
+{% block messenger_content %}
+
+<div
+    id="dialog-page"
+    class="flex h-full min-h-0 flex-col"
+    {% if dialog %}
+        data-dialog-id="{{ dialog.public_id }}"
+    {% endif %}
+>
+
+    {% include "messenger/partials/dialog/header.html" %}
+
+    {% include "messenger/partials/dialog/message_list.html" %}
+
+    {% include "messenger/partials/dialog/message_form.html" %}
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'messenger/js/messenger.js' %}"></script>
+{% endblock %}

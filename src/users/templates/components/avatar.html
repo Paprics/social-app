@@ -1,0 +1,7 @@
+{% load static i18n %}
+
+<img
+    src="{{ profile.avatar_url }}"
+    alt="{{ profile.user.username }}"
+    class="{{ class|default:'h-10 w-10 rounded-full object-cover' }}"
+>

@@ -1,0 +1,38 @@
+{# src/messenger/templates/messenger/partials/sidebar.html #}
+
+<aside
+    id="messenger-sidebar"
+    class="flex h-full flex-col border-r bg-base-100"
+>
+
+    <!-- Заголовок -->
+
+    <header class="border-b p-4">
+
+        <h1 class="text-xl font-bold">
+            Сообщения
+        </h1>
+
+    </header>
+
+    <!-- Список диалогов -->
+
+    <div class="flex-1 overflow-y-auto">
+
+        {% if dialogs %}
+
+            {% for dialog in dialogs %}
+
+                {% include "messenger/partials/dialog_item.html" %}
+
+            {% endfor %}
+
+        {% else %}
+
+            {% include "messenger/components/empty_state.html" with title="Нет диалогов" description="Начните общение с другим пользователем." %}
+
+        {% endif %}
+
+    </div>
+
+</aside>

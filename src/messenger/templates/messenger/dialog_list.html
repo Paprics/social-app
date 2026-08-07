@@ -1,0 +1,13 @@
+{# src/messenger/templates/messenger/dialog_list.html #}
+
+{% extends "messenger/layouts/messenger.html" %}
+
+{% block title %}
+Messenger
+{% endblock %}
+
+{% block messenger_content %}
+
+{% include "messenger/components/empty_state.html" with title="Выберите диалог" description="Откройте существующий диалог или начните новый." %}
+
+{% endblock %}
