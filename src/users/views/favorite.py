@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, render
 from django.views import View
 
-from users.models import Photo
+from gallery.models import Photo
 from users.services.favorite_service import FavoriteService
 
 User = get_user_model()

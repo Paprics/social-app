@@ -1,539 +1,117 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load static %}
+{% load static i18n render_image gender_icon %}
 
-{% block title %}{{ target_user.username|default:"No Username" }} — Social Network{% endblock %}
 
-{% block meta_description %}{% trans "User profile page." %}{% endblock %}
-
-{% block extra_head %}
-<style>
-    .avatar-img { object-fit: cover; object-position: center; }
-    .wall-post-textarea { resize: none; }
-    .carousel-track { scrollbar-width: none; -ms-overflow-style: none; }
-    .carousel-track::-webkit-scrollbar { display: none; }
-</style>
+{% block title %}
+    {{ target_user.username|default:"No Username" }} — Social Network
 {% endblock %}
 
+
+{% block meta_description %}
+    {% trans "User profile page." %}
+{% endblock %}
+
+
+{% block extra_head %}
+{% endblock %}
+
+
 {% block page %}
-<div class="min-h-screen bg-slate-50">
-    {% include "components/users_carousel.html" %}
+    <section class="mx-auto max-w-7xl space-y-4 px-4 py-6">
 
-    <section class="mx-auto max-w-7xl px-4 py-6 space-y-4">
+        {# Profile header #}
+        {% include "users/profile/_header.html" %}
 
-        {# ── Шапка профиля ── #}
-        <div class="rounded-xl border border-slate-200 bg-[#99C2FF] px-6 py-4 shadow-sm">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
-                <div class="flex items-center gap-3">
-                    <h1 class="m-0 self-center text-xl font-semibold text-slate-900">
-                        {{ target_user.username|default:"username" }}
-                    </h1>
-                    {% if target_user.profile.status and permissions.can_view_profile %}
-                        <span class="self-center text-base italic text-slate-700 whitespace-pre-line">
-                            «{{ target_user.profile.status|truncatechars:150 }}»
-                        </span>
-                    {% endif %}
-                </div>
-
-                <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
-                    {% if not is_owner %}
-                        <button type="button"
-                                class="text-sm font-medium text-amber-900 hover:text-rose-700 underline decoration-amber-900/40 hover:decoration-rose-700 transition duration-150">
-                            {% trans "Report page" %}
-                        </button>
-                    {% endif %}
-
-                    <div class="flex items-center gap-2 text-sm">
-                        {% if is_owner %}
-                            <span class="inline-flex items-center rounded-md bg-slate-900/10 px-2.5 py-0.5 text-xs font-semibold text-slate-900 border border-slate-900/15 tracking-wide uppercase">
-                                {% trans "My Page" %}
-                            </span>
-                        {% else %}
-                            {% if target_user.settings.show_online_status %}
-                                {% if target_user.profile.is_online %}
-                                    <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-800">
-                                        <span class="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                                        {% trans "Online" %}
-                                    </span>
-                                {% else %}
-                                    <span class="font-medium text-slate-700">
-                                        {% if target_user.profile.last_seen %}
-                                            {% trans "Last seen" %} {{ target_user.profile.last_seen|timesince }} {% trans "ago" %}
-                                        {% else %}
-                                            {% trans "Recently seen" %}
-                                        {% endif %}
-                                    </span>
-                                {% endif %}
-                            {% else %}
-                                <span class="font-medium text-slate-500 italic text-sm">{% trans "Status hidden" %}</span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        {# ── Основная сетка ── #}
+        {# Main layout #}
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start">
 
-            {# ── Левая колонка (35%) ── #}
+            {# Left column (35%) #}
             <aside class="w-full space-y-4 lg:w-[35%] lg:shrink-0">
 
-                {# Аватар — всегда виден #}
+                {# Profile avatar #}
                 <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
                     <div id="avatar-block">
-                        <div class="media-container">
-                            {% if target_user.profile.avatar_photo %}
-                                <img src="{{ target_user.profile.avatar_photo.image.url }}"
-                                     alt="{{ target_user.username }}"
-                                     class="media-image avatar-img aspect-[4/5] w-full sm:aspect-[3/4] {% if request.user.is_authenticated and request.user.settings.blur_media %}is-blurred{% endif %}">
-                            {% else %}
-                                <img src="{% static 'images/default-avatar.svg' %}"
-                                     alt="{{ target_user.username }}"
-                                     class="media-image avatar-img aspect-[4/5] w-full object-cover sm:aspect-[3/4] {% if request.user.is_authenticated and request.user.settings.blur_media %}is-blurred{% endif %}">
-                            {% endif %}
-                            {% if request.user.is_authenticated and request.user.settings.blur_media %}
-                                <div class="media-overlay">
-                                    <button type="button" class="media-reveal-btn" data-media-reveal>
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
-                                        </svg>
-                                        <span>{% trans "Show" %}</span>
-                                    </button>
-                                </div>
-                            {% endif %}
-                        </div>
+                        {% render_image target_user.profile.avatar_photo.image variant="avatar_lg" alt=target_user.username css_class="avatar-img aspect-[4/5] w-full object-cover sm:aspect-[3/4]" reveal=True %}
                     </div>
                 </div>
 
-                {# ── Блок кнопок ── #}
-                <div class="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                    {% if is_owner %}
 
-                        <a href="{% url 'users:settings' %}"
-                           class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-blue-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
-                            {% trans "Edit profile" %}
-                        </a>
-                        <button type="button"
-                                hx-get="{% url 'users:avatar_modal' %}"
-                                hx-target="#avatar-modal-container"
-                                hx-swap="innerHTML"
-                                class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            {% if target_user.profile.avatar_photo %}{% trans "Change profile photo" %}{% else %}{% trans "Add profile photo" %}{% endif %}
-                        </button>
-                        <a href="{% url 'users:gallery' target_user.pk %}"
-                           class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            {% trans "Manage photos" %}
-                        </a>
-                        <a href="{% url 'users:account_center' %}"
-                           class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            {% trans "Account Center" %}
-                        </a>
-                        <a href="#" aria-disabled="true" onclick="return false;"
-                           class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-medium text-amber-900 opacity-70 shadow-sm transition">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.922-.755 1.688-1.54 1.118L10 14.347l-2.937 2.134c-.784.57-1.838-.196-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L3.43 8.72c-.783-.57-.38-1.81.588-1.81H7.48a1 1 0 00.95-.69l1.07-3.292z"/>
-                            </svg>
-                            {% trans "Premium coming soon" %}
-                        </a>
+                {# Profile actions #}
+                {% include "users/profile/_actions_buttons.html" %}
 
-                    {% else %}
 
-                        {# Чужой профиль — показываем только то, что разрешено независимо от видимости профиля #}
-                        <a href="{% url 'users:profile_explore' pk=target_user.pk %}"
-                           class="flex w-full items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50/70 px-4 py-2.5 text-sm font-medium text-blue-700 shadow-sm transition duration-200 hover:bg-blue-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            {% trans "Explore Profile" %}
-                        </a>
+                {# Gifts #}
+                {% include "users/profile/_gifts_block.html" %}
 
-                        {# Send Message — отдельное право, не зависит от видимости профиля #}
-                        {% if permissions.can_send_message %}
-                            <a href="{% url 'messenger:conversation' target_user.pk %}"
-                               class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-blue-600" fill="none"
-                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                </svg>
-                                {% trans "Send message" %}
-                            </a>
-                        {% endif %}
 
-                        {# Остальные кнопки — только при доступе к профилю #}
-                        {% if permissions.can_view_profile %}
-                            {% include "users/partials/friendship_actions.html" %}
-                            {% include "users/partials/favorite_button.html" with favorite_url=favorite_url is_favorite=is_favorite %}
-                            <button type="button"
-                                    class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition duration-200 hover:bg-slate-50">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-                                </svg>
-                                {% trans "Send a gift" %}
-                            </button>
-                            {% include "users/partials/block_button.html" %}
-                        {% endif %}
+                {# Photo albums #}
+                {% include "users/profile/_albums.html" %}
 
-                    {% endif %}
-                </div>
 
-                {# Подарки — только при доступе к профилю #}
-                {% if permissions.can_view_profile %}
-                    {% include "components/gifts_block.html" %}
-                {% endif %}
+                {# Regional leader #}
+                {% include "users/components/regional_leader_block.html" %}
 
-                {# ── Фотоальбомы ── #}
-                {% if permissions.can_view_profile %}
-                    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <div class="mb-3 flex items-center justify-between">
-                            <h2 class="text-sm font-semibold text-slate-700">{% trans "Photo Albums" %}</h2>
-                            <div class="flex items-center gap-3">
-                                {% if is_owner %}
-                                    <button type="button"
-                                            hx-get="{% url 'users:avatar_modal' %}"
-                                            hx-target="#avatar-modal-container"
-                                            hx-swap="innerHTML"
-                                            class="flex items-center gap-1 text-xs font-medium text-green-600 transition hover:text-green-700">
-                                        <span>+</span><span>{% trans "Add photos" %}</span>
-                                    </button>
-                                {% endif %}
-                                {% if permissions.can_view_photo_albums %}
-                                    <a href="{% url 'users:gallery' target_user.pk %}"
-                                       class="text-xs text-blue-600 transition hover:text-blue-700">
-                                        {% trans "All albums" %}
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
 
-                        {% if permissions.can_view_photo_albums %}
-                            {% if albums %}
-                                <div class="space-y-3">
-                                    {% for album in albums %}
-                                        <div>
-                                            <div class="mb-1.5 flex items-center justify-between">
-                                                <a href="{% url 'users:album_detail' target_user.pk album.pk %}"
-                                                   class="text-xs font-medium text-slate-600 transition hover:text-blue-600">
-                                                    {{ album.title }}
-                                                </a>
-                                                <span class="text-xs text-slate-400">{{ album.photos.count }} {% trans "photos" %}</span>
-                                            </div>
-                                            <div class="grid grid-cols-4 gap-1">
-                                                {% for photo in album.photos.all|slice:":4" %}
-                                                    <a href="{% url 'users:album_detail' target_user.pk album.pk %}"
-                                                       class="block aspect-square overflow-hidden rounded bg-slate-100">
-                                                        <img src="{{ photo.image.url }}" alt="{{ photo.title }}" loading="lazy" class="h-full w-full object-cover {% if request.user.is_authenticated and request.user.settings.blur_media %}is-blurred{% endif %}">
-                                                    </a>
-                                                {% empty %}
-                                                    {% for i in "1234" %}<div class="aspect-square rounded bg-slate-100"></div>{% endfor %}
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="py-4 text-center text-xs text-slate-400">{% trans "No albums yet." %}</p>
-                                {% if is_owner %}
-                                    <a href="{% url 'users:gallery' target_user.pk %}"
-                                       class="mt-1 block w-full text-center text-xs text-blue-600 transition hover:text-blue-700">
-                                        {% trans "Upload your first photo" %}
-                                    </a>
-                                {% endif %}
-                            {% endif %}
-                        {% else %}
-                            {# Альбомы скрыты настройками приватности (профиль открыт, но альбомы — нет) #}
-                            <div class="flex flex-col items-center gap-2 py-6 text-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                </svg>
-                                <p class="text-xs text-slate-400">{% trans "Photo albums are hidden by privacy settings." %}</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endif %}
-                {# /can_view_profile — albums #}
+                {# Friends #}
+                {% include "users/profile/_friends.html" %}
 
-                {# Regional Leader #}
-                {% include "components/regional_leader_block.html" %}
 
-                {# ── Друзья ── #}
-                {% if permissions.can_view_profile %}
-                    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                        <div class="mb-3 flex items-center justify-between">
-                            <h2 class="text-sm font-semibold text-slate-700">{% trans "Friends" %}</h2>
-                            {% if permissions.can_view_friends %}
-                                <span class="text-xs text-slate-400">{{ friends_count }}</span>
-                            {% endif %}
-                        </div>
+                {# Mutual friends #}
+                {% include "users/profile/_mutual_friends.html" %}
 
-                        {% if permissions.can_view_friends %}
-                            {% if friends %}
-                                <div class="mb-3 grid grid-cols-5 gap-2">
-                                    {% for friend in friends %}
-                                        <a href="{% url 'users:profile' friend.pk %}"
-                                           class="flex flex-col items-center gap-1 transition hover:opacity-90">
-                                            <div class="aspect-square w-full overflow-hidden rounded-lg bg-slate-100 transition hover:ring-2 hover:ring-blue-500">
-                                                {% if friend.profile.avatar_photo %}
-                                                    <img src="{{ friend.profile.avatar_photo.image.url }}" alt="{{ friend.username }}" class="h-full w-full object-cover {% if request.user.is_authenticated and request.user.settings.blur_media %}is-blurred{% endif %}">
-                                                {% else %}
-                                                    <img src="{% static 'images/default-avatar.svg' %}" alt="{% trans 'Default avatar' %}" class="h-full w-full object-cover">
-                                                {% endif %}
-                                            </div>
-                                            <span class="w-full truncate text-center text-xs text-slate-600">{{ friend.username }}</span>
-                                        </a>
-                                    {% endfor %}
-                                </div>
-                                <a href="{% url 'users:account_center' %}?section=friends&friends_tab=friends"
-                                   class="block w-full rounded-lg border border-slate-200 px-3 py-2 text-center text-xs font-medium text-slate-600 transition hover:bg-slate-50">
-                                    {% trans "View all friends" %}
-                                </a>
-                            {% else %}
-                                <div class="py-8 text-center text-sm text-slate-500">{% trans "This user has no friends yet." %}</div>
-                            {% endif %}
-                        {% else %}
-                            {# Список друзей скрыт (профиль открыт, но friends — нет) #}
-                            <div class="flex flex-col items-center gap-2 py-6 text-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                </svg>
-                                <p class="text-xs text-slate-400">{% trans "Friends list is hidden by privacy settings." %}</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                {% endif %}
-                {# /can_view_profile — friends #}
 
-                {% include "components/sidebar_ad.html" %}
+                {# Sidebar advertisement #}
+                {% include "users/components/sidebar_ad.html" %}
 
             </aside>
 
-            {# ── Правая колонка (65%) ── #}
-            <div class="min-w-0 w-full space-y-4 lg:flex-1">
 
-                {% include "components/profile_banner.html" %}
+            {# Right column (65%) #}
+            <div class="w-full min-w-0 space-y-4 lg:flex-1">
 
-                {% if permissions.can_view_profile %}
+                {# Profile banner #}
+                {% include "users/components/profile_banner.html" %}
 
-                    {# ── Информация о пользователе ── #}
-                    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div class="space-y-3">
 
-                            {# Username #}
-                            <div class="flex items-baseline gap-3 pb-1 border-b border-slate-100">
-                                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Username" %}:</span>
-                                <span class="text-lg font-bold text-slate-900 tracking-tight">{{ target_user.username }}</span>
-                            </div>
+                {% if access.can_view_profile %}
 
-                            {# Пол #}
-                            <div class="flex items-baseline gap-3">
-                                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Gender" %}:</span>
-                                <span class="text-base text-slate-800">{{ target_user.profile.gender|default:"—" }}</span>
-                            </div>
+                    {# Profile details #}
+                    {% include "users/profile/_profile_details.html" %}
 
-                            {# Возраст #}
-                            <div class="flex items-baseline gap-3">
-                                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Age" %}:</span>
-                                <span class="text-base text-slate-800">{% if target_user.profile.age %}{{ target_user.profile.age }}{% else %}—{% endif %}</span>
-                            </div>
 
-                            {# Регион / Страна #}
-                            <div class="flex items-baseline gap-3">
-                                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Region" %}:</span>
-                                <span class="text-base text-slate-800">
-                                    {% if target_user.profile.region %}{{ target_user.profile.region.get_name }}{% endif %}
-                                    {% if target_user.profile.country %}{% if target_user.profile.region %}, {% endif %}{{ target_user.profile.country.get_name }}{% endif %}
-                                    {% if not target_user.profile.region and not target_user.profile.country %}—{% endif %}
-                                </span>
-                            </div>
-
-                            {# Город #}
-                            <div class="flex items-baseline gap-3">
-                                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "City" %}:</span>
-                                <span class="text-base text-slate-800">{{ target_user.profile.city.get_name|default:"—" }}</span>
-                            </div>
-
-                            {# Статус страницы #}
-                            <div class="flex items-baseline gap-3">
-                                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Page status" %}:</span>
-                                <span class="text-base text-slate-800">{{ target_user.profile.page_status|default:"Active" }}</span>
-                            </div>
-
-                            {# Last seen — только если онлайн-статус публичен #}
-                            {% if target_user.settings.show_online_status or is_owner %}
-                                <div class="flex items-baseline gap-3">
-                                    <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Last seen" %}:</span>
-                                    <span class="text-base text-slate-800">
-                                        {% if target_user.profile.last_seen %}{{ target_user.profile.last_seen|date:"d.m.Y H:i" }}{% else %}—{% endif %}
-                                    </span>
-                                </div>
-                            {% endif %}
-
-                            {# Статус профиля #}
-                            {% if target_user.profile.status %}
-                                <div class="flex items-baseline gap-3">
-                                    <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Status" %}:</span>
-                                    <span class="text-base italic text-slate-700 whitespace-pre-line">«{{ target_user.profile.status }}»</span>
-                                </div>
-                            {% endif %}
-
-                            {# Цель знакомства #}
-                            <div class="flex items-baseline gap-3">
-                                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Looking to meet" %}:</span>
-                                <span class="text-base text-slate-800">
-                                    {% if target_user.profile.looking_for_labels %}{{ target_user.profile.looking_for_labels|join:", " }}{% else %}—{% endif %}
-                                </span>
-                            </div>
-
-                            {# О себе #}
-                            {% if target_user.profile.bio %}
-                                <div class="flex items-baseline gap-3">
-                                    <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "About" %}:</span>
-                                    <span class="text-base text-slate-800 whitespace-pre-line">{{ target_user.profile.bio }}</span>
-                                </div>
-                            {% endif %}
-
-                            {# Особые метки #}
-                            {% if target_user.profile.open_to_gifts or target_user.profile.financial_meetings_only %}
-                                <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-2 justify-end">
-                                    {% if target_user.profile.open_to_gifts %}
-                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-700 border border-pink-200 shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-                                            </svg>
-                                            {% trans "Open to receiving gifts" %}
-                                        </span>
-                                    {% endif %}
-                                    {% if target_user.profile.financial_meetings_only %}
-                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200 shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            {% trans "Sponsorship / Financial support" %}
-                                        </span>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-
-                        </div>
-                    </div>
-
-                    {# ── Стена ── #}
+                    {# Profile wall #}
                     {% if target_user.settings.wall_enabled %}
 
-                        {# Форма — только если есть право и пользователь авторизован #}
-                        {% if permissions.can_write_wall and request.user.is_authenticated %}
-                            <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                                <form hx-post="{% url 'posts:wall_create' target_user.pk %}"
-                                      hx-target="#wall-posts"
-                                      hx-swap="afterbegin"
-                                      hx-on::after-request="if(event.detail.successful){ this.reset(); }">
-                                    <div class="flex gap-3">
-                                        <div class="shrink-0">
-                                            {% if request.user.profile.avatar_photo %}
-                                                <img src="{{ request.user.profile.avatar_photo.image.url }}" alt="{{ request.user.username }}" class="h-10 w-10 rounded-full border border-slate-300 object-cover">
-                                            {% else %}
-                                                <img src="{% static 'images/default-avatar.svg' %}" alt="{% trans 'Default avatar' %}" class="h-10 w-10 rounded-full border border-slate-300 object-cover">
-                                            {% endif %}
-                                        </div>
-                                        <div class="min-w-0 flex-1">
-                                            <textarea name="content" rows="3" required maxlength="5000"
-                                                      class="wall-post-textarea w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 transition duration-200 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                      placeholder="{% trans 'Write something on the wall...' %}"></textarea>
-                                            <div class="mt-3 flex justify-end">
-                                                <button type="submit"
-                                                        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
-                                                    {% trans "Post" %}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        {% endif %}
+                        {# Wall post form #}
+                        {% include "users/profile/_wall_post_form.html" %}
 
-                        {# Лента стены #}
-                        <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
-                            <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-                                <h2 class="text-sm font-semibold text-slate-700">{% trans "Wall" %}</h2>
-                            </div>
-                            <div id="wall-posts"
-                                 class="divide-y divide-slate-100"
-                                 hx-get="{% url 'posts:wall_posts' target_user.pk %}"
-                                 hx-trigger="revealed once"
-                                 hx-target="this"
-                                 hx-swap="innerHTML">
-                                <div class="flex items-center justify-center py-10">
-                                    <div class="flex flex-col items-center gap-3 text-slate-400">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M5.636 18.364A9 9 0 1020 12"/>
-                                        </svg>
-                                        <span class="text-sm">{% trans "Loading posts..." %}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+                        {# Wall posts #}
+                        {% include "users/profile/_wall.html" %}
 
                     {% endif %}
-                    {# /wall_enabled #}
 
                 {% else %}
 
-                    {# ── Профиль закрыт — информационный блок ── #}
-                    <div class="rounded-xl border border-orange-200 bg-orange-50 p-8 shadow-sm">
-                        <div class="flex flex-col items-center gap-4 text-center">
-                            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                </svg>
-                            </div>
-                            <div class="space-y-1">
-                                <h3 class="text-base font-semibold text-orange-900">{% trans "This profile is private" %}</h3>
-                                <p class="text-sm text-orange-700">
-                                    {% trans "The owner has restricted access to this page through privacy settings. Only certain users can view the full profile." %}
-                                </p>
-                            </div>
-                            {% if not request.user.is_authenticated %}
-                                <a href="{% url 'users:login' %}"
-                                   class="mt-2 inline-flex items-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-orange-600">
-                                    {% trans "Sign in to continue" %}
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {# Private profile notice #}
+                    {% include "users/profile/_private_profile_notice.html" %}
 
                 {% endif %}
-                {# /can_view_profile — right column #}
 
             </div>
-            {# /Правая колонка #}
 
         </div>
 
     </section>
 
+
+    {# Не удалять: точка монтирования модального окна смены аватара #}
     <div id="avatar-modal-container"></div>
-</div>
+
 {% endblock %}
 
+
 {% block extra_js %}
-    <script src="{% static 'js/profile.js' %}"></script>
+    <script src="{% static 'users/js/profile/avatar.js' %}"></script>
 {% endblock %}

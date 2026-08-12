@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512"
+     height="512"
+     viewBox="0 0 512 512"
+     role="img"
+     aria-labelledby="title">
+  <title id="title">Gender symbol icon</title>
+  <defs>
+    <mask id="symbol-cutout"
+          x="0"
+          y="0"
+          width="512"
+          height="512"
+          maskUnits="userSpaceOnUse">
+      <rect width="512" height="512" fill="#fff"/>
+      <circle cx="256" cy="256" r="87.5"
+              fill="none"
+              stroke="#000"
+              stroke-width="65"/>
+      <rect x="236" y="374" width="40" height="138" fill="#000"/>
+      <rect x="198" y="409" width="116" height="40" fill="#000"/>
+      <path fill="#000"
+            d="M318 76 408 84 416 175 383 177 380 135 342 174 316 153 357 112 316 109Z"/>
+    </mask>
+  </defs>
+  <circle cx="256" cy="256" r="230"
+          fill="currentColor"
+          mask="url(#symbol-cutout)"/>
+</svg>

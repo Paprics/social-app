@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512"
+     height="512"
+     viewBox="0 0 512 512"
+     role="img"
+     aria-labelledby="title">
+  <title id="title">Couple symbol</title>
+  <defs>
+    <mask id="couple-cutout"
+          x="0"
+          y="0"
+          width="512"
+          height="512"
+          maskUnits="userSpaceOnUse">
+      <rect width="512" height="512" fill="#fff"/>
+
+      <!-- Two interlocking rings -->
+      <circle cx="195" cy="274" r="66"
+              fill="none" stroke="#000" stroke-width="34"/>
+      <circle cx="300" cy="220" r="66"
+              fill="none" stroke="#000" stroke-width="34"/>
+
+      <!-- Female cross -->
+      <rect x="178" y="338" width="34" height="106" fill="#000"/>
+      <rect x="148" y="382" width="94" height="34" fill="#000"/>
+
+      <!-- Male arrow -->
+      <path fill="#000"
+            d="M359 95 430 101 436 172 407 174 404 137
+               367 174 343 150 380 113 357 111Z"/>
+    </mask>
+  </defs>
+
+  <circle cx="256" cy="256" r="230"
+          fill="currentColor"
+          mask="url(#couple-cutout)"/>
+</svg>

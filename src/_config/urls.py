@@ -5,7 +5,6 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("rosetta/", include("rosetta.urls")),
     path("i18n/", include("django.conf.urls.i18n")),
 ]
 
@@ -16,14 +15,17 @@ urlpatterns += i18n_patterns(
     path("", include("users.urls")),
     path("", include("accounts.urls")),
     path("", include("cms.urls")),
-    path("geo/", include("geo.urls", namespace="geo")),
+    path("geo/", include("geo.urls")),
     path("posts/", include("posts.urls")),
     path("messenger/", include("messenger.urls")),
+    path("search/", include("search.urls")),
+    path("gallery/", include("gallery.urls")),
 )
 
 if settings.DEBUG:
     urlpatterns += [
         path("__debug__/", include("debug_toolbar.urls")),
+        path("rosetta/", include("rosetta.urls")),
     ]
 
     urlpatterns += static(

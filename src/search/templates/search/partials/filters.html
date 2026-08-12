@@ -1,0 +1,237 @@
+{% load i18n %}
+
+<form
+    id="search-filters"
+    method="get"
+    action="{% url 'search:users' %}"
+    hx-get="{% url 'search:users' %}"
+    hx-target="#search-results"
+    hx-swap="innerHTML"
+    hx-push-url="true"
+    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+>
+    <div class="mb-5 flex items-center justify-between gap-3">
+        <h2 class="text-base font-semibold text-slate-900">
+            {% trans "Filters" %}
+        </h2>
+
+    <a
+        href="{% url 'search:users' %}"
+        class="text-sm font-medium text-blue-600 transition hover:text-blue-700"
+    >
+        {% trans "Reset" %}
+    </a>
+</div>
+
+<div class="space-y-4">
+
+    {# Gender #}
+    <div class="space-y-1.5">
+        <label
+            for="id_gender"
+            class="block text-sm font-medium text-slate-700"
+        >
+            {% trans "Gender" %}
+        </label>
+
+        <select
+            id="id_gender"
+            name="gender"
+            class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+        >
+            <option value="">
+                {% trans "Any" %}
+            </option>
+
+            {% for value, label in gender_choices %}
+                <option
+                    value="{{ value }}"
+                    {% if request.GET.gender == value %}selected{% endif %}
+                >
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    {# Age #}
+    <fieldset>
+        <legend class="mb-1.5 block text-sm font-medium text-slate-700">
+            {% trans "Age" %}
+        </legend>
+
+        <div class="grid grid-cols-2 gap-3">
+
+            <div class="space-y-1.5">
+                <label
+                    for="id_age_from"
+                    class="block text-xs text-slate-500"
+                >
+                    {% trans "From" %}
+                </label>
+
+                <select
+                    id="id_age_from"
+                    name="age_from"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                    <option value="">
+                        {% trans "Any" %}
+                    </option>
+
+                    {% for age in age_choices %}
+                        <option
+                            value="{{ age }}"
+                            {% if request.GET.age_from == age|stringformat:"s" %}selected{% endif %}
+                        >
+                            {{ age }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="space-y-1.5">
+                <label
+                    for="id_age_to"
+                    class="block text-xs text-slate-500"
+                >
+                    {% trans "To" %}
+                </label>
+
+                <select
+                    id="id_age_to"
+                    name="age_to"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                    <option value="">
+                        {% trans "Any" %}
+                    </option>
+
+                    {% for age in age_choices %}
+                        <option
+                            value="{{ age }}"
+                            {% if request.GET.age_to == age|stringformat:"s" %}selected{% endif %}
+                        >
+                            {{ age }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+    </fieldset>
+
+    {# Location #}
+    <div class="border-t border-slate-200 pt-4">
+
+        <h3 class="mb-3 text-sm font-medium text-slate-700">
+            {% trans "Location" %}
+        </h3>
+
+        <div class="space-y-4">
+
+            {# Country #}
+            <div class="space-y-1.5">
+                <label
+                    for="id_country"
+                    class="block text-sm font-medium text-slate-700"
+                >
+                    {% trans "Country" %}
+                </label>
+
+                <select
+                    id="id_country"
+                    name="country"
+                    hx-get="{% url 'geo:regions' %}"
+                    hx-trigger="change"
+                    hx-target="#id_region"
+                    hx-swap="innerHTML"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                    <option value="">
+                        {% trans "Any country" %}
+                    </option>
+
+                    {% for country in countries %}
+                        <option
+                            value="{{ country.pk }}"
+                            {% if request.GET.country == country.pk|stringformat:"s" %}selected{% endif %}
+                        >
+                            {{ country.get_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            {# Region #}
+            <div class="space-y-1.5">
+                <label
+                    for="id_region"
+                    class="block text-sm font-medium text-slate-700"
+                >
+                    {% trans "Region" %}
+                </label>
+
+                <select
+                    id="id_region"
+                    name="region"
+                    hx-get="{% url 'geo:cities' %}"
+                    hx-trigger="change"
+                    hx-target="#id_city"
+                    hx-swap="innerHTML"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                    <option value="">
+                        {% trans "Any region" %}
+                    </option>
+                </select>
+            </div>
+
+            {# City #}
+            <div class="space-y-1.5">
+                <label
+                    for="id_city"
+                    class="block text-sm font-medium text-slate-700"
+                >
+                    {% trans "City" %}
+                </label>
+
+                <select
+                    id="id_city"
+                    name="city"
+                    class="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                    <option value="">
+                        {% trans "Any city" %}
+                    </option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+    <button
+        type="submit"
+        class="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition duration-200 hover:bg-blue-700"
+    >
+        <svg
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
+            />
+        </svg>
+
+        {% trans "Search" %}
+    </button>
+
+</div>
+
+</form>

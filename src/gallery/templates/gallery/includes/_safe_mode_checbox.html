@@ -1,0 +1,45 @@
+{% load static i18n render_image gender_icon %}
+
+<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+
+    <form method="post"
+          action="{% url 'users:toggle_sensitive_content' %}"
+          data-safe-media-form>
+
+        {% csrf_token %}
+
+        <div class="flex items-center justify-between gap-4">
+
+            <div>
+                <p class="text-sm font-medium text-slate-900">
+                    {% trans "Safe Media Mode" %}
+                </p>
+
+                <p class="mt-0.5 text-xs text-slate-500">
+                    {% trans "Blur sensitive media" %}
+                </p>
+            </div>
+
+            <label class="relative inline-flex shrink-0 cursor-pointer items-center">
+
+                <input type="checkbox"
+                       name="blur_media"
+                       class="peer sr-only"
+                       data-safe-media-toggle
+                       {% if user_settings.blur_media %}checked{% endif %}>
+
+                <span class="h-6 w-11 rounded-full bg-slate-300 transition
+                             peer-checked:bg-blue-600
+                             after:absolute after:left-[2px] after:top-[2px]
+                             after:h-5 after:w-5 after:rounded-full
+                             after:bg-white after:transition-all
+                             peer-checked:after:translate-x-5">
+                </span>
+
+            </label>
+
+        </div>
+
+    </form>
+
+</div>

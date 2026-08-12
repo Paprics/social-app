@@ -1,0 +1,81 @@
+{% load i18n %}
+
+{% if is_paginated %}
+    <div class="border-t border-slate-200 px-5 pb-5 pt-5">
+
+        <nav
+            class="grid grid-cols-3 items-center gap-4"
+            aria-label="{% trans 'Search results pagination' %}"
+        >
+            {# Left: First / Previous #}
+            <div class="flex items-center justify-start gap-2">
+                {% if page_obj.has_previous %}
+                    <a
+                        href="?page=1"
+                        hx-get="?page=1"
+                        hx-include="#search-filters"
+                        hx-target="#search-results"
+                        hx-swap="innerHTML"
+                        hx-push-url="true"
+                        class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-500 transition hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
+                    >
+                        {% trans "First" %}
+                    </a>
+
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        hx-get="?page={{ page_obj.previous_page_number }}"
+                        hx-include="#search-filters"
+                        hx-target="#search-results"
+                        hx-swap="innerHTML"
+                        hx-push-url="true"
+                        class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                    >
+                        {% trans "Previous" %}
+                    </a>
+                {% endif %}
+            </div>
+
+            {# Center: current page #}
+            <div class="flex justify-center">
+                <span
+                    class="whitespace-nowrap rounded-lg bg-slate-50 px-4 py-2 text-sm font-medium text-slate-600"
+                >
+                    {% blocktrans with current=page_obj.number total=paginator.num_pages %}
+                        Page {{ current }} of {{ total }}
+                    {% endblocktrans %}
+                </span>
+            </div>
+
+            {# Right: Next / Last #}
+            <div class="flex items-center justify-end gap-2">
+                {% if page_obj.has_next %}
+                    <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        hx-get="?page={{ page_obj.next_page_number }}"
+                        hx-include="#search-filters"
+                        hx-target="#search-results"
+                        hx-swap="innerHTML"
+                        hx-push-url="true"
+                        class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                    >
+                        {% trans "Next" %}
+                    </a>
+
+                    <a
+                        href="?page={{ paginator.num_pages }}"
+                        hx-get="?page={{ paginator.num_pages }}"
+                        hx-include="#search-filters"
+                        hx-target="#search-results"
+                        hx-swap="innerHTML"
+                        hx-push-url="true"
+                        class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-500 transition hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700"
+                    >
+                        {% trans "Last" %}
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+
+    </div>
+{% endif %}

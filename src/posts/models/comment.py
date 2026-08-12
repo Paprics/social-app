@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from posts.models.post import Post
-from users.models.gallery import Photo
+from gallery.models import Photo
 
 
 class Comment(models.Model):

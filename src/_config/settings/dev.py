@@ -18,15 +18,21 @@ DATABASES = {
 
 INSTALLED_APPS += [
     "debug_toolbar",
+    "rosetta",
 ]
 
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ] + MIDDLEWARE
 
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+# INTERNAL_IPS = [
+#     "127.0.0.1",
+# ]
+
+# Debug ToolBar Docker
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+}
 
 # На dev письма пишутся в консоль, не отправляются реально
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

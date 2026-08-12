@@ -1,0 +1,103 @@
+{% load i18n render_image gender_icon %}
+
+<div class="flex items-center justify-between gap-4 border-b border-slate-200 px-5 py-4">
+    <h2 class="text-base font-semibold text-slate-900">
+        {% trans "Results" %}
+    </h2>
+
+    {% if paginator %}
+        <span class="text-sm text-slate-500">
+            {% blocktrans count count=paginator.count %}
+                {{ count }} user found
+            {% plural %}
+                {{ count }} users found
+            {% endblocktrans %}
+        </span>
+    {% endif %}
+</div>
+
+{% if profiles %}
+    <div class="w-full divide-y divide-slate-200">
+        {% for profile in profiles %}
+            <article class="flex w-full gap-4 px-5 py-4 transition duration-200 hover:bg-slate-50">
+                {% render_image profile.avatar_photo.image variant="avatar_sm" shape="circle" reveal=True alt=profile.user.username css_class="media-image--compact h-24 w-24 shrink-0 rounded-full border border-slate-200 object-cover" %}
+
+                <a
+                    href="{% url 'users:profile' profile.user.pk %}"
+                    class="min-w-0 flex-1"
+                >
+                    <div class="min-w-0">
+                        <h3 class="truncate text-base font-semibold text-slate-900">
+                            {% gender_icon profile.gender size=16 %}
+                            {{ profile.user.username }}
+                        </h3>
+
+                        <p class="mt-1 truncate text-sm text-slate-500">
+                            {% if profile.city %}
+                                {{ profile.city.get_name }}
+                            {% endif %}
+
+                            {% if profile.country %}
+                                {% if profile.city %}, {% endif %}
+                                {{ profile.country.get_name }}
+                            {% endif %}
+
+                            {% if not profile.city and not profile.country %}
+                                —
+                            {% endif %}
+                        </p>
+
+                        <p class="mt-2 line-clamp-2 text-sm leading-5 text-slate-600">
+                            {% if profile.bio %}
+                                {{ profile.bio }}
+                            {% else %}
+                                {% trans "No bio yet." %}
+                            {% endif %}
+                        </p>
+
+                        <p class="mt-2 text-xs text-slate-500">
+                            <span class="font-medium text-slate-700">
+                                {% trans "Looking for" %}:
+                            </span>
+
+                            {% if profile.looking_for_labels %}
+                                {{ profile.looking_for_labels|join:", " }}
+                            {% else %}
+                                {% trans "Not specified" %}
+                            {% endif %}
+                        </p>
+                    </div>
+                </a>
+            </article>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+        {% include "search/partials/pagination.html" %}
+    {% endif %}
+{% else %}
+    <div class="w-full py-16 text-center">
+        <svg
+            class="mx-auto h-10 w-10 text-slate-300"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-4.35-4.35m2.35-5.15a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
+            />
+        </svg>
+
+        <h3 class="mt-4 text-sm font-semibold text-slate-900">
+            {% trans "No users found" %}
+        </h3>
+
+        <p class="mx-auto mt-1 max-w-sm text-sm text-slate-500">
+            {% trans "Try changing or clearing some filters to see more people." %}
+        </p>
+    </div>
+{% endif %}

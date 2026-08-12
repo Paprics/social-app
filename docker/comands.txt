@@ -1,10 +1,27 @@
-docker compose \
-  --env-file .env.dev \
-  -f docker/compose.dev.yml \
-  up -d
+docker compose --env-file .env.dev -f docker/compose.dev.yml up -d
 
 
 Следить за логами в реальном времени:
 docker logs -f sn-web-dev
 Или через Compose:
 docker compose -f docker/compose.dev.yml logs web
+
+Restar
+docker compose --env-file .env.dev -f docker/compose.dev.yml restart web
+
+
+10 000 000
+docker exec -it sn-postgres-dev sh
+
+psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+
+ALTER SEQUENCE public.auth_user_id_seq RESTART WITH 10000000;
+
+проверка
+SELECT last_value, is_called
+FROM public.auth_user_id_seq;
+
+ last_value | is_called
+------------+-----------
+   10000000 | f
+(1 row)

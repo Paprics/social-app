@@ -1,4 +1,4 @@
-import "./components/media.js";
+import "./components/image_blur.js";
 
 // main.js — точка входа для глобальных скриптов
 // Импортируем модуль авторизации (модалки, дропдауны, мобильное меню)

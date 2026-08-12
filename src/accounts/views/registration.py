@@ -155,8 +155,11 @@ class LoginView(View):
             logger.debug("LoginView: invalid form errors=%s", form.errors)
             return render(
                 request,
-                "index.html",
-                {"login_form": form, "open_login_modal": True},
+                "core/index.html",
+                {
+                    "login_form": form,
+                    "open_login_modal": True,
+                },
             )
 
         username = form.cleaned_data["username"]
@@ -176,7 +179,7 @@ class LoginView(View):
             form.add_error(None, "Неверный логин или пароль.")
             return render(
                 request,
-                "index.html",
+                "core/index.html",  # <-- Слэш вместо двоеточия
                 {"login_form": form, "open_login_modal": True},
             )
 

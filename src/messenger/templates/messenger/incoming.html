@@ -2,7 +2,7 @@
 
 <div id="message-{{ message.id }}" class="flex justify-start gap-3">
 
-    {% include "components/avatar.html" with profile=message.sender.profile %}
+    {% include "users/components/avatar.html" with profile=message.sender.profile %}
 
     <div class="max-w-[75%] rounded-2xl bg-gray-200 px-4 py-2 dark:bg-gray-700">
 

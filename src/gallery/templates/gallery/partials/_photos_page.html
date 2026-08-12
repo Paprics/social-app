@@ -1,0 +1,69 @@
+{% load i18n render_image %}
+
+{% if all_photos %}
+    <div id="photo-grid"
+         class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+
+        {% for photo in all_photos %}
+            <div class="photo-thumb block aspect-square w-full cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-slate-100 transition hover:opacity-90"
+                 data-photo-index="{{ forloop.counter0 }}"
+                 data-photo-url="{{ photo.image.url }}"
+                 data-photo-title="{{ photo.title|default:'' }}"
+                 data-photo-id="{{ photo.pk }}">
+
+                {% render_image photo.image variant="avatar_md" alt=photo.title reveal=True css_class="media-image--compact h-full w-full object-cover" %}
+
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <nav class="mt-6 flex items-center justify-center gap-2"
+             aria-label="{% trans 'Photos pagination' %}">
+
+            {% if page_obj.has_previous %}
+                <button type="button"
+                        hx-get="{% url 'gallery:gallery_photos' profile_user.pk %}?page={{ page_obj.previous_page_number }}"
+                        hx-target="#gallery-tab-content"
+                        hx-swap="innerHTML"
+                        class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700">
+                    {% trans "Previous" %}
+                </button>
+            {% endif %}
+
+            <span class="px-2 text-sm text-slate-500">
+                {% blocktrans with current=page_obj.number total=page_obj.paginator.num_pages %}
+                    Page {{ current }} of {{ total }}
+                {% endblocktrans %}
+            </span>
+
+            {% if page_obj.has_next %}
+                <button type="button"
+                        hx-get="{% url 'gallery:gallery_photos' profile_user.pk %}?page={{ page_obj.next_page_number }}"
+                        hx-target="#gallery-tab-content"
+                        hx-swap="innerHTML"
+                        class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700">
+                    {% trans "Next" %}
+                </button>
+            {% endif %}
+        </nav>
+    {% endif %}
+
+{% else %}
+    <div class="py-10 text-center">
+        <svg class="mx-auto h-12 w-12 text-slate-300"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="1.5"
+             viewBox="0 0 24 24"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+
+        <p class="mt-2 text-sm text-slate-500">
+            {% trans "No photos uploaded yet." %}
+        </p>
+    </div>
+{% endif %}

@@ -1,0 +1,52 @@
+{# Mutual friends #}
+
+{% load static i18n %}
+
+{% if access.can_view_friends and mutual_friends %}
+
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+
+        <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-700">
+                {% trans "Mutual friends" %}
+            </h2>
+
+            <span class="text-xs text-slate-400">
+                {{ mutual_friends_count }}
+            </span>
+        </div>
+
+        <div class="grid grid-cols-5 gap-2">
+
+            {% for friend in mutual_friends %}
+
+                <a href="{% url 'users:profile' friend.pk %}"
+                   class="flex flex-col items-center gap-1 transition hover:opacity-90">
+
+                    <div class="aspect-square w-full overflow-hidden rounded-lg bg-slate-100 transition hover:ring-2 hover:ring-blue-500">
+
+                        {% if friend.profile.avatar_photo %}
+                            <img src="{{ friend.profile.avatar_photo.image.url }}"
+                                 alt="{{ friend.username }}"
+                                 class="h-full w-full object-cover {% if request.user.settings.blur_media %}is-blurred{% endif %}">
+                        {% else %}
+                            <img src="{% static 'images/default-avatar.svg' %}"
+                                 alt="{% trans 'Default avatar' %}"
+                                 class="h-full w-full object-cover">
+                        {% endif %}
+
+                    </div>
+
+                    <span class="w-full truncate text-center text-xs text-slate-600">
+                        {{ friend.username }}
+                    </span>
+
+                </a>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+{% endif %}

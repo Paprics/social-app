@@ -1,5 +1,6 @@
 {% load static i18n %}
-<header class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm">
+
+<header class="sticky top-0 z-50 border-b border-slate-200 bg-[#E3F2FD] shadow-sm">
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <!-- Logo -->
         <a href="{% url 'core:index' %}" class="flex items-center gap-3">
@@ -15,44 +16,51 @@
                 </p>
             </div>
         </a>
+
         <!-- Desktop Navigation -->
         <nav class="hidden items-center gap-8 lg:flex">
             <a href="{% url 'core:index' %}"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "Home" %}
             </a>
-            <a href="#"
+
+            <a href="{% url 'search:users' %}"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "People" %}
             </a>
+
             <a href="{% url 'chat:chat_view' %}"
-   class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-600 transition">
-    <svg xmlns="http://www.w3.org/2000/svg"
-         class="h-4 w-4 shrink-0"
-         fill="none"
-         viewBox="0 0 24 24"
-         stroke="currentColor"
-         stroke-width="2">
-        <path stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-    </svg>
-    <span>{% trans "VideoChat" %}</span>
-</a>
+               class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-600 transition">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="h-4 w-4 shrink-0"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor"
+                     stroke-width="2">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                <span>{% trans "VideoChat" %}</span>
+            </a>
+
             <a href="{% url 'messenger:dialog_list' %}"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "Messages" %}
             </a>
+
             <a href="#"
                class="text-sm font-medium text-slate-700 transition hover:text-blue-600">
                 {% trans "SexShop" %}
             </a>
+
             <!-- More -->
             <div class="relative">
                 <button
-                        type="button"
-                        data-dropdown-button="more-menu"
-                        class="flex items-center gap-1 text-sm font-medium text-slate-700 transition hover:text-blue-600">
+                    type="button"
+                    data-dropdown-button="more-menu"
+                    class="flex items-center gap-1 text-sm font-medium text-slate-700 transition hover:text-blue-600"
+                >
                     {% trans "More" %}
                     <svg xmlns="http://www.w3.org/2000/svg"
                          fill="none"
@@ -65,28 +73,35 @@
                               d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
                     </svg>
                 </button>
+
                 <div
-                        id="more-menu"
-                        data-dropdown
-                        class="absolute left-0 top-full z-50 mt-2 hidden w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+                    id="more-menu"
+                    data-dropdown
+                    class="absolute left-0 top-full z-50 mt-2 hidden w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+                >
                     <div class="py-2">
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Marketplace" %}
                         </a>
+
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Groups" %}
                         </a>
+
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Events" %}
                         </a>
+
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Games" %}
                         </a>
+
                         <hr class="my-2 border-slate-200">
+
                         <a href="#"
                            class="block px-5 py-3 text-slate-700 transition hover:bg-slate-100">
                             {% trans "Coming soon" %}
@@ -95,70 +110,76 @@
                 </div>
             </div>
         </nav>
+
         <!-- Right -->
         <div class="flex items-center gap-3">
+
             <!-- Language (для неавторизованных) -->
             {% if not user.is_authenticated %}
-            <div class="relative">
-                <button
+                <div class="relative">
+                    <button
                         type="button"
                         data-dropdown-button="lang-menu"
-                        class="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke-width="1.8"
-                         stroke="currentColor"
-                         class="h-4 w-4">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M3 12h18M12 3c2.5 2.7 4 6.2 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6.2-4-9s1.5-6.3 4-9z"/>
-                        <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
-                    </svg>
-                    <span class="font-medium uppercase">{{ LANGUAGE_CODE }}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke-width="2"
-                         stroke="currentColor"
-                         class="h-3 w-3 text-slate-400">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-                    </svg>
-                </button>
-                <div
+                        class="flex items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="1.8"
+                             stroke="currentColor"
+                             class="h-4 w-4">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M3 12h18M12 3c2.5 2.7 4 6.2 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6.2-4-9s1.5-6.3 4-9z"/>
+                            <circle cx="12" cy="12" r="9" stroke-width="1.8"/>
+                        </svg>
+
+                        <span class="font-medium uppercase">{{ LANGUAGE_CODE }}</span>
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             class="h-3 w-3 text-slate-400">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+                        </svg>
+                    </button>
+
+                    <div
                         id="lang-menu"
                         data-dropdown
-                        class="absolute right-0 top-full z-50 mt-2 hidden w-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-                    <form action="{% url 'set_language' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.path }}">
+                        class="absolute right-0 top-full z-50 mt-2 hidden w-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+                    >
                         {% get_available_languages as LANGUAGES %}
                         {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
+
                         {% for lang in LANGUAGE_INFO_LIST %}
-                        <button
-                                type="submit"
-                                name="language"
-                                value="{{ lang.code }}"
-                                class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition hover:bg-slate-100 {% if lang.code == LANGUAGE_CODE %}font-medium text-blue-600{% else %}text-slate-700{% endif %}">
-                            <span class="font-mono text-xs uppercase text-slate-400">
-                                {{ lang.code }}
-                            </span>
-                            <span>
-                                {{ lang.name_local|capfirst }}
-                            </span>
-                        </button>
+                            <button
+                                type="button"
+                                data-language-switch="{{ lang.code }}"
+                                class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition hover:bg-slate-100 {% if lang.code == LANGUAGE_CODE %}font-medium text-blue-600{% else %}text-slate-700{% endif %}"
+                            >
+                                <span class="font-mono text-xs uppercase text-slate-400">
+                                    {{ lang.code }}
+                                </span>
+                                <span>
+                                    {{ lang.name_local|capfirst }}
+                                </span>
+                            </button>
                         {% endfor %}
-                    </form>
+                    </div>
                 </div>
-            </div>
             {% endif %}
+
             <!-- User -->
             {% if user.is_authenticated %}
-            <!-- ===== КОЛОКОЛЬЧИК УВЕДОМЛЕНИЙ ===== -->
-            <div class="relative">
-                <button
+
+                <!-- ===== КОЛОКОЛЬЧИК УВЕДОМЛЕНИЙ ===== -->
+                <div class="relative">
+                    <button
                         type="button"
                         data-dropdown-button="notifications-menu"
                         class="relative flex h-10 w-10 items-center justify-center rounded-xl border transition
@@ -166,420 +187,605 @@
                                    border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100
                                {% else %}
                                    border-slate-200 bg-white text-slate-400 hover:bg-slate-100 hover:text-slate-600
-                               {% endif %}">
-                    {% if notifications.has_notifications %}
-                        <!-- Колокольчик активный: наклонён, синий, красная точка -->
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke-width="1.8"
-                             stroke="currentColor"
-                             class="h-5 w-5 -rotate-12">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
-                        </svg>
-                        <!-- Красная точка с пульсацией -->
-                        <span class="absolute right-1.5 top-1.5 flex h-2.5 w-2.5">
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
-                            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
-                        </span>
-                    {% else %}
-                        <!-- Колокольчик обычный: серый, прямой -->
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke-width="1.8"
-                             stroke="currentColor"
-                             class="h-5 w-5">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
-                        </svg>
-                    {% endif %}
-                </button>
-                <!-- Дропдаун уведомлений -->
-                <div
+                               {% endif %}"
+                    >
+                        {% if notifications.has_notifications %}
+                            <!-- Колокольчик активный -->
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke-width="1.8"
+                                 stroke="currentColor"
+                                 class="h-5 w-5 -rotate-12">
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                            </svg>
+
+                            <span class="absolute right-1.5 top-1.5 flex h-2.5 w-2.5">
+                                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                            </span>
+                        {% else %}
+                            <!-- Колокольчик обычный -->
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 fill="none"
+                                 viewBox="0 0 24 24"
+                                 stroke-width="1.8"
+                                 stroke="currentColor"
+                                 class="h-5 w-5">
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                            </svg>
+                        {% endif %}
+                    </button>
+
+                    <!-- Дропдаун уведомлений -->
+                    <div
                         id="notifications-menu"
                         data-dropdown
-                        class="absolute right-0 top-full z-50 mt-2 hidden w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-                    <div class="border-b border-slate-200 px-5 py-3 flex items-center justify-between">
-                        <p class="font-semibold text-slate-900">{% trans "Notifications" %}</p>
-                        {% if notifications.has_notifications %}
-                        <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">
-                            {{ notifications.count }}
-                        </span>
-                        {% endif %}
-                    </div>
-                    <div class="py-1 max-h-80 overflow-y-auto">
-                        {% if notifications.friend_requests %}
-                        <a href="{% url 'users:account_center' %}?friends_tab=incoming#friends"
+                        class="absolute right-0 top-full z-50 mt-2 hidden w-72 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+                    >
+                        <div class="border-b border-slate-200 px-5 py-3 flex items-center justify-between">
+                            <p class="font-semibold text-slate-900">
+                                {% trans "Notifications" %}
+                            </p>
 
-                           class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z"/>
-                                </svg>
-                            </span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-medium text-slate-900">{% trans "Friend requests" %}</p>
-                                <p class="text-xs text-slate-500">{{ notifications.friend_requests }} {% trans "new" %}</p>
-                            </div>
-                            <span class="ml-auto shrink-0 rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
-                                {{ notifications.friend_requests }}
-                            </span>
-                        </a>
-                        {% endif %}
-                        {% if notifications.messages %}
-                        <a href="#"
-                           class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
-                                </svg>
-                            </span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-medium text-slate-900">{% trans "Messages" %}</p>
-                                <p class="text-xs text-slate-500">{{ notifications.messages }} {% trans "unread" %}</p>
-                            </div>
-                            <span class="ml-auto shrink-0 rounded-full bg-green-500 px-2 py-0.5 text-xs font-bold text-white">
-                                {{ notifications.messages }}
-                            </span>
-                        </a>
-                        {% endif %}
-                        {% if notifications.likes %}
-                        <a href="#"
-                           class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-500">
-                                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"/>
-                                </svg>
-                            </span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-medium text-slate-900">{% trans "Likes" %}</p>
-                                <p class="text-xs text-slate-500">{{ notifications.likes }} {% trans "new" %}</p>
-                            </div>
-                            <span class="ml-auto shrink-0 rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
-                                {{ notifications.likes }}
-                            </span>
-                        </a>
-                        {% endif %}
-                        {% if notifications.comments %}
-                        <a href="#"
-                           class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
-                                </svg>
-                            </span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-medium text-slate-900">{% trans "Comments" %}</p>
-                                <p class="text-xs text-slate-500">{{ notifications.comments }} {% trans "new" %}</p>
-                            </div>
-                            <span class="ml-auto shrink-0 rounded-full bg-purple-600 px-2 py-0.5 text-xs font-bold text-white">
-                                {{ notifications.comments }}
-                            </span>
-                        </a>
-                        {% endif %}
-                        {% if notifications.gifts %}
-                        <a href="#"
-                           class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 09.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
-                                </svg>
-                            </span>
-                            <div class="min-w-0">
-                                <p class="text-sm font-medium text-slate-900">{% trans "Gifts" %}</p>
-                                <p class="text-xs text-slate-500">{{ notifications.gifts }} {% trans "new" %}</p>
-                            </div>
-                            <span class="ml-auto shrink-0 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
-                                {{ notifications.gifts }}
-                            </span>
-                        </a>
-                        {% endif %}
-                        {% if not notifications.has_notifications %}
-                        <div class="flex flex-col items-center gap-2 px-5 py-8 text-center">
-                            <svg class="h-10 w-10 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
-                            </svg>
-                            <p class="text-sm text-slate-400">{% trans "No new notifications" %}</p>
+                            {% if notifications.has_notifications %}
+                                <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600">
+                                    {{ notifications.count }}
+                                </span>
+                            {% endif %}
                         </div>
-                        {% endif %}
+
+                        <div class="py-1 max-h-80 overflow-y-auto">
+                            {% if notifications.friend_requests %}
+                                <a href="{% url 'users:account_center' %}?friends_tab=incoming#friends"
+                                   class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                                        <svg class="h-4 w-4"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="1.8"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z"/>
+                                        </svg>
+                                    </span>
+
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-slate-900">
+                                            {% trans "Friend requests" %}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ notifications.friend_requests }} {% trans "new" %}
+                                        </p>
+                                    </div>
+
+                                    <span class="ml-auto shrink-0 rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white">
+                                        {{ notifications.friend_requests }}
+                                    </span>
+                                </a>
+                            {% endif %}
+
+                            {% if notifications.messages %}
+                                <a href="#"
+                                   class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+                                        <svg class="h-4 w-4"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="1.8"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
+                                        </svg>
+                                    </span>
+
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-slate-900">
+                                            {% trans "Messages" %}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ notifications.messages }} {% trans "unread" %}
+                                        </p>
+                                    </div>
+
+                                    <span class="ml-auto shrink-0 rounded-full bg-green-500 px-2 py-0.5 text-xs font-bold text-white">
+                                        {{ notifications.messages }}
+                                    </span>
+                                </a>
+                            {% endif %}
+
+                            {% if notifications.likes %}
+                                <a href="#"
+                                   class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-500">
+                                        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"/>
+                                        </svg>
+                                    </span>
+
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-slate-900">
+                                            {% trans "Likes" %}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ notifications.likes }} {% trans "new" %}
+                                        </p>
+                                    </div>
+
+                                    <span class="ml-auto shrink-0 rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
+                                        {{ notifications.likes }}
+                                    </span>
+                                </a>
+                            {% endif %}
+
+                            {% if notifications.comments %}
+                                <a href="#"
+                                   class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                                        <svg class="h-4 w-4"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="1.8"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M8.625 9.75a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"/>
+                                        </svg>
+                                    </span>
+
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-slate-900">
+                                            {% trans "Comments" %}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ notifications.comments }} {% trans "new" %}
+                                        </p>
+                                    </div>
+
+                                    <span class="ml-auto shrink-0 rounded-full bg-purple-600 px-2 py-0.5 text-xs font-bold text-white">
+                                        {{ notifications.comments }}
+                                    </span>
+                                </a>
+                            {% endif %}
+
+                            {% if notifications.gifts %}
+                                <a href="#"
+                                   class="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50">
+                                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+                                        <svg class="h-4 w-4"
+                                             fill="none"
+                                             stroke="currentColor"
+                                             stroke-width="1.8"
+                                             viewBox="0 0 24 24">
+                                            <path stroke-linecap="round"
+                                                  stroke-linejoin="round"
+                                                  d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/>
+                                        </svg>
+                                    </span>
+
+                                    <div class="min-w-0">
+                                        <p class="text-sm font-medium text-slate-900">
+                                            {% trans "Gifts" %}
+                                        </p>
+                                        <p class="text-xs text-slate-500">
+                                            {{ notifications.gifts }} {% trans "new" %}
+                                        </p>
+                                    </div>
+
+                                    <span class="ml-auto shrink-0 rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white">
+                                        {{ notifications.gifts }}
+                                    </span>
+                                </a>
+                            {% endif %}
+
+                            {% if not notifications.has_notifications %}
+                                <div class="flex flex-col items-center gap-2 px-5 py-8 text-center">
+                                    <svg class="h-10 w-10 text-slate-300"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="1.5"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                                    </svg>
+
+                                    <p class="text-sm text-slate-400">
+                                        {% trans "No new notifications" %}
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="border-t border-slate-200 bg-slate-50">
+                            <a href="{% url 'users:account_center' %}#notifications"
+                               class="flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-blue-600 transition hover:bg-blue-50 hover:text-blue-700">
+                                {% trans "View all notifications" %}
+
+                                <svg class="h-4 w-4"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
-
-                    <div class="border-t border-slate-200 bg-slate-50">
-    <a href="{% url 'users:account_center' %}#notifications"
-       class="flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-blue-600 transition hover:bg-blue-50 hover:text-blue-700">
-
-        {% trans "View all notifications" %}
-
-        <svg class="h-4 w-4"
-             fill="none"
-             stroke="currentColor"
-             stroke-width="2"
-             viewBox="0 0 24 24">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M9 5l7 7-7 7"/>
-        </svg>
-    </a>
-</div>
-
                 </div>
-            </div>
-            <!-- ===== КОНЕЦ КОЛОКОЛЬЧИКА ===== -->
+                <!-- ===== КОНЕЦ КОЛОКОЛЬЧИКА ===== -->
 
-            <div class="relative">
-                <button
+                <!-- Profile -->
+                <div class="relative">
+                    <button
                         type="button"
                         id="profile-button"
                         data-dropdown-button="profile-menu"
-                        class="flex items-center gap-3 rounded-xl border border-slate-200 px-2 py-1 transition hover:bg-slate-100">
+                        class="flex items-center gap-3 rounded-xl border border-slate-200 px-2 py-1 transition hover:bg-slate-100"
+                    >
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden bg-slate-200 shrink-0">
+                            {% if user.profile.avatar_photo %}
+                                <img
+                                    src="{{ user.profile.avatar_photo.image.url }}"
+                                    alt="{{ user.username }}"
+                                    class="w-full h-full object-cover"
+                                >
+                            {% else %}
+                                <img
+                                    src="{% static 'images/default-avatar.svg' %}"
+                                    alt="{% trans 'Default avatar' %}"
+                                    class="w-full h-full object-cover"
+                                >
+                            {% endif %}
+                        </div>
 
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden bg-slate-200 shrink-0">
+                        <div class="hidden text-left lg:block">
+                            <p class="text-sm font-medium text-slate-900">
+                                {{ user.username|slice:":25" }}
+                            </p>
+                            <p class="text-xs text-slate-500">
+                                {% trans "Online" %}
+                            </p>
+                        </div>
 
-                        {% if user.profile.avatar_photo %}
-                        <img
-                                src="{{ user.profile.avatar_photo.image.url }}"
-                                alt="{{ user.username }}"
-                                class="w-full h-full object-cover">
-                        {% else %}
-                        <img
-                                src="{% static 'images/default-avatar.svg' %}"
-                                alt="{% trans 'Default avatar' %}"
-                                class="w-full h-full object-cover">
-                        {% endif %}
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             class="h-4 w-4 text-slate-500">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+                        </svg>
+                    </button>
 
-                    </div>
-
-                    <div class="hidden text-left lg:block">
-                        <p class="text-sm font-medium text-slate-900">
-                            {{ user.username|slice:":25" }}
-                        </p>
-                        <p class="text-xs text-slate-500">
-                            {% trans "Online" %}
-                        </p>
-                    </div>
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke-width="2"
-                         stroke="currentColor"
-                         class="h-4 w-4 text-slate-500">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
-                    </svg>
-                </button>
-                <div
+                    <div
                         id="profile-menu"
                         data-dropdown
-                        class="absolute right-0 top-full z-50 mt-2 hidden w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
-                    <div class="border-b border-slate-200 px-5 py-4">
-                        <p class="font-semibold text-slate-900">
-                            {{ user.username|slice:":35" }}
-                        </p>
-                        <p class="text-sm text-slate-500">
-                            {{ user.email }}
-                        </p>
-                    </div>
-                    <div class="py-2">
-                        <!-- Profile -->
-                        <a href="#"
-                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
-                            </svg>
-                            {% trans "Profile" %}
-                        </a>
-                        <!-- Account Center -->
-                        <a href="{% url 'users:account_center' %}"
-                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            {% trans "Account Center" %}
-                        </a>
-                        <!-- Settings -->
-                        <a href="{% url 'users:settings' %}"
-                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/>
-                            </svg>
-                            {% trans "Settings" %}
-                        </a>
-                        <!-- Privacy -->
-                        <a href="#"
-                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
-                            </svg>
-                            {% trans "Privacy" %}
-                        </a>
-                        <!-- Help -->
-                        <a href="#"
-                           class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
-                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
-                            </svg>
-                            {% trans "Help" %}
-                        </a>
-                        <hr class="my-2 border-slate-200">
-                        <!-- Sensitive content toggle -->
-                        <div class="flex items-center justify-between px-5 py-3" data-keep-dropdown>
-                            <div class="pr-4">
-                                <p class="text-sm font-medium text-slate-900">
-                                    {% trans "Safe Media Mode" %}
-                                </p>
-                                <p class="text-xs text-slate-500">
-                                    {% trans "Blur images, videos, and avatars until revealed." %}
-                                </p>
-                            </div>
-                            <form
-                                    hx-post="{% url 'users:toggle_sensitive_content' %}"
-                                    hx-trigger="change from:input"
-                                    hx-swap="none"
-                                    hx-disabled-elt="input"
-                                    onclick="event.stopPropagation()"
-                            >
-                                {% csrf_token %}
-                                <label class="relative inline-flex cursor-pointer items-center">
-                                    <input
-                                            type="checkbox"
-                                            name="blur_media"
-                                            class="peer sr-only"
-                                            {% if user_settings.blur_media %}checked{% endif %}
-                                    >
-                                    <div class="h-6 w-11 rounded-full bg-slate-300 transition
-                                                peer-checked:bg-blue-600
-                                                after:absolute after:left-[2px] after:top-[2px]
-                                                after:h-5 after:w-5 after:rounded-full
-                                                after:bg-white after:transition-all
-                                                peer-checked:after:translate-x-5">
-                                    </div>
-                                </label>
-                            </form>
+                        class="absolute right-0 top-full z-50 mt-2 hidden w-64 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+                    >
+                        <div class="border-b border-slate-200 px-5 py-4">
+                            <p class="font-semibold text-slate-900">
+                                {{ user.username|slice:":35" }}
+                            </p>
+                            <p class="text-sm text-slate-500">
+                                {{ user.email }}
+                            </p>
                         </div>
-                        <hr class="my-2 border-slate-200">
-                        <!-- Language switcher (внутри меню) -->
-                        <div class="px-5 py-3">
-                            <form action="{% url 'set_language' %}" method="post" class="flex items-center gap-2">
+
+                        <div class="py-2">
+                            <!-- Profile -->
+                            <a href="#"
+                               class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                                <svg class="w-5 h-5 shrink-0"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                                </svg>
+                                {% trans "Profile" %}
+                            </a>
+
+                            <!-- Account Center -->
+                            <a href="{% url 'users:account_center' %}"
+                               class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                                <svg class="w-5 h-5 shrink-0"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/>
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                {% trans "Account Center" %}
+                            </a>
+
+                            <!-- Settings -->
+                            <a href="{% url 'users:settings' %}"
+                               class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                                <svg class="w-5 h-5 shrink-0"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/>
+                                </svg>
+                                {% trans "Settings" %}
+                            </a>
+
+                            <!-- Privacy -->
+                            <a href="#"
+                               class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                                <svg class="w-5 h-5 shrink-0"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+                                </svg>
+                                {% trans "Privacy" %}
+                            </a>
+
+                            <!-- Help -->
+                            <a href="#"
+                               class="flex items-center gap-2.5 px-5 py-3 text-slate-700 transition hover:bg-slate-100">
+                                <svg class="w-5 h-5 shrink-0"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.5"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+                                </svg>
+                                {% trans "Help" %}
+                            </a>
+
+                            <hr class="my-2 border-slate-200">
+
+                            <!-- Sensitive content toggle -->
+                            <div class="flex items-center justify-between px-5 py-3" data-keep-dropdown>
+                                <div class="pr-4">
+                                    <p class="text-sm font-medium text-slate-900">
+                                        {% trans "Safe Media Mode" %}
+                                    </p>
+                                    <p class="text-xs text-slate-500">
+                                        {% trans "Blur images, videos, and avatars until revealed." %}
+                                    </p>
+                                </div>
+
+                                <form method="post"
+                                      action="{% url 'users:toggle_sensitive_content' %}"
+                                      data-safe-media-form
+                                      onclick="event.stopPropagation()">
+
+                                    {% csrf_token %}
+
+                                    <label class="relative inline-flex cursor-pointer items-center">
+
+                                        <input type="checkbox"
+                                               name="blur_media"
+                                               class="peer sr-only"
+                                               data-safe-media-toggle
+                                               {% if user_settings.blur_media %}checked{% endif %}>
+
+                                        <div class="h-6 w-11 rounded-full bg-slate-300 transition
+                    peer-checked:bg-blue-600
+                    after:absolute after:left-[2px] after:top-[2px]
+                    after:h-5 after:w-5 after:rounded-full
+                    after:bg-white after:transition-all
+                    peer-checked:after:translate-x-5">
+                                        </div>
+
+                                    </label>
+
+                                </form>
+                            </div>
+
+                            <hr class="my-2 border-slate-200">
+
+                            <!-- Language switcher (для авторизованных) -->
+                            <div class="px-5 py-3">
+                                <div class="flex items-center gap-2">
+                                    {% get_available_languages as LANGUAGES %}
+                                    {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
+
+                                    {% for lang in LANGUAGE_INFO_LIST %}
+                                        <button
+                                            type="button"
+                                            data-language-switch="{{ lang.code }}"
+                                            class="rounded-lg border px-3 py-1.5 text-xs font-mono uppercase transition {% if lang.code == LANGUAGE_CODE %}border-blue-600 bg-blue-50 font-medium text-blue-600{% else %}border-slate-200 text-slate-600 hover:bg-slate-100{% endif %}"
+                                        >
+                                            {{ lang.code }}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <hr class="my-2 border-slate-200">
+
+                            <!-- Premium -->
+                            <div class="px-5 py-3 opacity-60 pointer-events-none select-none">
+                                <div class="flex items-center gap-2.5 text-amber-600">
+                                    <svg class="w-5 h-5 shrink-0"
+                                         fill="currentColor"
+                                         viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+
+                                    <span class="text-sm font-medium">
+                                        {% trans "Premium" %}
+                                    </span>
+
+                                    <span class="ml-auto text-[10px] font-semibold uppercase tracking-wider text-amber-400 border border-amber-200 rounded-full px-2 py-0.5">
+                                        {% trans "Soon" %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <hr class="my-2 border-slate-200">
+
+                            <!-- Sign out -->
+                            <form method="post" action="{% url 'accounts:logout' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="next" value="{{ request.path }}">
-                                {% get_available_languages as LANGUAGES %}
-                                {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
-                                {% for lang in LANGUAGE_INFO_LIST %}
+
                                 <button
-                                        type="submit"
-                                        name="language"
-                                        value="{{ lang.code }}"
-                                        class="rounded-lg border px-3 py-1.5 text-xs font-mono uppercase transition {% if lang.code == LANGUAGE_CODE %}border-blue-600 bg-blue-50 font-medium text-blue-600{% else %}border-slate-200 text-slate-600 hover:bg-slate-100{% endif %}">
-                                    {{ lang.code }}
+                                    type="submit"
+                                    class="flex w-full items-center gap-2.5 px-5 py-3 text-left text-red-600 transition hover:bg-red-50"
+                                >
+                                    <svg class="w-5 h-5 shrink-0"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="1.5"
+                                         viewBox="0 0 24 24">
+                                        <path stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+                                    </svg>
+
+                                    {% trans "Sign out" %}
                                 </button>
-                                {% endfor %}
                             </form>
                         </div>
-                        <hr class="my-2 border-slate-200">
-                        <!-- Premium (заглушка) -->
-                        <div class="px-5 py-3 opacity-60 pointer-events-none select-none">
-                            <div class="flex items-center gap-2.5 text-amber-600">
-                                <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
-                                <span class="text-sm font-medium">{% trans "Premium" %}</span>
-                                <span class="ml-auto text-[10px] font-semibold uppercase tracking-wider text-amber-400 border border-amber-200 rounded-full px-2 py-0.5">{% trans "Soon" %}</span>
-                            </div>
-                        </div>
-                        <hr class="my-2 border-slate-200">
-                        <!-- Sign out -->
-                        <form method="post" action="{% url 'accounts:logout' %}">
-                            {% csrf_token %}
-                            <button
-                                    type="submit"
-                                    class="flex w-full items-center gap-2.5 px-5 py-3 text-left text-red-600 transition hover:bg-red-50">
-                                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
-                                </svg>
-                                {% trans "Sign out" %}
-                            </button>
-                        </form>
                     </div>
                 </div>
-            </div>
+
             {% else %}
-            <!-- Кнопка входа для неавторизованных -->
-            <button
+                <!-- Кнопка входа для неавторизованных -->
+                <button
                     type="button"
                     data-modal-open="login-modal"
-                    class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700">
-                {% trans "Log in" %}
-            </button>
+                    class="inline-flex items-center rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+                >
+                    {% trans "Log in" %}
+                </button>
             {% endif %}
-        </div><!-- /right -->
+        </div>
+        <!-- /right -->
     </div>
 </header>
+
 <!-- Mobile Menu -->
-<div id="mobile-menu"
-     class="hidden border-b border-slate-200 bg-white lg:hidden">
+<div
+    id="mobile-menu"
+    class="hidden border-b border-slate-200 bg-white lg:hidden"
+>
     <nav class="mx-auto flex max-w-7xl flex-col px-4 py-4">
         <a href="{% url 'core:index' %}"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Home" %}
         </a>
+
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "People" %}
         </a>
+
         <a href="{% url 'chat:chat_view' %}"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "VideoChat" %}
         </a>
+
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Messages" %}
         </a>
+
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "SexShop" %}
         </a>
+
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Marketplace" %}
         </a>
+
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Groups" %}
         </a>
+
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Events" %}
         </a>
+
         <a href="#"
            class="rounded-lg px-4 py-3 text-slate-700 transition hover:bg-slate-100">
             {% trans "Games" %}
         </a>
+
         <hr class="my-4 border-slate-200">
+
+        <!-- Language (mobile) -->
         <div class="px-4 py-2">
             <p class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
                 {% trans "Language" %}
             </p>
-            <form action="{% url 'set_language' %}" method="post" class="flex flex-wrap gap-2">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
+
+            <div class="flex flex-wrap gap-2">
                 {% get_available_languages as LANGUAGES %}
                 {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
+
                 {% for lang in LANGUAGE_INFO_LIST %}
-                <button
-                        type="submit"
-                        name="language"
-                        value="{{ lang.code }}"
-                        class="rounded-lg border px-3 py-1.5 text-sm transition {% if lang.code == LANGUAGE_CODE %}border-blue-600 bg-blue-50 font-medium text-blue-600{% else %}border-slate-200 text-slate-600 hover:bg-slate-100{% endif %}">
-                    {{ lang.name_local|capfirst }}
-                </button>
+                    <button
+                        type="button"
+                        data-language-switch="{{ lang.code }}"
+                        class="rounded-lg border px-3 py-1.5 text-sm transition {% if lang.code == LANGUAGE_CODE %}border-blue-600 bg-blue-50 font-medium text-blue-600{% else %}border-slate-200 text-slate-600 hover:bg-slate-100{% endif %}"
+                    >
+                        {{ lang.name_local|capfirst }}
+                    </button>
                 {% endfor %}
-            </form>
+            </div>
         </div>
     </nav>
 </div>
+<script>
+    document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-language-switch]");
+        if (!button) {
+            return;
+        }
+
+        const language = button.dataset.languageSwitch;
+        const supportedLanguages = new Set(["en", "ru", "uk"]);
+        if (!supportedLanguages.has(language)) {
+            return;
+        }
+
+        const url = new URL(window.location.href);
+        const parts = url.pathname.split("/").filter(Boolean);
+
+        if (parts.length && supportedLanguages.has(parts[0])) {
+            parts[0] = language;
+        } else {
+            parts.unshift(language);
+        }
+
+        url.pathname = "/" + parts.join("/") + (url.pathname.endsWith("/") ? "/" : "");
+
+        document.cookie = `django_language=${encodeURIComponent(language)}; Path=/; SameSite=Lax`;
+        window.location.assign(url.toString());
+    });
+</script>

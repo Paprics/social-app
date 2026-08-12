@@ -1,0 +1,72 @@
+{% load i18n render_image %}
+
+<div id="avatar-photo-page">
+
+    {% if photos %}
+
+        <div class="grid grid-cols-4 gap-2 sm:grid-cols-5">
+
+            {% for photo in photos %}
+
+                <button type="button"
+                        class="avatar-photo-btn relative aspect-square overflow-hidden rounded-lg border-2 border-transparent bg-slate-100 hover:border-blue-400"
+                        data-photo-id="{{ photo.pk }}"
+                        aria-label="{% trans 'Select photo' %}">
+
+                    {% render_image photo.image variant="avatar_sm" alt=photo.title css_class="pointer-events-none h-full w-full object-cover" %}
+
+                </button>
+
+            {% endfor %}
+
+        </div>
+
+        {% if page_obj.has_previous or page_obj.has_next %}
+
+            <div class="mt-4 flex items-center justify-between gap-3">
+
+                <div>
+                    {% if page_obj.has_previous %}
+
+                        <button type="button"
+                                hx-get="{% url 'users:avatar_photos' %}?page={{ page_obj.previous_page_number }}"
+                                hx-target="#avatar-photo-page"
+                                hx-swap="outerHTML"
+                                class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                            ← {% trans "Previous" %}
+
+                        </button>
+
+                    {% endif %}
+                </div>
+
+                <div>
+                    {% if page_obj.has_next %}
+
+                        <button type="button"
+                                hx-get="{% url 'users:avatar_photos' %}?page={{ page_obj.next_page_number }}"
+                                hx-target="#avatar-photo-page"
+                                hx-swap="outerHTML"
+                                class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                            {% trans "Next" %} →
+
+                        </button>
+
+                    {% endif %}
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <p class="py-6 text-center text-sm text-slate-500">
+            {% trans "No photos yet." %}
+        </p>
+
+    {% endif %}
+
+</div>

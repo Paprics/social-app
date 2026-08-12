@@ -4,13 +4,6 @@ from .settings import *
 from .favorite import *
 from .block import *
 
-from .gallery import (
-    GalleryView,
-    PhotoUploadView,
-    AlbumDetailView,
-    AlbumSettingsView,
-    PhotoDeleteView,
-)
 from .friendship import (
     FriendRequestSendView,
     FriendRequestCancelView,
@@ -30,9 +23,6 @@ from .account_center import (
 
 from .profile import (
     ProfileView,
-    AvatarModalView,
-    AvatarSetView,
-    AvatarUploadView,
 )
 
 from .profile_explore import (
@@ -43,4 +33,12 @@ from .profile_explore import (
     ProfileExploreMutualFriendsView,
     ProfileExplorePostsView,
     ProfileExploreVideosView,
+)
+
+from users.views.avatar import (
+    AvatarModalView,
+    AvatarRemoveView,
+    AvatarSetView,
+    AvatarUploadView,
+    AvatarPhotosView,
 )

@@ -1,0 +1,93 @@
+{# src/users/templates/users/profile/_header.html #}
+
+{% load static i18n render_image gender_icon %}
+
+{# ── Шапка профиля ── #}
+<div class="rounded-xl border border-slate-200 bg-[#b8c1b4] px-6 py-4 shadow-sm">
+
+    <div class="flex items-center justify-between gap-4">
+
+        {# ── Левая часть: gender + username + status ── #}
+        <div class="flex min-w-0 flex-1 items-center gap-3">
+
+            {# Gender #}
+            <div class="shrink-0">
+                {% gender_icon target_user.profile.gender size=24 %}
+            </div>
+
+            {# Username #}
+            <h1 class="m-0 shrink-0 text-xl font-semibold text-slate-900">
+                {{ target_user.username|default:"username" }}
+            </h1>
+
+            {# Profile status #}
+            {% if access.can_view_profile and target_user.profile.status %}
+                <span class="min-w-0 truncate whitespace-nowrap text-base italic text-slate-700"
+                      title="{{ target_user.profile.status }}">
+                    «{{ target_user.profile.status|truncatechars:150 }}»
+                </span>
+            {% endif %}
+
+        </div>
+
+        {# ── Правая часть: report / owner + online status ── #}
+        <div class="flex shrink-0 items-center gap-4">
+
+            {% if is_owner %}
+
+                {# Owner label #}
+                <span class="inline-flex items-center rounded-md border border-slate-900/15 bg-slate-900/10 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-900">
+                    {% trans "My Page" %}
+                </span>
+
+            {% else %}
+
+                {# Report page #}
+                <button type="button"
+                        class="whitespace-nowrap text-sm font-medium text-amber-900 underline decoration-amber-900/40 transition duration-150 hover:text-rose-700 hover:decoration-rose-700">
+                    {% trans "Report page" %}
+                </button>
+
+                {# Online status #}
+                <div class="flex items-center gap-2 whitespace-nowrap text-sm">
+
+                    {% if access.can_view_profile and target_user.settings.show_online_status %}
+
+                        {% if target_user.profile.is_online %}
+
+                            <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-800">
+                                <span class="h-2 w-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                                {% trans "Online" %}
+                            </span>
+
+                        {% else %}
+
+                            <span class="font-medium text-slate-700">
+                                {% if target_user.profile.last_seen %}
+                                    {% trans "Last seen" %}
+                                    {{ target_user.profile.last_seen|timesince }}
+                                    {% trans "ago" %}
+                                {% else %}
+                                    {% trans "Recently seen" %}
+                                {% endif %}
+                            </span>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <span class="text-sm font-medium italic text-slate-500">
+                            {% trans "Status hidden" %}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>

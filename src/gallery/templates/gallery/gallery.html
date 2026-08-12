@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}
+    {% trans "Photos" %} — {{ profile_user.username }}
+{% endblock %}
+
+{% block page %}
+<div class="min-h-screen bg-slate-50 py-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {# Back to profile #}
+        <div class="mb-6">
+            <a href="{% url 'users:profile' profile_user.pk %}"
+               class="inline-flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-slate-700">
+
+                <svg class="h-4 w-4"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                </svg>
+
+                {% trans "Back to profile" %}
+            </a>
+        </div>
+
+        <div class="flex flex-col gap-6 lg:flex-row">
+
+            {# ── LEFT COLUMN ─────────────────────────────────── #}
+            <aside class="shrink-0 space-y-4 lg:w-72">
+
+                {# Profile summary #}
+                {% include "gallery/includes/_profile_summary.html" %}
+
+                {# Storage — owner only #}
+                {% if is_owner %}
+                    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+
+                        <div class="mb-2 flex items-center justify-between text-xs text-slate-500">
+                            <span>{% trans "Storage" %}</span>
+
+                            <span>
+                                {{ gallery_stats.used_slots }}
+                                /
+                                {{ gallery_stats.max_photos }}
+                            </span>
+                        </div>
+
+                        <div class="h-1.5 w-full rounded-full bg-slate-100">
+                            <div class="h-1.5 rounded-full bg-blue-600 transition-all duration-300"
+                                 style="width: {% widthratio gallery_stats.used_slots gallery_stats.max_photos 100 %}%">
+                            </div>
+                        </div>
+
+                    </div>
+                {% endif %}
+
+                {# Safe Media Mode — current authenticated viewer #}
+                {% if user.is_authenticated %}
+                    {% include "gallery/includes/_safe_mode_checbox.html" %}
+                {% endif %}
+
+                {# Owner actions #}
+                {% if is_owner %}
+                    <div class="space-y-2">
+
+                        <button type="button"
+                                data-album-modal-open
+                                class="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700">
+
+                            <svg class="h-4 w-4"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 viewBox="0 0 24 24"
+                                 aria-hidden="true">
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M12 4v16m8-8H4"/>
+                            </svg>
+
+                            {% trans "Create album" %}
+                        </button>
+
+                    </div>
+                {% endif %}
+
+            </aside>
+
+            {# ── RIGHT COLUMN ────────────────────────────────── #}
+            <div class="min-w-0 flex-1">
+
+                <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+                    {# Tabs #}
+                    <div class="flex items-center gap-6 border-b border-slate-200 px-5 py-3">
+
+                        <button type="button"
+                                data-gallery-tab="albums"
+                                hx-get="{% url 'gallery:gallery_albums' profile_user.pk %}"
+                                hx-target="#gallery-tab-content"
+                                hx-swap="innerHTML"
+                                class="gallery-tab -mb-px border-b-2 border-blue-600 pb-1 text-sm font-medium text-blue-600">
+
+                            {% trans "Albums" %}
+
+                            <span class="ml-1 text-xs text-slate-400">
+                                {{ gallery_stats.albums_count }}
+                            </span>
+                        </button>
+
+                        <button type="button"
+                                data-gallery-tab="photos"
+                                hx-get="{% url 'gallery:gallery_photos' profile_user.pk %}"
+                                hx-target="#gallery-tab-content"
+                                hx-swap="innerHTML"
+                                class="gallery-tab -mb-px border-b-2 border-transparent pb-1 text-sm font-medium text-slate-500 transition hover:text-slate-700">
+
+                            {% trans "All photos" %}
+
+                            <span class="ml-1 text-xs text-slate-400">
+                                {{ gallery_stats.photos_count }}
+                            </span>
+                        </button>
+
+                    </div>
+
+                    {# Dynamic tab content #}
+                    <div id="gallery-tab-content"
+                         class="min-h-48 p-5"
+                         hx-get="{% url 'gallery:gallery_albums' profile_user.pk %}"
+                         hx-trigger="load"
+                         hx-swap="innerHTML">
+
+                        {# Initial loading state #}
+                        <div class="flex min-h-40 items-center justify-center">
+                            <div class="flex items-center gap-2 text-sm text-slate-400">
+
+                                <svg class="h-5 w-5 animate-spin"
+                                     viewBox="0 0 24 24"
+                                     fill="none"
+                                     aria-hidden="true">
+                                    <circle class="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            stroke-width="4">
+                                    </circle>
+
+                                    <path class="opacity-75"
+                                          fill="currentColor"
+                                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                                    </path>
+                                </svg>
+
+                                <span>{% trans "Loading..." %}</span>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{# Lightbox #}
+{% include "gallery/components/lightbox.html" %}
+
+{# Owner modals #}
+{% if is_owner %}
+    {% include "gallery/modals/_album_create_modal.html" %}
+{% endif %}
+
+{% endblock %}
+
+
+{% block extra_js %}
+    <script src="{% static 'gallery/js/tabs.js' %}"></script>
+    <script src="{% static 'gallery/js/lightbox.js' %}"></script>
+    <script src="{% static 'gallery/js/create_albums.js' %}"></script>
+{% endblock %}

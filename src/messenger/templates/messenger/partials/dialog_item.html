@@ -29,7 +29,7 @@
 
                 {% if dialog.is_private and dialog.other_user %}
 
-                    {% include "components/avatar.html" with profile=dialog.other_user.profile class="h-14 w-14 rounded-full object-cover" %}
+                    {% include "users/components/avatar.html" with profile=dialog.other_user.profile class="h-14 w-14 rounded-full object-cover" %}
 
                 {% else %}
 

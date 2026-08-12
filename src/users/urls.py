@@ -9,13 +9,7 @@ from users.views import (
     SettingsPremiumFeaturesView,
     SettingsPrivacyView,
     SettingsProfileView,
-    #
-    GalleryView,
     SensitiveContentToggleView,
-    PhotoUploadView,
-    AlbumDetailView,
-    AlbumSettingsView,
-    PhotoDeleteView,
     #
     FriendRequestSendView,
     FriendRequestCancelView,
@@ -31,6 +25,8 @@ from users.views import (
     AccountCenterProfileVisitsView,
     #
     AvatarModalView,
+    AvatarPhotosView,
+    AvatarRemoveView,
     AvatarSetView,
     AvatarUploadView,
     #
@@ -67,15 +63,6 @@ settings_urlpatterns = [
     ),
 ]
 
-gallery_urlpatterns = [
-    path("<int:pk>/gallery/", GalleryView.as_view(), name="gallery"),
-    path("<int:pk>/gallery/<int:album_pk>/", AlbumDetailView.as_view(), name="album_detail"),
-    path("<int:pk>/gallery/<int:album_pk>/settings/", AlbumSettingsView.as_view(), name="album_settings"),
-    path("<int:pk>/gallery/<int:album_pk>/settings/save/", AlbumSettingsView.as_view(), name="album_settings_save"),
-    path("photos/upload/", PhotoUploadView.as_view(), name="photo_upload"),
-    path("photos/<int:photo_pk>/delete/", PhotoDeleteView.as_view(), name="photo_delete"),
-]
-
 
 friendship_urlpatterns = [
     path("<int:pk>/friend-request/send/", FriendRequestSendView.as_view(), name="friend_request_send"),
@@ -109,9 +96,31 @@ account_center_urlpatterns = [
 ]
 
 avatar_urlpatterns = [
-    path("profile/avatar/", AvatarModalView.as_view(), name="avatar_modal"),
-    path("profile/avatar/set/", AvatarSetView.as_view(), name="avatar_set"),
-    path("profile/avatar/upload/", AvatarUploadView.as_view(), name="avatar_upload"),
+    path(
+        "profile/avatar/",
+        AvatarModalView.as_view(),
+        name="avatar_modal",
+    ),
+    path(
+        "profile/avatar/set/",
+        AvatarSetView.as_view(),
+        name="avatar_set",
+    ),
+    path(
+        "profile/avatar/upload/",
+        AvatarUploadView.as_view(),
+        name="avatar_upload",
+    ),
+    path(
+        "profile/avatar/remove/",
+        AvatarRemoveView.as_view(),
+        name="avatar_remove",
+    ),
+    path(
+        "profile/avatar/photos/",
+        AvatarPhotosView.as_view(),
+        name="avatar_photos",
+    ),
 ]
 
 favorite_urlpatterns = [
@@ -146,7 +155,6 @@ explore_urlpatterns = [
 urlpatterns = [
     *core_urlpatterns,
     *settings_urlpatterns,
-    *gallery_urlpatterns,
     *friendship_urlpatterns,
     *account_center_urlpatterns,
     *avatar_urlpatterns,

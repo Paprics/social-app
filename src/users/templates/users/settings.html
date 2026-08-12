@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-{% load i18n %}
-{% load static %}
+{% load i18n static render_image %}
+
+
 
 {% block title %}{% trans "Settings" %} — Social Network{% endblock %}
 
@@ -109,51 +110,47 @@
 
                     <!-- Avatar -->
                     <div class="flex items-center gap-4">
+
                         <div class="relative shrink-0">
-                            {% if user.profile.avatar_photo %}
-                            <img id="avatar-preview"
-                                 src="{{ user.profile.avatar_photo.image.url }}"
-                                 alt="{{ user.username }}"
-                                 class="w-16 h-16 rounded-full object-cover border border-slate-200">
-                            <div id="avatar-placeholder" class="hidden"></div>
-                            {% else %}
-                            <div id="avatar-placeholder"
-                                 class="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center">
-                                <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
-                                </svg>
-                            </div>
-                            <img id="avatar-preview" src="" alt="" class="w-16 h-16 rounded-full object-cover border border-slate-200 hidden">
-                            {% endif %}
+                            {% render_image user.profile.avatar_photo.image variant="avatar_sm" alt=user.username shape="circle" reveal=True css_class="media-image--compact h-16 w-16 object-cover border border-slate-200" %}
                         </div>
 
                         <div>
-                            <label class="inline-flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 cursor-pointer transition">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+
+                            <button type="button"
+                                    hx-get="{% url 'users:avatar_modal' %}"
+                                    hx-target="#avatar-modal-container"
+                                    hx-swap="innerHTML"
+                                    class="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+
+                                <svg class="h-4 w-4"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.5"
+                                     viewBox="0 0 24 24"
+                                     aria-hidden="true">
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
 
                                 {% if user.profile.avatar_photo %}
-                                    {% trans "Change photo" %}
+                                {% trans "Change photo" %}
                                 {% else %}
-                                    {% trans "Upload photo" %}
+                                {% trans "Upload photo" %}
                                 {% endif %}
 
-                                <input type="file" name="avatar" accept="image/*" class="sr-only" data-js="avatar-input">
-                            </label>
+                            </button>
 
                             <p class="mt-1.5 text-xs text-slate-400">
-                                {% trans "JPG, PNG or WebP. Max 5 MB." %}
+                                {% trans "Choose an existing photo or upload a new one." %}
                             </p>
 
-                            {% if form.avatar.errors %}
-                            <div class="mt-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2">
-                                {% for error in form.avatar.errors %}
-                                <p class="text-xs text-red-700">{{ error }}</p>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
                         </div>
+
                     </div>
 
                     <!-- Bio -->
@@ -1083,6 +1080,8 @@
   </div><!-- /container -->
 </div>
 
+<div id="avatar-modal-container"></div>
+
 <!-- Toggle switch стили -->
 <style>
 .toggle-switch { position: relative; display: inline-flex; align-items: center; cursor: pointer; }
@@ -1105,4 +1104,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 <!-- settings.js — без type="module", чтобы видел глобальный flatpickr -->
 <script src="{% static 'js/settings.js' %}"></script>
+<script src="{% static 'users/js/profile/avatar.js' %}"></script>
 {% endblock %}

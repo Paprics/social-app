@@ -1,0 +1,25 @@
+{% load i18n render_image gender_icon %}
+
+<div class="rounded-xl border border-orange-200 bg-orange-50 p-8 shadow-sm">
+    <div class="flex flex-col items-center gap-4 text-center">
+        <div class="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-orange-500" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+        </div>
+        <div class="space-y-1">
+            <h3 class="text-base font-semibold text-orange-900">{% trans "This profile is private" %}</h3>
+            <p class="text-sm text-orange-700">
+                {% trans "The owner has restricted access to this page through privacy settings. Only certain users can view the full profile." %}
+            </p>
+        </div>
+        {% if not request.user.is_authenticated %}
+        <a href="{% url 'users:login' %}"
+           class="mt-2 inline-flex items-center gap-2 rounded-lg bg-orange-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-orange-600">
+            {% trans "Sign in to continue" %}
+        </a>
+        {% endif %}
+    </div>
+</div>

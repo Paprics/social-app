@@ -1,12 +1,20 @@
-# friendship.py
+# src/users/models/friendship.py
+
 from django.conf import settings
 from django.db import models
 from django.db.models import F, Q
+from django.db.models.functions import Greatest, Least
 
 
 class Friendship(models.Model):
     """
     Represents a friendship request and its current status between two users.
+
+    A friendship relation is directional while pending:
+        from_user -> to_user
+
+    However, only one relation may exist between the same two users,
+    regardless of direction.
     """
 
     class Status(models.TextChoices):
@@ -47,16 +55,21 @@ class Friendship(models.Model):
     class Meta:
         verbose_name = "Friendship"
         verbose_name_plural = "Friendships"
+
         constraints = [
+            # Treat A -> B and B -> A as the same friendship pair.
             models.UniqueConstraint(
-                fields=["from_user", "to_user"],
-                name="unique_friendship_request",
+                Least("from_user", "to_user"),
+                Greatest("from_user", "to_user"),
+                name="unique_friendship_pair",
             ),
+            # A user cannot create a friendship relation with themselves.
             models.CheckConstraint(
                 condition=~Q(from_user=F("to_user")),
                 name="prevent_self_friendship",
             ),
         ]
+
         indexes = [
             models.Index(fields=["to_user"]),
             models.Index(fields=["from_user", "status"]),

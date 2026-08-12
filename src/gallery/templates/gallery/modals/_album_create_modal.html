@@ -1,0 +1,102 @@
+{% load i18n %}
+
+<div data-album-modal
+     class="fixed inset-0 z-50 hidden overflow-y-auto"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true"
+     aria-labelledby="album-modal-title">
+
+    <button type="button"
+            data-album-modal-close
+            class="absolute inset-0 bg-slate-950/50"
+            aria-label="{% trans 'Close' %}">
+    </button>
+
+    <div class="pointer-events-none relative z-10 flex min-h-full items-end justify-center sm:items-center sm:p-4">
+        <div class="pointer-events-auto relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-xl sm:max-w-md sm:rounded-2xl">
+
+            <h2 id="album-modal-title"
+                class="text-lg font-semibold text-slate-900">
+                {% trans "Create photo album" %}
+            </h2>
+
+            <form method="post"
+                  action="{% url 'gallery:photo_album_create' %}"
+                  data-album-create-form
+                  class="mt-5 space-y-4">
+                {% csrf_token %}
+
+                <div data-form-general-errors
+                     class="hidden rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+                     role="alert">
+                </div>
+
+                <div>
+                    <label for="album-title"
+                           class="mb-1.5 block text-sm font-medium text-slate-700">
+                        {% trans "Album title" %}
+                    </label>
+
+                    <input id="album-title"
+                           name="title"
+                           type="text"
+                           required
+                           maxlength="100"
+                           autocomplete="off"
+                           aria-describedby="album-title-error"
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+
+                    <p id="album-title-error"
+                       data-field-error="title"
+                       class="mt-1.5 hidden text-sm text-red-600"
+                       role="alert">
+                    </p>
+                </div>
+
+                <div>
+                    <label for="album-visibility"
+                           class="mb-1.5 block text-sm font-medium text-slate-700">
+                        {% trans "Who can see this album" %}
+                    </label>
+
+                    {% with selected=album_create_form.visibility.value|default:"public" %}
+                        <select id="album-visibility"
+                                name="visibility"
+                                required
+                                aria-describedby="album-visibility-error"
+                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+
+                            {% for value, label in album_create_form.fields.visibility.choices %}
+                                <option value="{{ value }}"
+                                        {% if value == selected %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endwith %}
+
+                    <p id="album-visibility-error"
+                       data-field-error="visibility"
+                       class="mt-1.5 hidden text-sm text-red-600"
+                       role="alert">
+                    </p>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-1">
+                    <button type="button"
+                            data-album-modal-close
+                            class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">
+                        {% trans "Cancel" %}
+                    </button>
+
+                    <button type="submit"
+                            data-album-submit
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60">
+                        {% trans "Create album" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

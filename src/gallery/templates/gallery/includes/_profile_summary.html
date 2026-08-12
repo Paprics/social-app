@@ -1,0 +1,74 @@
+{# src/gallery/templates/gallery/includes/_profile_summary.html #}
+
+{% load static i18n render_image gender_icon %}
+
+<div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+    <div class="flex items-center gap-4">
+
+        <div class="shrink-0">
+            {% render_image profile.avatar_photo.image shape="circle" variant="avatar_sm" alt=profile_user.username reveal=True css_class="media-image--compact h-16 w-16 rounded-full object-cover border border-slate-200" %}
+        </div>
+
+        <div class="min-w-0">
+
+            <h2 class="flex items-center gap-1.5 text-base font-semibold text-slate-900">
+
+                <span class="inline-flex shrink-0">
+                    {% gender_icon profile.gender %}
+                </span>
+
+                <a href="{% url 'users:profile' profile_user.pk %}"
+                   class="truncate hover:text-blue-600 hover:underline transition-colors">
+                    {{ profile_user.username }}
+                </a>
+
+            </h2>
+
+            <p class="mt-0.5 truncate text-sm text-slate-500">
+                {{ profile.status|default:_("No status") }}
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="mt-4 border-t border-slate-100 pt-4
+                {% if is_owner %}grid grid-cols-3{% else %}grid grid-cols-2{% endif %}
+                gap-2 text-center text-sm">
+
+        <div>
+            <span class="block text-lg font-bold text-slate-900">
+                {{ gallery_stats.albums_count }}
+            </span>
+
+            <span class="text-xs text-slate-500">
+                {% trans "Albums" %}
+            </span>
+        </div>
+
+        <div>
+            <span class="block text-lg font-bold text-slate-900">
+                {{ gallery_stats.photos_count }}
+            </span>
+
+            <span class="text-xs text-slate-500">
+                {% trans "All photos" %}
+            </span>
+        </div>
+
+        {% if is_owner %}
+            <div>
+                <span class="block text-lg font-bold text-slate-900">
+                    {{ gallery_stats.remaining_slots }}
+                </span>
+
+                <span class="text-xs text-slate-500">
+                    {% trans "Free slots" %}
+                </span>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>

@@ -1,120 +1,24 @@
 # src/users/views/profile.py
-from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+
+from django.shortcuts import render
 from django.views import View
 
-from users.models.gallery import Photo
-from users.models.profile import Profile
-from users.services.gallery import get_or_create_default_album, get_remaining_slots
-from users.services.photo_service import process_image
-from users.services.user_block import UserBlockService
-from users.validators.image import validate_uploaded_image
-from users.services.friendship_service import FriendshipService
-from users.services.favorite_service import FavoriteService
-from users.services.profile_page import ProfilePageService
-
-User = get_user_model()
+from users.services.profile_context import ProfileContextBuilder
 
 
 class ProfileView(View):
+    """Render a user profile page."""
+
     template_name = "users/profile.html"
 
     def get(self, request, pk):
-        context = ProfilePageService.profile(request, pk)
-        return render(request, self.template_name, context)
-
-
-class AvatarModalView(LoginRequiredMixin, View):
-    """GET — возвращает HTML модального окна выбора аватара."""
-
-    template_name = "users/partials/avatar_modal.html"
-
-    def get(self, request):
-        photos = (
-            Photo.objects.filter(
-                album__user=request.user,
-                is_visible=True,
-            )
-            .select_related("album")
-            .order_by("-created_at")
+        context = ProfileContextBuilder.build_profile(
+            request,
+            pk,
         )
 
         return render(
             request,
             self.template_name,
-            {
-                "photos": photos,
-                "current_avatar": request.user.profile.avatar_photo,
-            },
-        )
-
-
-class AvatarSetView(LoginRequiredMixin, View):
-    """POST — устанавливает существующее фото аватаром профиля."""
-
-    def post(self, request):
-        photo_id = request.POST.get("photo_id")
-        if not photo_id:
-            return HttpResponseBadRequest()
-
-        photo = get_object_or_404(Photo, pk=photo_id, album__user=request.user)
-        profile = request.user.profile
-        profile.avatar_photo = photo
-        profile.save(update_fields=["avatar_photo"])
-
-        print(f"[profile] Аватар пользователя {request.user.pk} → Photo #{photo.pk}")
-
-        # HTMX обновляет блок аватара без перезагрузки страницы
-        return render(
-            request,
-            "users/partials/avatar_block.html",
-            {
-                "profile_user": request.user,
-            },
-        )
-
-
-class AvatarUploadView(LoginRequiredMixin, View):
-    """
-    POST — загружает новое фото, кладёт в дефолтный альбом,
-    ставит аватаром, возвращает обновлённый блок аватара.
-    """
-
-    def post(self, request):
-        file = request.FILES.get("photo")
-        if not file:
-            return HttpResponseBadRequest()
-
-        # Валидация
-        try:
-            validate_uploaded_image(file)
-        except Exception as exc:
-            return HttpResponse(str(exc), status=422)
-
-        # Проверяем лимит
-        if get_remaining_slots(request.user) <= 0:
-            return HttpResponse("Photo limit reached.", status=422)
-
-        # Обрабатываем и сохраняем
-        processed = process_image(file)
-        album = get_or_create_default_album(request.user)
-        photo = Photo(album=album, image=processed, title=file.name)
-        photo.save()
-
-        # Ставим аватаром
-        profile = request.user.profile
-        profile.avatar_photo = photo
-        profile.save(update_fields=["avatar_photo"])
-
-        print(f"[profile] Загружен и установлен новый аватар для пользователя {request.user.pk}, Photo #{photo.pk}")
-
-        return render(
-            request,
-            "users/partials/avatar_block.html",
-            {
-                "profile_user": request.user,
-            },
+            context,
         )

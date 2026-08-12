@@ -7,7 +7,8 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from users.models import Photo, Profile, UserAlbum
+from users.models import Profile
+from gallery.models import Photo, UserAlbum
 
 logger = logging.getLogger(__name__)
 User = get_user_model()

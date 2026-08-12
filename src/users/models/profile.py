@@ -1,4 +1,4 @@
-# profile.py
+# src/users/models/profile.py
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
@@ -56,7 +56,7 @@ class Profile(models.Model):
     )
 
     avatar_photo = models.ForeignKey(
-        "users.Photo",
+        "gallery.Photo",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

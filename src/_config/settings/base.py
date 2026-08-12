@@ -23,12 +23,14 @@ INSTALLED_APPS = [
     "cms.apps.CmsConfig",
     "tinymce",
     "geo.apps.GeoConfig",
-    "rosetta",
     "users.apps.UsersConfig",
     "accounts.apps.AccountsConfig",
     "notifications.apps.NotificationsConfig",
     "posts.apps.PostsConfig",
     "messenger.apps.MessengerConfig",
+    "search.apps.SearchConfig",
+    "easy_thumbnails",
+    "gallery.apps.GalleryConfig",
 ]
 
 MIDDLEWARE = [
@@ -164,7 +166,7 @@ EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
 DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL")
 
 # Gallery
-GALLERY_MAX_PHOTOS = 10
+GALLERY_MAX_PHOTOS = 50
 GALLERY_IMAGE_MAX_SIZE = 1200
 GALLERY_IMAGE_FORMAT = "WEBP"
 GALLERY_IMAGE_QUALITY = 82
@@ -214,3 +216,39 @@ CELERY_BEAT_SCHEDULE = {
 TURN_URL = env("TURN_URL")
 TURN_USER = env("TURN_USER")
 TURN_PASSWORD = env("TURN_PASSWORD")
+
+THUMBNAIL_ALIASES = {
+    "": {
+        # Display size: up to 32x32 CSS px
+        "avatar_xs": {
+            "size": (64, 64),
+            "crop": "smart",
+            "quality": 85,
+        },
+        # Display size: up to 96x96 CSS px
+        "avatar_sm": {
+            "size": (192, 192),
+            "crop": "smart",
+            "quality": 85,
+        },
+        # Display size: up to 128x128 CSS px
+        "avatar_md": {
+            "size": (256, 256),
+            "crop": "smart",
+            "quality": 85,
+        },
+        "avatar_lg": {
+            "size": (400, 500),
+            "crop": "smart",
+            "quality": 88,
+        },
+        "photo_preview": {
+            "size": (640, 640),
+            "quality": 85,
+        },
+        "photo_large": {
+            "size": (1280, 1280),
+            "quality": 88,
+        },
+    },
+}

@@ -1,0 +1,117 @@
+{% load i18n %}
+
+<div class="space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+    {# Album title #}
+    <h2 class="text-base font-semibold text-slate-900">
+        {{ album.title }}
+    </h2>
+
+    {# Album description #}
+    {% if album.description %}
+        <p class="text-sm leading-relaxed text-slate-500">
+            {{ album.description }}
+        </p>
+    {% endif %}
+
+    <div class="space-y-1.5 border-t border-slate-100 pt-3 text-xs text-slate-500">
+
+        {# Creation date #}
+        <div class="flex items-center gap-2">
+            <svg class="h-3.5 w-3.5 shrink-0"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 viewBox="0 0 24 24"
+                 aria-hidden="true">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+
+            {{ album.created_at|date:"d M Y" }}
+        </div>
+
+        {# Photo count #}
+        <div class="flex items-center gap-2">
+            <svg class="h-3.5 w-3.5 shrink-0"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 viewBox="0 0 24 24"
+                 aria-hidden="true">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 00-2-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+
+            {{ album_photos_count }} {% trans "photos" %}
+        </div>
+
+        {# Visibility #}
+        <div class="flex items-center gap-2">
+            <svg class="h-3.5 w-3.5 shrink-0"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 viewBox="0 0 24 24"
+                 aria-hidden="true">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+
+            {% if album.visibility == "public" %}
+                {% trans "Public" %}
+            {% elif album.visibility == "friends" %}
+                {% trans "Friends only" %}
+            {% else %}
+                {% trans "Private" %}
+            {% endif %}
+        </div>
+
+        {# Album state — owner only #}
+        {% if is_owner %}
+        {% if album.is_visible %}
+        <div class="flex items-center gap-2 text-slate-500">
+            <svg class="h-3.5 w-3.5 shrink-0"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 viewBox="0 0 24 24"
+                 aria-hidden="true">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 13l4 4L19 7"/>
+            </svg>
+
+            <span>
+                {% trans "Album enabled" %}
+            </span>
+        </div>
+        {% else %}
+        <div class="flex items-center gap-2 font-semibold text-red-600">
+            <svg class="h-3.5 w-3.5 shrink-0"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2.5"
+                 viewBox="0 0 24 24"
+                 aria-hidden="true">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+
+            <span>
+                {% trans "Album disabled" %}
+            </span>
+        </div>
+        {% endif %}
+        {% endif %}
+
+    </div>
+
+</div>

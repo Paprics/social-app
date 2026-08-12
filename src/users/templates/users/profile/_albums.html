@@ -1,0 +1,192 @@
+{# src/users/templates/users/profile/_albums.html #}
+{% load static i18n render_image gender_icon %}
+
+{% if access.can_view_profile %}
+    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+
+        {# Заголовок блока #}
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
+            <h2 class="text-sm font-semibold text-slate-800">
+                {% trans "Photo albums" %}
+                <span class="font-bold text-slate-900">
+                    ({{ albums_count }})
+                </span>
+            </h2>
+
+            <div class="flex items-center gap-2">
+
+                {% if is_owner %}
+                    <a href="{% url 'gallery:gallery' target_user.pk %}"
+                       class="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-3.5 w-3.5"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             aria-hidden="true">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 5v14M5 12h14"/>
+                        </svg>
+
+                        {% trans "Add photos" %}
+                    </a>
+                {% endif %}
+
+                {% if is_owner or albums %}
+                    <a href="{% url 'gallery:gallery' target_user.pk %}"
+                       class="inline-flex items-center gap-1 text-xs font-medium text-slate-500 transition hover:text-blue-600">
+
+                        {% trans "All albums" %}
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-3.5 w-3.5"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             aria-hidden="true">
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </a>
+                {% endif %}
+
+            </div>
+        </div>
+
+        {% if albums %}
+
+            {# Список разрешённых альбомов #}
+            <div class="divide-y divide-slate-100">
+
+                {% for album in albums %}
+                    <article class="px-4 py-4">
+
+                        {# Заголовок альбома #}
+                        <div class="mb-2.5 flex min-w-0 items-center justify-between gap-3">
+
+                            <a href="{% url 'gallery:album_detail' target_user.pk album.pk %}"
+                               class="min-w-0 truncate text-sm font-medium text-slate-700 transition hover:text-blue-600">
+                                {{ album.title }}
+                            </a>
+
+                            <div class="flex shrink-0 items-center gap-2">
+
+                                <span class="text-xs text-slate-400">
+                                    {% blocktrans count counter=album.photos_count %}
+                                        {{ counter }} photo
+                                    {% plural %}
+                                        {{ counter }} photos
+                                    {% endblocktrans %}
+                                </span>
+
+                                <span class="h-3.5 w-px bg-slate-200"
+                                      aria-hidden="true"></span>
+
+                                <a href="{% url 'gallery:album_detail' target_user.pk album.pk %}"
+                                   class="inline-flex items-center gap-1 text-xs font-medium text-blue-600 transition hover:text-blue-700">
+
+                                    {% trans "View album" %}
+
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         class="h-3.5 w-3.5"
+                                         viewBox="0 0 24 24"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         stroke-width="2"
+                                         aria-hidden="true">
+                                        <path stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="m9 18 6-6-6-6"/>
+                                    </svg>
+                                </a>
+
+                            </div>
+                        </div>
+
+                        {# Четыре превью-фотографии #}
+                        {% if album.preview_photos %}
+
+                            <div class="grid grid-cols-4 gap-1.5">
+
+                                {% for photo in album.preview_photos %}
+                                    <a href="{% url 'gallery:album_detail' target_user.pk album.pk %}"
+                                       class="group relative block aspect-square overflow-hidden rounded-lg bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                       aria-label="{% trans 'View album' %}: {{ album.title }}">
+
+                                        {% render_image photo.image variant="avatar_md" alt=photo.title css_class="media-image--compact h-full w-full object-cover transition duration-200 group-hover:scale-105" reveal=True %}
+
+                                    </a>
+                                {% endfor %}
+
+                            </div>
+
+                        {% else %}
+
+                            <a href="{% url 'gallery:album_detail' target_user.pk album.pk %}"
+                               class="flex min-h-20 items-center justify-center rounded-lg border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400 transition hover:border-slate-300 hover:bg-slate-100">
+
+                                {% trans "This album has no photos yet." %}
+
+                            </a>
+
+                        {% endif %}
+
+                    </article>
+                {% endfor %}
+
+            </div>
+
+            {# Ссылка на полную галерею #}
+            <div class="border-t border-slate-100 px-4 py-3">
+
+                <a href="{% url 'gallery:gallery' target_user.pk %}"
+                   class="flex w-full items-center justify-center gap-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-slate-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+
+                    {% trans "View all albums" %}
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-4 w-4"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         aria-hidden="true">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m9 18 6-6-6-6"/>
+                    </svg>
+
+                </a>
+
+            </div>
+
+        {% else %}
+
+            <div class="px-4 py-6 text-center">
+
+                <p class="text-xs text-slate-400">
+                    {% if is_owner %}
+                        {% trans "No albums yet." %}
+                    {% else %}
+                        {% trans "No albums available." %}
+                    {% endif %}
+                </p>
+
+                {% if is_owner %}
+                    <a href="{% url 'gallery:gallery' target_user.pk %}"
+                       class="mt-2 inline-flex text-xs font-medium text-blue-600 transition hover:text-blue-700">
+                        {% trans "Upload your first photo" %}
+                    </a>
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </section>
+{% endif %}
