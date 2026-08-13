@@ -1,0 +1,14 @@
+<div id="photo-comment-reply-slot-{{ parent.pk }}"></div>
+
+<div hx-swap-oob="beforeend:#photo-comment-replies-{{ parent.pk }}">
+    {% include "gallery/partials/comments/_comment.html" with item=item %}
+</div>
+
+<span id="lb-comments-count"
+      hx-swap-oob="outerHTML"
+      class="text-sm text-slate-400">
+    {{ total_count }}
+</span>
+
+<div id="lb-comments-empty"
+     hx-swap-oob="outerHTML"></div>

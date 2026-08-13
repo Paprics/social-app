@@ -1,0 +1,18 @@
+{% load i18n %}
+
+<span id="lb-comments-count"
+      hx-swap-oob="outerHTML"
+      class="text-sm text-slate-400">
+    {{ total_count }}
+</span>
+
+<div id="lb-comments-empty"
+     hx-swap-oob="outerHTML">
+
+    {% if total_count == 0 %}
+        <p class="py-6 text-center text-sm text-slate-400">
+            {% trans "No comments yet." %}
+        </p>
+    {% endif %}
+
+</div>

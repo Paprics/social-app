@@ -163,6 +163,7 @@ class PrivacySettingsForm(forms.ModelForm):
             "photo_albums_visibility",
             "show_online_status",
             "wall_enabled",
+            "comments_enabled",
             "blur_media",
         )
 

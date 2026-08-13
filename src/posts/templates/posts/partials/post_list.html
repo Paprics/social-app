@@ -1,11 +1,12 @@
 {% load i18n %}
 
-{% if posts %}
+{% if post_items %}
 
-    {% for post in posts %}
-        {% include "posts/partials/post.html" %}
+    {% for item in post_items %}
+
+        {% include "posts/partials/post.html" with post=item.post post_permissions=item.permissions %}
+
     {% endfor %}
-
 
     {% if has_next %}
 
@@ -23,10 +24,10 @@
 
     {% endif %}
 
-
 {% else %}
 
-    <div class="flex flex-col items-center justify-center py-12 px-5 text-center">
+    <div id="wall-empty-state"
+         class="flex flex-col items-center justify-center py-12 px-5 text-center">
 
         <svg xmlns="http://www.w3.org/2000/svg"
              class="h-12 w-12 text-slate-300"
@@ -41,11 +42,9 @@
 
         </svg>
 
-
         <h3 class="mt-4 text-sm font-semibold text-slate-700">
             {% trans "No posts yet" %}
         </h3>
-
 
         <p class="mt-1 text-sm text-slate-500">
             {% trans "This user has not published any posts yet." %}

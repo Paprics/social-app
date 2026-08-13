@@ -1,0 +1,33 @@
+{% load i18n %}
+
+{% if comment_items %}
+
+    {% for item in comment_items %}
+
+        {% include "posts/partials/comment.html" with comment=item.comment comment_permissions=item.permissions %}
+
+    {% endfor %}
+
+{% elif show_empty_state %}
+
+    <div id="comments-empty-{{ post.pk }}"
+         class="py-4 text-center text-sm text-slate-400">
+
+        {% trans "No comments yet." %}
+
+    </div>
+
+{% endif %}
+
+{% if has_next %}
+
+    <div hx-get="{% url 'posts:comment_list' post.pk %}?page={{ next_page }}"
+         hx-trigger="revealed"
+         hx-swap="outerHTML"
+         class="py-3 text-center text-xs text-slate-400">
+
+        {% trans "Loading more comments..." %}
+
+    </div>
+
+{% endif %}

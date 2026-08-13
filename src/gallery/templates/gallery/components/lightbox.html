@@ -1,123 +1,122 @@
 {% load i18n %}
 
 <div id="lightbox"
-     class="hidden fixed inset-0 z-50 bg-black/90 flex flex-col"
+     class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/75 backdrop-blur-sm"
      role="dialog"
      aria-modal="true">
 
-  {# ── Шапка: счётчик + кнопка закрытия ── #}
-  <div class="flex items-center justify-between px-4 py-3 shrink-0">
-    <span id="lb-counter" class="text-sm text-white/60 font-medium select-none"></span>
-    <button type="button"
-            id="lb-close"
-            class="w-9 h-9 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
-  </div>
-
-  {# ── Центральная зона: стрелка | изображение | стрелка ── #}
-  <div class="flex-1 flex items-center min-h-0 gap-2 px-2">
-
-    <button type="button"
-            id="lb-prev"
-            class="shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-      </svg>
-    </button>
-
-    <div class="flex-1 flex items-center justify-center min-h-0 min-w-0">
-      <img id="lb-img"
-           src=""
-           alt=""
-           class="max-h-full max-w-full object-contain rounded select-none"
-           draggable="false">
+    {# Клик по свободной затемнённой области закрывает lightbox #}
+    <div id="lb-backdrop"
+         class="fixed inset-0 z-0">
     </div>
 
-    <button type="button"
-            id="lb-next"
-            class="shrink-0 w-10 h-10 flex items-center justify-center rounded-full text-white/60 hover:text-white hover:bg-white/10 transition">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-      </svg>
-    </button>
 
-  </div>
+    {# ── Верхняя панель ─────────────────────────────────────── #}
+    <div class="pointer-events-none sticky top-0 z-30 flex items-center justify-between px-4 py-3">
 
-  {# ── Нижняя панель: статистика + комментарии ── #}
-  <div class="shrink-0 bg-black/60 border-t border-white/10">
+        <span id="lb-counter"
+              class="select-none rounded-full bg-slate-950/55 px-3 py-1.5 text-sm font-medium text-white/75 backdrop-blur-sm">
+        </span>
 
-    {# Статистика #}
-    <div class="flex items-center gap-6 px-5 py-3 border-b border-white/10">
-      {# Лайки — заглушка #}
-      <button type="button"
-              class="flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition"
-              title="{% trans 'Likes' %}">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-        </svg>
-        <span id="lb-likes">0</span>
-      </button>
+        <button type="button"
+                id="lb-close"
+                class="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-950/55 text-white/75 backdrop-blur-sm transition hover:bg-slate-950/75 hover:text-white"
+                aria-label="{% trans 'Close' %}">
 
-      {# Просмотры — заглушка #}
-      <div class="flex items-center gap-1.5 text-sm text-white/60"
-           title="{% trans 'Views' %}">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-          <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-        </svg>
-        <span id="lb-views">0</span>
-      </div>
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-5 w-5"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 aria-hidden="true">
 
-      {# Избранное — заглушка #}
-      <button type="button"
-              class="flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition"
-              title="{% trans 'Favorites' %}">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-        </svg>
-        <span id="lb-favorites">0</span>
-      </button>
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"/>
 
-      {# Комментарии — прокрутка к секции #}
-      <button type="button"
-              id="lb-scroll-comments"
-              class="flex items-center gap-1.5 text-sm text-white/60 hover:text-white transition ml-auto"
-              title="{% trans 'Comments' %}">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-        </svg>
-        <span id="lb-comments-count">0</span>
-        <span class="text-xs">{% trans "comments" %}</span>
-      </button>
-    </div>
+            </svg>
 
-    {# Заголовок фото #}
-    <div class="px-5 py-2">
-      <p id="lb-title" class="text-sm text-white/80 font-medium truncate"></p>
-    </div>
-
-    {# Комментарии — секция-заглушка, скрытая по умолчанию #}
-    <div id="lb-comments-section"
-         class="hidden border-t border-white/10 max-h-48 overflow-y-auto px-5 py-3 space-y-3">
-
-      {# Заглушка — нет комментариев #}
-      <p class="text-sm text-white/40 text-center py-4">{% trans "No comments yet." %}</p>
-
-      {# Форма комментария — заглушка #}
-      <div class="flex gap-2 pt-2 border-t border-white/10">
-        <input type="text"
-               disabled
-               placeholder="{% trans 'Comments coming soon…' %}"
-               class="flex-1 bg-white/10 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white/50 placeholder-white/30 cursor-not-allowed">
-        <button type="button" disabled
-                class="px-3 py-1.5 bg-blue-600/50 text-white/50 text-sm rounded-lg cursor-not-allowed">
-          {% trans "Send" %}
         </button>
-      </div>
+
     </div>
 
-  </div>
+
+    {# ── Фотография ─────────────────────────────────────────── #}
+    <div class="relative z-10 flex min-h-0 items-center justify-center px-3 pb-4 pt-1 sm:px-12">
+
+        <button type="button"
+                id="lb-prev"
+                class="absolute left-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/55 text-white/75 backdrop-blur-sm transition hover:bg-slate-950/75 hover:text-white sm:left-5"
+                aria-label="{% trans 'Previous photo' %}">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-6 w-6"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 aria-hidden="true">
+
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15 19l-7-7 7-7"/>
+
+            </svg>
+
+        </button>
+
+
+        <div class="flex w-full items-center justify-center">
+
+            <img id="lb-img"
+                 src=""
+                 alt=""
+                 class="max-h-[calc(100dvh-6rem)] max-w-full select-none object-contain"
+                 draggable="false">
+
+        </div>
+
+
+        <button type="button"
+                id="lb-next"
+                class="absolute right-2 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-slate-950/55 text-white/75 backdrop-blur-sm transition hover:bg-slate-950/75 hover:text-white sm:right-5"
+                aria-label="{% trans 'Next photo' %}">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-6 w-6"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 aria-hidden="true">
+
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9 5l7 7-7 7"/>
+
+            </svg>
+
+        </button>
+
+    </div>
+
+
+    {# ── Информация и комментарии ───────────────────────────── #}
+    {% url "gallery:photo_lightbox_detail" 0 as lightbox_detail_url %}
+
+    <div id="lb-photo-detail"
+         data-detail-url-template="{{ lightbox_detail_url }}"
+         class="relative z-10 mx-auto w-full max-w-4xl overflow-hidden rounded-t-2xl bg-white shadow-2xl">
+
+        <div data-lightbox-detail-placeholder
+             class="px-4 py-8 text-center text-sm text-slate-400 sm:px-6">
+            {% trans "Loading photo details..." %}
+        </div>
+
+    </div>
+
+
+    <div class="relative z-10 h-8"></div>
+
 </div>

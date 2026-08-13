@@ -1,0 +1,43 @@
+{% load i18n %}
+
+<div id="photo-comment-{{ comment.pk }}">
+
+    <form hx-post="{% url 'gallery:photo_comment_update' photo.pk comment.pk %}"
+          hx-target="#photo-comment-{{ comment.pk }}"
+          hx-swap="outerHTML">
+
+        {% csrf_token %}
+
+        {% if comment_form.content.errors %}
+            <div class="mb-2 text-xs text-red-600">
+                {{ comment_form.content.errors.0 }}
+            </div>
+        {% endif %}
+
+        <textarea name="content"
+                  rows="2"
+                  maxlength="100"
+                  required
+                  autofocus
+                  class="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400">{{ comment_form.content.value|default_if_none:"" }}</textarea>
+
+        <div class="mt-2 flex gap-2">
+
+            <button type="submit"
+                    class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-500">
+                {% trans "Save" %}
+            </button>
+
+            <button type="button"
+                    hx-get="{% url 'gallery:photo_comment_detail' photo.pk comment.pk %}"
+                    hx-target="#photo-comment-{{ comment.pk }}"
+                    hx-swap="outerHTML"
+                    class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50">
+                {% trans "Cancel" %}
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

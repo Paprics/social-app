@@ -1,0 +1,114 @@
+{% load i18n %}
+
+{# gallery/partials/_lightbox_photo_detail.html #}
+
+{# Actions — пока UI-заглушки #}
+<div class="flex items-center gap-5 border-b border-slate-200 px-4 py-4 sm:px-6">
+
+    <button type="button"
+            class="flex items-center gap-2 text-sm text-slate-600 transition hover:text-slate-900"
+            title="{% trans 'Like' %}">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="h-5 w-5"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor"
+             stroke-width="2"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+
+        <span>0</span>
+    </button>
+
+
+    <div class="flex items-center gap-2 text-sm text-slate-500"
+         title="{% trans 'Views' %}">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="h-5 w-5"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor"
+             stroke-width="2"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+
+        <span>0</span>
+    </div>
+
+
+    <button type="button"
+            class="ml-auto flex items-center gap-2 text-sm text-slate-600 transition hover:text-slate-900"
+            title="{% trans 'Save' %}">
+        <svg xmlns="http://www.w3.org/2000/svg"
+             class="h-5 w-5"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke="currentColor"
+             stroke-width="2"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+        </svg>
+
+        <span>0</span>
+    </button>
+
+</div>
+
+
+{# Title фотографии намеренно не выводим. #}
+{% if photo.description %}
+    <div class="border-b border-slate-200 px-4 py-4 sm:px-6">
+        <p class="whitespace-pre-line break-words text-sm leading-relaxed text-slate-700">
+            {{ photo.description }}
+        </p>
+    </div>
+{% endif %}
+
+
+{% if photo.album.user.settings.comments_enabled or request.user == photo.album.user %}
+
+    <section id="lb-comments-section"
+             hx-get="{% url 'gallery:photo_comment_list' photo.pk %}"
+             hx-trigger="load"
+             hx-swap="outerHTML"
+             class="px-4 py-8 text-center text-sm text-slate-400 sm:px-6">
+
+        {% trans "Loading comments..." %}
+
+    </section>
+
+{% else %}
+
+    <section class="border-t border-amber-200 bg-amber-50 px-4 py-5 sm:px-6">
+        <div class="flex items-center justify-center gap-2 text-sm text-amber-800">
+
+            <svg class="h-5 w-5 shrink-0"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 viewBox="0 0 24 24"
+                 aria-hidden="true">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 9v3.75m9-1.5a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12V16.5z"/>
+            </svg>
+
+            <span>
+                {% trans "Comments are disabled for this photo." %}
+            </span>
+
+        </div>
+    </section>
+
+{% endif %}

@@ -1,6 +1,10 @@
 # src/gallery/selectors/photos.py
 
+from django.contrib.auth import get_user_model
+
 from gallery.models import Photo, UserAlbum
+
+User = get_user_model()
 
 
 def get_avatar_candidate_photos(*, user):
@@ -22,6 +26,26 @@ def get_avatar_candidate_photos(*, user):
         .order_by(
             "-created_at",
         )
+    )
+
+
+def get_photo_target_user(*, photo_id):
+    """
+    Return the owner of a photo with relations required for access checks.
+
+    The photo may still be rejected later by get_photo_for_view(), for
+    example when it belongs to a system album or is not visible to viewer.
+    """
+
+    return (
+        User.objects.select_related(
+            "profile",
+            "settings",
+        )
+        .filter(
+            galleries__photos__pk=photo_id,
+        )
+        .first()
     )
 
 

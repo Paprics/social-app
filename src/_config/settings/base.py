@@ -252,3 +252,5 @@ THUMBNAIL_ALIASES = {
         },
     },
 }
+
+POST_MAX_IMAGES = 10

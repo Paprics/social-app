@@ -1,11 +1,60 @@
 # src/gallery/views/photos.py
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import render
 from django.views import View
 
 from gallery.forms import PhotoUploadForm
+from gallery.selectors.gallery import get_gallery_access_context
+from gallery.selectors.photos import (
+    get_photo_for_view,
+    get_photo_target_user,
+)
 from gallery.services.photo_service import PhotoService
+
+
+class PhotoLightboxDetailView(View):
+    """Render the detail block displayed below a photo in the lightbox."""
+
+    template_name = "gallery/partials/_lightbox_photo_detail.html"
+
+    def get(self, request, photo_pk):
+        target = get_photo_target_user(
+            photo_id=photo_pk,
+        )
+
+        if target is None:
+            raise Http404
+
+        access = get_gallery_access_context(
+            viewer=request.user,
+            target=target,
+        )
+
+        if not access["can_view_profile"]:
+            raise Http404
+
+        if not access["can_view_gallery"]:
+            raise PermissionDenied
+
+        photo = get_photo_for_view(
+            target=target,
+            photo_id=photo_pk,
+            access=access,
+        )
+
+        if photo is None:
+            raise Http404
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "photo": photo,
+            },
+        )
 
 
 class PhotoUploadView(LoginRequiredMixin, View):

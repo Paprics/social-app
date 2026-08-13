@@ -1,3 +1,5 @@
+"""Persistence models for user galleries and system-managed photo albums."""
+
 # src/gallery/models.py
 
 from django.conf import settings
@@ -8,8 +10,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 def photo_upload_path(instance, filename):
-    """Build storage path for a photo inside a user album."""
-    return f"photos/users/" f"{instance.album.user_id}/" f"{instance.album_id}/" f"{filename}"
+    """Build the storage path for a photo inside a user album."""
+    return f"photos/users/{instance.album.user_id}/{instance.album_id}/{filename}"
 
 
 class UserAlbum(models.Model):
@@ -29,6 +31,7 @@ class UserAlbum(models.Model):
 
         USER = "user", _("User album")
         PROFILE_PHOTOS = "profile_photos", _("Profile photos")
+        POST_PHOTOS = "post_photos", _("Post photos")
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -45,7 +48,8 @@ class UserAlbum(models.Model):
         help_text=_("Media type stored in this album."),
     )
 
-    # Separates ordinary user albums from albums used by the system.
+    # Separates ordinary user albums from albums managed internally
+    # by features such as profile photos and post attachments.
     purpose = models.CharField(
         max_length=32,
         choices=Purpose.choices,
@@ -73,8 +77,8 @@ class UserAlbum(models.Model):
         help_text=_("Optional album description."),
     )
 
-    # Default for ordinary user albums.
-    # Profile Photos will explicitly use PRIVATE in its service.
+    # Ordinary albums are public by default.
+    # System-managed albums explicitly use PRIVATE in their services.
     visibility = models.CharField(
         max_length=20,
         choices=Visibility.choices,
@@ -105,22 +109,27 @@ class UserAlbum(models.Model):
         verbose_name_plural = _("Photo albums")
 
         constraints = [
-            # A user cannot have two albums with the same slug.
+            # Album slugs are unique within one user's gallery.
             models.UniqueConstraint(
                 fields=["user", "slug"],
                 name="unique_user_album_slug",
             ),
-            # A user may have many ordinary albums,
-            # but only one dedicated Profile Photos album.
+            # Each user has at most one system Profile Photos album.
             models.UniqueConstraint(
                 fields=["user"],
                 condition=Q(purpose="profile_photos"),
                 name="unique_profile_photos_album_per_user",
             ),
+            # Each user has at most one system Post Photos album.
+            models.UniqueConstraint(
+                fields=["user"],
+                condition=Q(purpose="post_photos"),
+                name="unique_post_photos_album_per_user",
+            ),
         ]
 
     def save(self, *args, **kwargs):
-        """Generate slug from title when it was not supplied."""
+        """Generate the slug from the title when it was not supplied."""
         if not self.slug:
             self.slug = slugify(self.title)
 

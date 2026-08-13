@@ -1,0 +1,24 @@
+{% load i18n %}
+
+<div class="space-y-5">
+    {% for item in comment_items %}
+        {% include "gallery/partials/comments/_comment.html" with item=item %}
+    {% endfor %}
+</div>
+
+{% if next_page %}
+    <div id="lb-comments-more"
+         class="pt-5 text-center">
+
+        <button type="button"
+                hx-get="{% url 'gallery:photo_comment_list' photo.pk %}?page={{ next_page }}&snapshot={{ snapshot }}"
+                hx-target="#lb-comments-more"
+                hx-swap="outerHTML"
+                class="text-sm font-medium text-slate-500 transition hover:text-slate-900">
+            {% trans "Show more comments" %}
+        </button>
+
+    </div>
+{% else %}
+    <div id="lb-comments-more"></div>
+{% endif %}

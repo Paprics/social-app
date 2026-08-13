@@ -69,6 +69,12 @@ class UserSettings(models.Model):
         help_text="Controls who can send private messages.",
     )
 
+    comments_enabled = models.BooleanField(
+        verbose_name=_("Comments enabled"),
+        default=True,
+        help_text=_("Enable comments on the user's content."),
+    )
+
     comment_permission = models.CharField(
         max_length=16,
         choices=AccessLevel.choices,

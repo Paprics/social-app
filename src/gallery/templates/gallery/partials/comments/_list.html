@@ -1,0 +1,87 @@
+{% load i18n %}
+
+<section id="lb-comments-section"
+         class="px-4 py-5 sm:px-6">
+
+    <div class="mb-5 flex items-center gap-2">
+
+        <h3 class="text-sm font-semibold text-slate-900">
+            {% trans "Comments" %}
+        </h3>
+
+        <span id="lb-comments-count"
+              class="text-sm text-slate-400">
+            {{ total_count }}
+        </span>
+
+    </div>
+
+    {% if not photo.album.user.settings.comments_enabled %}
+
+    <div class="mb-5 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800">
+
+        <svg class="mt-0.5 h-5 w-5 shrink-0"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             viewBox="0 0 24 24"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 9v3.75m9-1.5a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12V16.5z"/>
+        </svg>
+
+        <div>
+            <p class="text-sm font-medium">
+                {% trans "Comments are disabled." %}
+            </p>
+
+            <p class="mt-0.5 text-xs text-amber-700">
+                {% trans "Only you can see existing comments." %}
+            </p>
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <div id="lb-comments-empty">
+        {% if total_count == 0 %}
+            <p class="py-6 text-center text-sm text-slate-400">
+                {% trans "No comments yet." %}
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="space-y-5">
+        {% for item in comment_items %}
+            {% include "gallery/partials/comments/_comment.html" with item=item %}
+        {% endfor %}
+    </div>
+
+    {% if next_page %}
+        <div id="lb-comments-more"
+             class="pt-5 text-center">
+
+            <button type="button"
+                    hx-get="{% url 'gallery:photo_comment_list' photo.pk %}?page={{ next_page }}&snapshot={{ snapshot }}"
+                    hx-target="#lb-comments-more"
+                    hx-swap="outerHTML"
+                    class="text-sm font-medium text-slate-500 transition hover:text-slate-900">
+                {% trans "Show more comments" %}
+            </button>
+
+        </div>
+    {% else %}
+        <div id="lb-comments-more"></div>
+    {% endif %}
+
+    {# Новые root comments идут сюда. #}
+    <div id="lb-comments-new"
+         class="mt-5 space-y-5"></div>
+
+    {% if can_comment %}
+        {% include "gallery/partials/comments/_form.html" %}
+    {% endif %}
+
+</section>

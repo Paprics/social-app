@@ -135,6 +135,8 @@ class ProfileContextBuilder:
             is_friend=is_friend,
         )
 
+        can_view_profile = profile_access.can_view_profile()
+
         messenger_access = MessengerAccessService(
             viewer=viewer,
             target=target_user,
@@ -146,6 +148,8 @@ class ProfileContextBuilder:
             viewer=viewer,
             target=target_user,
             is_friend=is_friend,
+            is_blocked=is_blocked,
+            can_view_profile=can_view_profile,
         )
 
         # =====================================================================
@@ -154,7 +158,7 @@ class ProfileContextBuilder:
 
         access = {
             # Profile
-            "can_view_profile": profile_access.can_view_profile(),
+            "can_view_profile": can_view_profile,
             "can_view_friends": profile_access.can_view_friends(),
             # Messenger
             "can_send_message": messenger_access.can_send_message(),

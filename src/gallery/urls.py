@@ -11,7 +11,14 @@ from gallery.views import (
     GalleryPhotosView,
     GalleryView,
     PhotoDeleteView,
+    PhotoLightboxDetailView,
     PhotoUploadView,
+    PhotoCommentCreateView,
+    PhotoCommentDeleteView,
+    PhotoCommentDetailView,
+    PhotoCommentListView,
+    PhotoCommentReplyView,
+    PhotoCommentUpdateView,
 )
 
 app_name = "gallery"
@@ -61,6 +68,11 @@ urlpatterns = [
         name="photo_upload",
     ),
     path(
+        "photos/<int:photo_pk>/lightbox/",
+        PhotoLightboxDetailView.as_view(),
+        name="photo_lightbox_detail",
+    ),
+    path(
         "photos/<int:photo_pk>/delete/",
         PhotoDeleteView.as_view(),
         name="photo_delete",
@@ -77,5 +89,36 @@ urlpatterns = [
         AlbumCreateView.as_view(),
         {"album_type": "video"},
         name="video_album_create",
+    ),
+    # Photo comments
+    path(
+        "photos/<int:photo_pk>/comments/",
+        PhotoCommentListView.as_view(),
+        name="photo_comment_list",
+    ),
+    path(
+        "photos/<int:photo_pk>/comments/create/",
+        PhotoCommentCreateView.as_view(),
+        name="photo_comment_create",
+    ),
+    path(
+        "photos/<int:photo_pk>/comments/<int:comment_id>/",
+        PhotoCommentDetailView.as_view(),
+        name="photo_comment_detail",
+    ),
+    path(
+        "photos/<int:photo_pk>/comments/<int:comment_id>/reply/",
+        PhotoCommentReplyView.as_view(),
+        name="photo_comment_reply",
+    ),
+    path(
+        "photos/<int:photo_pk>/comments/<int:comment_id>/update/",
+        PhotoCommentUpdateView.as_view(),
+        name="photo_comment_update",
+    ),
+    path(
+        "photos/<int:photo_pk>/comments/<int:comment_id>/delete/",
+        PhotoCommentDeleteView.as_view(),
+        name="photo_comment_delete",
     ),
 ]

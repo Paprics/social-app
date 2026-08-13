@@ -1,0 +1,42 @@
+{% load i18n %}
+
+<div id="lb-comment-form"
+     class="mt-6 border-t border-slate-200 pt-4">
+
+    <form hx-post="{% url 'gallery:photo_comment_create' photo.pk %}"
+          hx-target="#lb-comment-form"
+          hx-swap="outerHTML">
+
+        {% csrf_token %}
+
+        {% if comment_form.non_field_errors %}
+            <div class="mb-2 text-sm text-red-600">
+                {{ comment_form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        {% if comment_form.content.errors %}
+            <div class="mb-2 text-sm text-red-600">
+                {{ comment_form.content.errors.0 }}
+            </div>
+        {% endif %}
+
+        <div class="flex items-end gap-3">
+
+            <textarea name="content"
+                      rows="1"
+                      maxlength="100"
+                      required
+                      placeholder="{% trans 'Add a comment...' %}"
+                      class="min-h-10 flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-400 focus:bg-white">{{ comment_form.content.value|default_if_none:"" }}</textarea>
+
+            <button type="submit"
+                    class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-blue-500">
+                {% trans "Post" %}
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

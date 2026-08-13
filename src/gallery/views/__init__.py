@@ -13,7 +13,17 @@ from gallery.views.gallery import (
 )
 from gallery.views.photos import (
     PhotoDeleteView,
+    PhotoLightboxDetailView,
     PhotoUploadView,
+)
+
+from gallery.views.comments import (
+    PhotoCommentCreateView,
+    PhotoCommentDeleteView,
+    PhotoCommentDetailView,
+    PhotoCommentListView,
+    PhotoCommentReplyView,
+    PhotoCommentUpdateView,
 )
 
 __all__ = [
@@ -25,5 +35,12 @@ __all__ = [
     "GalleryPhotosView",
     "GalleryView",
     "PhotoDeleteView",
+    "PhotoLightboxDetailView",
     "PhotoUploadView",
+    "PhotoCommentCreateView",
+    "PhotoCommentDeleteView",
+    "PhotoCommentDetailView",
+    "PhotoCommentListView",
+    "PhotoCommentReplyView",
+    "PhotoCommentUpdateView",
 ]

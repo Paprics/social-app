@@ -109,9 +109,15 @@
     {# Не удалять: точка монтирования модального окна смены аватара #}
     <div id="avatar-modal-container"></div>
 
+
+    {# Lightbox for wall post images #}
+    {% include "gallery/components/lightbox.html" %}
+
 {% endblock %}
 
 
 {% block extra_js %}
     <script src="{% static 'users/js/profile/avatar.js' %}"></script>
+    <script src="{% static 'gallery/js/lightbox.js' %}"></script>
+    <script src="{% static 'posts/js/post_form.js' %}"></script>
 {% endblock %}

@@ -728,6 +728,28 @@
                         </label>
                     </div>
 
+                    <!-- Comments enabled -->
+                    <div class="flex items-center justify-between gap-4 py-3 border-b border-slate-100">
+                        <div>
+                            <p class="text-sm font-medium text-slate-800">
+                                {% trans "Enable comments" %}
+                            </p>
+
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                {% trans "Allow comments on your content." %}
+                            </p>
+                        </div>
+
+                        <label class="toggle-switch shrink-0">
+                            <input
+                                    type="checkbox"
+                                    name="comments_enabled"
+                                    {% if s.comments_enabled %}checked{% endif %}
+                            >
+                            <span class="toggle-track"></span>
+                        </label>
+                    </div>
+
                     <!-- Safe Media Mode -->
                     <div class="flex items-center justify-between gap-4 py-3">
                         <div>
