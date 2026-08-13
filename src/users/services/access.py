@@ -22,6 +22,10 @@ class ProfileAccessService:
 
     def can_view_friends(self):
         """Return whether the viewer can access the user's friends."""
+
+        if not self.can_view_profile():
+            return False
+
         return self._check_access(
             self.target.settings.friends_visibility,
         )

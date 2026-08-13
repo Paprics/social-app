@@ -19,3 +19,10 @@ python src/manage.py compilemessages
 {% include "users/partials/photo_favorite_button.html" with favorite_url=photo.favorite_url is_favorite=photo.is_favorite %}
 
 http://127.0.0.1:8000/en/account-center/?friends_tab=incoming#friendsk
+
+docker compose --env-file .env.dev -f docker/compose.dev.yml exec web \
+    pytest --ds=_config.settings.test posts/tests -v
+
+Запуск всех тестов в проекте
+docker compose --env-file .env.dev -f docker/compose.dev.yml exec web \
+    pytest --ds=_config.settings.test -q
