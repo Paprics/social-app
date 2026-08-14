@@ -2,7 +2,7 @@
 """Access rules for private messaging."""
 
 from users.models.preferences import UserSettings
-from users.selectors.user_block import is_blocked_between
+from users.selectors.user_block import has_blocked
 from users.services.friendship_service import FriendshipService
 
 
@@ -21,15 +21,32 @@ class MessengerAccessService:
         target,
         is_friend=None,
         is_blocked=None,
+        target_has_blocked=None,
     ):
         self.viewer = viewer
         self.target = target
 
-        self.is_authenticated = viewer.is_authenticated
-        self.is_owner = viewer == target
+        self.is_authenticated = bool(
+            getattr(
+                viewer,
+                "is_authenticated",
+                False,
+            )
+        )
+        self.is_owner = (
+            self.is_authenticated
+            and viewer.pk == target.pk
+        )
 
         self._is_friend = is_friend
+
+        # Symmetric relationship state.
+        # Kept for compatibility with existing callers, but it does not
+        # restrict the viewer's access to the target.
         self._is_blocked = is_blocked
+
+        # Directional state: target has explicitly blocked viewer.
+        self._target_has_blocked = target_has_blocked
 
     def can_send_message(self) -> bool:
         """Return whether viewer may send a private message to target."""
@@ -40,7 +57,7 @@ class MessengerAccessService:
         if self.is_owner:
             return False
 
-        if self._get_is_blocked():
+        if self._get_target_has_blocked():
             return False
 
         return self._check_access(
@@ -70,15 +87,15 @@ class MessengerAccessService:
                 self.target,
             )
 
-        return self._is_friend
+        return bool(self._is_friend)
 
-    def _get_is_blocked(self) -> bool:
-        """Return whether either user has blocked the other."""
+    def _get_target_has_blocked(self) -> bool:
+        """Return whether target has explicitly blocked viewer."""
 
-        if self._is_blocked is None:
-            self._is_blocked = is_blocked_between(
-                self.viewer,
+        if self._target_has_blocked is None:
+            self._target_has_blocked = has_blocked(
                 self.target,
+                self.viewer,
             )
 
-        return self._is_blocked
+        return bool(self._target_has_blocked)

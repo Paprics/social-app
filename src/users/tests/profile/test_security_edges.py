@@ -132,7 +132,7 @@ class TestRealBlockIntegration:
                 owner.pk,
             )
 
-    def test_viewer_blocking_owner_keeps_profile_but_closes_interactions(
+    def test_viewer_blocking_owner_keeps_normal_target_access(
         self,
         rf,
         owner,
@@ -171,10 +171,10 @@ class TestRealBlockIntegration:
         assert context["target_has_blocked"] is False
 
         assert context["access"]["can_view_profile"] is True
-        assert context["access"]["can_view_friends"] is False
-        assert context["access"]["can_send_message"] is False
-        assert context["access"]["can_view_wall"] is False
-        assert context["access"]["can_post_on_wall"] is False
+        assert context["access"]["can_view_friends"] is True
+        assert context["access"]["can_send_message"] is True
+        assert context["access"]["can_view_wall"] is True
+        assert context["access"]["can_post_on_wall"] is True
 
 
 @pytest.mark.django_db

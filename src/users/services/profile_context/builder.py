@@ -32,15 +32,12 @@ class ProfileContextBuilder:
             is_blocked=context["is_blocked"],
         )
 
-        if context["is_blocked"]:
-            content = cls._empty_profile_content()
-        else:
-            content = build_profile_content(
-                viewer=request.user,
-                target=target,
-                is_friend=is_friend,
-                access=context["access"],
-            )
+        content = build_profile_content(
+            viewer=request.user,
+            target=target,
+            is_friend=is_friend,
+            access=context["access"],
+        )
 
         return {
             **context,
@@ -67,12 +64,7 @@ class ProfileContextBuilder:
 
         mutual_friends_count = 0
 
-        if (
-            not context["is_blocked"]
-            and viewer.is_authenticated
-            and viewer != target
-            and context["access"]["can_view_friends"]
-        ):
+        if viewer.is_authenticated and viewer != target and context["access"]["can_view_friends"]:
             mutual_friends_count = get_mutual_friends_count(
                 viewer,
                 target,
@@ -137,16 +129,3 @@ class ProfileContextBuilder:
         }
 
         return context, is_friend
-
-    @staticmethod
-    def _empty_profile_content():
-        """Return empty child resources for a blocked profile relation."""
-
-        return {
-            "albums": [],
-            "albums_count": 0,
-            "friends": [],
-            "friends_count": 0,
-            "mutual_friends": [],
-            "mutual_friends_count": 0,
-        }

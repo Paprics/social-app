@@ -108,7 +108,7 @@ class TestPostAccessService:
 
         assert access.can_post_on_wall() is expected
 
-    def test_blocked_user_cannot_post(
+    def test_target_blocking_viewer_prevents_wall_post(
         self,
         owner,
         other,
@@ -117,10 +117,26 @@ class TestPostAccessService:
             viewer=other,
             target=owner,
             is_blocked=True,
+            target_has_blocked=True,
             can_view_profile=True,
         )
 
         assert access.can_post_on_wall() is False
+
+    def test_viewer_blocking_target_does_not_prevent_wall_post(
+        self,
+        owner,
+        other,
+    ):
+        access = PostAccessService(
+            viewer=other,
+            target=owner,
+            is_blocked=True,
+            target_has_blocked=False,
+            can_view_profile=True,
+        )
+
+        assert access.can_post_on_wall() is True
 
     def test_only_author_can_edit_post(
         self,

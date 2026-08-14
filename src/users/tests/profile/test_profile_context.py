@@ -316,7 +316,7 @@ class TestProfileContextBlocking:
                 owner.pk,
             )
 
-    def test_viewer_blocking_target_keeps_unblock_profile_but_closes_children(
+    def test_viewer_blocking_target_keeps_normal_target_access(
         self,
         request_factory,
         owner,
@@ -344,15 +344,9 @@ class TestProfileContextBlocking:
             blocked=owner,
         )
 
-        gallery_mock = Mock(
-            side_effect=AssertionError(
-                "Profile child content must not be loaded for a blocked pair."
-            )
-        )
-
         monkeypatch.setattr(
             "users.services.profile_context.content.get_profile_albums",
-            gallery_mock,
+            lambda **kwargs: ([], 0),
         )
 
         request = request_factory.get("/")
@@ -368,16 +362,10 @@ class TestProfileContextBlocking:
         assert context["target_has_blocked"] is False
 
         assert context["access"]["can_view_profile"] is True
-        assert context["access"]["can_view_friends"] is False
-        assert context["access"]["can_send_message"] is False
-        assert context["access"]["can_view_wall"] is False
-        assert context["access"]["can_post_on_wall"] is False
-
-        assert context["albums"] == []
-        assert context["friends"] == []
-        assert context["mutual_friends"] == []
-
-        gallery_mock.assert_not_called()
+        assert context["access"]["can_view_friends"] is True
+        assert context["access"]["can_send_message"] is True
+        assert context["access"]["can_view_wall"] is True
+        assert context["access"]["can_post_on_wall"] is True
 
 
 @pytest.mark.django_db
