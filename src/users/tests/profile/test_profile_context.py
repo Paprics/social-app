@@ -8,6 +8,7 @@ from django.test import RequestFactory
 
 from users.models.friendship import Friendship
 from users.models.preferences import UserSettings
+from users.models.user_block import UserBlock
 from users.services.profile_context import ProfileContextBuilder
 
 
@@ -29,7 +30,7 @@ class TestProfileContextContract:
         request.user = stranger
 
         monkeypatch.setattr(
-            "users.services.profile_context.get_profile_albums",
+            "users.services.profile_context.content.get_profile_albums",
             lambda **kwargs: ([], 0),
         )
 
@@ -52,6 +53,8 @@ class TestProfileContextContract:
             "favorite_url",
             "is_favorite",
             "is_blocked",
+            "viewer_has_blocked",
+            "target_has_blocked",
         }
 
         assert context["target_user"].pk == owner.pk
@@ -119,22 +122,22 @@ class TestProfileContextAccessHierarchy:
         mutual_mock = Mock(side_effect=AssertionError("Mutual friends must not be loaded for a closed profile."))
 
         monkeypatch.setattr(
-            "users.services.profile_context.get_profile_albums",
+            "users.services.profile_context.content.get_profile_albums",
             gallery_mock,
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_preview",
+            "users.services.profile_context.content.get_friends_preview",
             friends_preview_mock,
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_count",
+            "users.services.profile_context.content.get_friends_count",
             friends_count_mock,
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_mutual_friends",
+            "users.services.profile_context.content.get_mutual_friends",
             mutual_mock,
         )
 
@@ -182,7 +185,7 @@ class TestProfileContextAccessHierarchy:
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.get_profile_albums",
+            "users.services.profile_context.content.get_profile_albums",
             lambda **kwargs: ([], 0),
         )
 
@@ -225,17 +228,17 @@ class TestProfileContextFriendship:
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.get_profile_albums",
+            "users.services.profile_context.content.get_profile_albums",
             lambda **kwargs: ([], 0),
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_preview",
+            "users.services.profile_context.content.get_friends_preview",
             lambda *args, **kwargs: [],
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_count",
+            "users.services.profile_context.content.get_friends_count",
             lambda *args, **kwargs: 0,
         )
 
@@ -290,7 +293,30 @@ class TestProfileContextFriendship:
 
 @pytest.mark.django_db
 class TestProfileContextBlocking:
-    def test_block_does_not_close_profile_but_blocks_interactions(
+    def test_target_blocking_viewer_hides_profile(
+        self,
+        request_factory,
+        owner,
+        stranger,
+    ):
+        owner.settings.profile_visibility = UserSettings.AccessLevel.EVERYONE
+        owner.settings.save(update_fields=["profile_visibility"])
+
+        UserBlock.objects.create(
+            blocker=owner,
+            blocked=stranger,
+        )
+
+        request = request_factory.get("/")
+        request.user = stranger
+
+        with pytest.raises(Http404):
+            ProfileContextBuilder.build_profile(
+                request,
+                owner.pk,
+            )
+
+    def test_viewer_blocking_target_keeps_unblock_profile_but_closes_children(
         self,
         request_factory,
         owner,
@@ -313,24 +339,20 @@ class TestProfileContextBlocking:
             ]
         )
 
-        monkeypatch.setattr(
-            "users.services.profile_context.UserBlockService.is_blocked",
-            lambda *args, **kwargs: True,
+        UserBlock.objects.create(
+            blocker=stranger,
+            blocked=owner,
+        )
+
+        gallery_mock = Mock(
+            side_effect=AssertionError(
+                "Profile child content must not be loaded for a blocked pair."
+            )
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.get_profile_albums",
-            lambda **kwargs: ([], 0),
-        )
-
-        monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_preview",
-            lambda *args, **kwargs: [],
-        )
-
-        monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_count",
-            lambda *args, **kwargs: 0,
+            "users.services.profile_context.content.get_profile_albums",
+            gallery_mock,
         )
 
         request = request_factory.get("/")
@@ -342,12 +364,20 @@ class TestProfileContextBlocking:
         )
 
         assert context["is_blocked"] is True
+        assert context["viewer_has_blocked"] is True
+        assert context["target_has_blocked"] is False
 
         assert context["access"]["can_view_profile"] is True
+        assert context["access"]["can_view_friends"] is False
         assert context["access"]["can_send_message"] is False
-
-        assert context["access"]["can_view_wall"] is True
+        assert context["access"]["can_view_wall"] is False
         assert context["access"]["can_post_on_wall"] is False
+
+        assert context["albums"] == []
+        assert context["friends"] == []
+        assert context["mutual_friends"] == []
+
+        gallery_mock.assert_not_called()
 
 
 @pytest.mark.django_db
@@ -371,17 +401,17 @@ class TestAnonymousProfileContext:
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.get_profile_albums",
+            "users.services.profile_context.content.get_profile_albums",
             lambda **kwargs: ([], 0),
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_preview",
+            "users.services.profile_context.content.get_friends_preview",
             lambda *args, **kwargs: [],
         )
 
         monkeypatch.setattr(
-            "users.services.profile_context.FriendshipService.get_friends_count",
+            "users.services.profile_context.content.get_friends_count",
             lambda *args, **kwargs: 0,
         )
 

@@ -1,0 +1,26 @@
+{# src/gallery/templates/gallery/components/_album_card.html #}
+
+{% load i18n render_image %}
+
+<article class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition hover:shadow-md">
+
+    <div class="overflow-hidden bg-slate-100">
+        {% with cover=album.preview_photos.0 %}
+            {% render_image cover.image variant="avatar_md" alt=album.title reveal=True css_class="media-image--compact aspect-square w-full object-cover" %}
+        {% endwith %}
+    </div>
+
+    <a href="{% url 'gallery:album_detail' profile_user.pk album.pk %}"
+       class="block px-3 py-2 transition hover:bg-slate-100">
+
+        <p class="truncate text-sm font-medium text-slate-800">
+            {{ album.title }}
+        </p>
+
+        <p class="mt-0.5 text-xs text-slate-500">
+            {{ album.photos_count }} {% trans "photos" %}
+        </p>
+
+    </a>
+
+</article>

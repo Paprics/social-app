@@ -44,6 +44,7 @@ from users.views import (
     ProfileExplorePostsView,
     ProfileExploreVideosView,
 )
+from users.views.account_center import AccountCenterBlacklistListView
 
 app_name = "users"
 
@@ -59,10 +60,11 @@ settings_urlpatterns = [
     path("settings/communication/", SettingsCommunicationView.as_view(), name="communication"),
     path("settings/premium-features/", SettingsPremiumFeaturesView.as_view(), name="premium_features"),
     path(
-        "settings/preferences/sensitive-content/", SensitiveContentToggleView.as_view(), name="toggle_sensitive_content"
+        "settings/preferences/sensitive-content/",
+        SensitiveContentToggleView.as_view(),
+        name="toggle_sensitive_content",
     ),
 ]
-
 
 friendship_urlpatterns = [
     path("<int:pk>/friend-request/send/", FriendRequestSendView.as_view(), name="friend_request_send"),
@@ -84,15 +86,26 @@ account_center_urlpatterns = [
         AccountCenterOutgoingFriendRequestsView.as_view(),
         name="account_center_friends_outgoing",
     ),
-    path("account-center/friends/list/", AccountCenterFriendsListView.as_view(), name="account_center_friends_list"),
-    path("account-center/statistics/", AccountCenterStatisticsView.as_view(), name="account_center_statistics"),
     path(
-        "account-center/profile-visits/", AccountCenterProfileVisitsView.as_view(), name="account_center_profile_visits"
+        "account-center/friends/list/",
+        AccountCenterFriendsListView.as_view(),
+        name="account_center_friends_list",
     ),
-    # path("account-center/favorites/", AccountCenterFavoritesSectionView.as_view(), name="account_center_favorites_section"),
-    # path("account-center/blacklist/", AccountCenterBlacklistSectionView.as_view(), name="account_center_blacklist_section"),
-    # path("account-center/gifts/", AccountCenterGiftsSectionView.as_view(), name="account_center_gifts_section"),
-    # path("account-center/premium-history/", AccountCenterPremiumHistorySectionView.as_view(), name="account_center_premium_history_section"),
+    path(
+        "account-center/blacklist/list/",
+        AccountCenterBlacklistListView.as_view(),
+        name="account_center_blacklist_list",
+    ),
+    path(
+        "account-center/statistics/",
+        AccountCenterStatisticsView.as_view(),
+        name="account_center_statistics",
+    ),
+    path(
+        "account-center/profile-visits/",
+        AccountCenterProfileVisitsView.as_view(),
+        name="account_center_profile_visits",
+    ),
 ]
 
 avatar_urlpatterns = [
@@ -139,7 +152,6 @@ favorite_urlpatterns = [
 block_urlpatterns = [
     path("<int:pk>/block/", UserBlockCreateView.as_view(), name="block"),
     path("<int:pk>/unblock/", UserBlockDeleteView.as_view(), name="unblock"),
-    # path("blocked-users/", BlockedUsersListView.as_view(), name="blocked_users"),
 ]
 
 explore_urlpatterns = [
@@ -147,7 +159,11 @@ explore_urlpatterns = [
     path("<int:pk>/explore/photos/", ProfileExplorePhotosView.as_view(), name="profile_explore_photos"),
     path("<int:pk>/explore/albums/", ProfileExploreAlbumsView.as_view(), name="profile_explore_albums"),
     path("<int:pk>/explore/friends/", ProfileExploreFriendsView.as_view(), name="profile_explore_friends"),
-    path("<int:pk>/explore/mutual/", ProfileExploreMutualFriendsView.as_view(), name="profile_explore_mutual_friends"),
+    path(
+        "<int:pk>/explore/mutual/",
+        ProfileExploreMutualFriendsView.as_view(),
+        name="profile_explore_mutual_friends",
+    ),
     path("<int:pk>/explore/posts/", ProfileExplorePostsView.as_view(), name="profile_explore_posts"),
     path("<int:pk>/explore/videos/", ProfileExploreVideosView.as_view(), name="profile_explore_videos"),
 ]

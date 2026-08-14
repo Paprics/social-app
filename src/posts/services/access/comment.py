@@ -1,4 +1,5 @@
 # src/posts/services/access/comment.py
+"""Access rules for comments on wall posts."""
 
 from users.models.preferences import UserSettings
 
@@ -19,21 +20,19 @@ class CommentAccessService:
         self.target = target
 
         self.is_authenticated = bool(getattr(viewer, "is_authenticated", False))
-
         self.is_owner = self.is_authenticated and viewer.pk == target.pk
 
         self.is_friend = bool(is_friend)
         self.is_blocked = bool(is_blocked)
         self.can_view_profile = bool(can_view_profile)
 
-    # -------------------------------------------------------------------------
-    # Viewing
-    # -------------------------------------------------------------------------
-
     def can_view_comments(self, post) -> bool:
         """Return whether viewer may access comments of the given post."""
 
         if not self.can_view_profile:
+            return False
+
+        if self.is_blocked and not self.is_owner:
             return False
 
         if not self.target.settings.wall_enabled:
@@ -47,18 +46,12 @@ class CommentAccessService:
 
         return True
 
-    # -------------------------------------------------------------------------
-    # Creation
-    # -------------------------------------------------------------------------
-
     def can_comment_on_post(self, post) -> bool:
         """Return whether viewer may leave a comment on the given post."""
 
         if not self.can_view_comments(post):
             return False
 
-        # Global switch disables creation for everyone,
-        # including the wall owner.
         if not self.target.settings.comments_enabled:
             return False
 
@@ -84,10 +77,6 @@ class CommentAccessService:
 
         return False
 
-    # -------------------------------------------------------------------------
-    # Editing
-    # -------------------------------------------------------------------------
-
     def can_edit_comment(self, comment) -> bool:
         """Return whether viewer may edit the comment."""
 
@@ -105,24 +94,20 @@ class CommentAccessService:
 
         return True
 
-    # -------------------------------------------------------------------------
-    # Deletion
-    # -------------------------------------------------------------------------
-
     def can_delete_comment(self, comment) -> bool:
         """
         Return whether viewer may delete the comment.
 
-        Allowed for:
-            - comment author;
-            - post author;
-            - wall owner.
+        Allowed for comment author, post author, or wall owner.
         """
 
         if not self.is_authenticated:
             return False
 
         if not self.can_view_comments(comment.post):
+            return False
+
+        if self.is_blocked and not self.is_owner:
             return False
 
         return (

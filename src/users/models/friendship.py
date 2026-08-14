@@ -1,4 +1,5 @@
 # src/users/models/friendship.py
+"""Database model for friend requests and accepted friendships."""
 
 from django.conf import settings
 from django.db import models
@@ -8,13 +9,12 @@ from django.db.models.functions import Greatest, Least
 
 class Friendship(models.Model):
     """
-    Represents a friendship request and its current status between two users.
+    Represents a friendship relation between two users.
 
-    A friendship relation is directional while pending:
+    Pending relations are directional:
         from_user -> to_user
 
-    However, only one relation may exist between the same two users,
-    regardless of direction.
+    Accepted relations are treated as an undirected friendship pair.
     """
 
     class Status(models.TextChoices):
@@ -39,17 +39,23 @@ class Friendship(models.Model):
         max_length=20,
         choices=Status.choices,
         default=Status.PENDING,
-        help_text="Current status of the friendship request.",
+        help_text="Current status of the friendship relation.",
     )
 
     created_at = models.DateTimeField(
         auto_now_add=True,
-        help_text="Date and time when the friendship request was created.",
+        help_text="Date and time when the friend request was created.",
+    )
+
+    accepted_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Date and time when the friend request was accepted.",
     )
 
     updated_at = models.DateTimeField(
         auto_now=True,
-        help_text="Date and time when the friendship request was last updated.",
+        help_text="Date and time when the friendship relation was last updated.",
     )
 
     class Meta:
@@ -57,23 +63,39 @@ class Friendship(models.Model):
         verbose_name_plural = "Friendships"
 
         constraints = [
-            # Treat A -> B and B -> A as the same friendship pair.
             models.UniqueConstraint(
                 Least("from_user", "to_user"),
                 Greatest("from_user", "to_user"),
                 name="unique_friendship_pair",
             ),
-            # A user cannot create a friendship relation with themselves.
             models.CheckConstraint(
                 condition=~Q(from_user=F("to_user")),
                 name="prevent_self_friendship",
             ),
+            models.CheckConstraint(
+                condition=Q(
+                    status__in=[
+                        "pending",
+                        "accepted",
+                    ]
+                ),
+                name="valid_friendship_status",
+            ),
         ]
 
         indexes = [
-            models.Index(fields=["to_user"]),
-            models.Index(fields=["from_user", "status"]),
-            models.Index(fields=["to_user", "status"]),
+            models.Index(
+                fields=[
+                    "from_user",
+                    "status",
+                ]
+            ),
+            models.Index(
+                fields=[
+                    "to_user",
+                    "status",
+                ]
+            ),
         ]
 
     def __str__(self):

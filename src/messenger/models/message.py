@@ -1,4 +1,5 @@
 # src/messenger/models/message.py
+
 from django.conf import settings
 from django.db import models
 
@@ -6,15 +7,20 @@ from .dialog import Dialog
 
 
 class MessageQuerySet(models.QuerySet):
-    """Запросы для сообщений."""
+    """Queries for messages."""
 
     def visible(self):
-        """Сообщения, доступные пользователям."""
-        return self.filter(is_deleted=False)
+        """
+        Return messages currently present in the database.
+
+        Messages use hard deletion, so deleted messages no longer
+        exist and no additional visibility filter is required.
+        """
+        return self.all()
 
 
 class Message(models.Model):
-    """Сообщение в диалоге."""
+    """Message in a dialog."""
 
     dialog = models.ForeignKey(
         Dialog,

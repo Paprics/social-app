@@ -1,47 +1,24 @@
+{# src/users/templates/users/partials/block_button.html #}
 {% load i18n %}
 
-{% if is_blocked %}
-    <div id="block-button">
-        <button
-            hx-post="{% url 'users:unblock' profile.user.pk %}"
-            hx-target="#block-button"
-            hx-swap="outerHTML"
-            type="button"
-            class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition duration-200 hover:bg-slate-50 text-green-600"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-4 w-4 shrink-0"
-                 fill="none"
-                 viewBox="0 0 24 24"
-                 stroke="currentColor"
-                 stroke-width="2">
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M5 13l4 4L19 7"/>
-            </svg>
+<div id="block-button">
+    {% if viewer_has_blocked %}
+        <button type="button"
+                hx-post="{% url 'users:unblock' target_user.pk %}"
+                hx-target="#block-button"
+                hx-swap="outerHTML"
+                hx-disabled-elt="this"
+                class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-green-600 shadow-sm transition duration-200 hover:bg-slate-50">
             {% trans "Unblock user" %}
         </button>
-    </div>
-{% else %}
-    <div id="block-button">
-        <button
-            hx-post="{% url 'users:block' target_user.pk %}"
-            hx-target="#block-button"
-            hx-swap="outerHTML"
-            type="button"
-            class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium shadow-sm transition duration-200 hover:bg-slate-50 text-red-600"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-4 w-4 shrink-0"
-                 fill="none"
-                 viewBox="0 0 24 24"
-                 stroke="currentColor"
-                 stroke-width="2">
-                <path stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
-            </svg>
+    {% else %}
+        <button type="button"
+                hx-post="{% url 'users:block' target_user.pk %}"
+                hx-target="#block-button"
+                hx-swap="outerHTML"
+                hx-disabled-elt="this"
+                class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 shadow-sm transition duration-200 hover:bg-slate-50">
             {% trans "Block user" %}
         </button>
-    </div>
-{% endif %}
+    {% endif %}
+</div>

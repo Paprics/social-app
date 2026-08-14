@@ -1,0 +1,53 @@
+{# src/users/templates/users/partials/explore/mutual_friends.html #}
+
+{% load i18n %}
+
+{% if not can_view_mutual_friends %}
+
+    <div class="py-12 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "Mutual friends are not available." %}
+        </p>
+    </div>
+
+{% elif paginator.count == 0 %}
+
+    <div class="py-12 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "No mutual friends." %}
+        </p>
+    </div>
+
+{% else %}
+
+    {% if page_obj.number == 1 %}
+        <div id="explore-mutual-friends-grid"
+             class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+    {% endif %}
+
+        {% for friend in mutual_friends %}
+            {% include "users/components/_user_card.html" with user=friend only %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <div data-explore-mutual-friends-more
+                 class="col-span-full flex justify-center py-5">
+
+                <button
+                    type="button"
+                    hx-get="{% url 'users:profile_explore_mutual_friends' target_user.pk %}?page={{ page_obj.next_page_number }}"
+                    hx-target="closest [data-explore-mutual-friends-more]"
+                    hx-swap="outerHTML"
+                    class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+                >
+                    {% trans "Show more mutual friends" %}
+                </button>
+
+            </div>
+        {% endif %}
+
+    {% if page_obj.number == 1 %}
+        </div>
+    {% endif %}
+
+{% endif %}

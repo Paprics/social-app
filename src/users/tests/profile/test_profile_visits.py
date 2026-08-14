@@ -21,7 +21,7 @@ class TestProfileContextVisits:
         record_mock = Mock()
 
         monkeypatch.setattr(
-            "users.services.profile_context.ProfileVisitService.record",
+            "users.services.profile_context.builder.ProfileVisitService.record",
             record_mock,
         )
 
@@ -43,7 +43,7 @@ class TestProfileContextVisits:
         record_mock = Mock()
 
         monkeypatch.setattr(
-            "users.services.profile_context.ProfileVisitService.record",
+            "users.services.profile_context.builder.ProfileVisitService.record",
             record_mock,
         )
 
@@ -62,13 +62,34 @@ class TestProfileContextVisits:
         record_mock = Mock()
 
         monkeypatch.setattr(
-            "users.services.profile_context.ProfileVisitService.record",
+            "users.services.profile_context.builder.ProfileVisitService.record",
             record_mock,
         )
 
         ProfileContextBuilder._record_visit(
             viewer=owner,
             target=owner,
+        )
+
+        record_mock.assert_not_called()
+
+    def test_blocked_visit_is_not_recorded(
+        self,
+        owner,
+        stranger,
+        monkeypatch,
+    ):
+        record_mock = Mock()
+
+        monkeypatch.setattr(
+            "users.services.profile_context.builder.ProfileVisitService.record",
+            record_mock,
+        )
+
+        ProfileContextBuilder._record_visit(
+            viewer=stranger,
+            target=owner,
+            is_blocked=True,
         )
 
         record_mock.assert_not_called()

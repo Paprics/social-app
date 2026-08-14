@@ -1,0 +1,39 @@
+{# src/users/templates/users/profile_explore/_about_card.html #}
+
+{% load i18n %}
+
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+    <div class="space-y-4">
+
+        <div>
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                {% trans "Status" %}
+            </h3>
+
+            <p class="mt-1 text-sm leading-relaxed text-slate-700 whitespace-pre-line">
+                {% if target_user.profile.status %}
+                    {{ target_user.profile.status }}
+                {% else %}
+                    —
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="border-t border-slate-100 pt-4">
+            <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                {% trans "About" %}
+            </h3>
+
+            <p class="mt-1 text-sm leading-relaxed text-slate-700 whitespace-pre-line break-words">
+                {% if target_user.profile.bio %}
+                    {{ target_user.profile.bio }}
+                {% else %}
+                    —
+                {% endif %}
+            </p>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,13 @@
+{# src/users/templates/users/partials/account_center/_block_counts_oob.html #}
+
+<strong id="account-blocked-count"
+        class="font-semibold text-slate-900"
+        hx-swap-oob="outerHTML">
+    {{ block_counts.blocked }}
+</strong>
+
+<strong id="account-blockers-count"
+        class="font-semibold text-slate-900"
+        hx-swap-oob="outerHTML">
+    {{ block_counts.blockers }}
+</strong>

@@ -1,5 +1,9 @@
+# src/users/tests/profile/test_security_edges.py
+"""Security edge-case tests for profile and gallery access."""
+
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.http import Http404
 from django.test import override_settings
 
 from gallery.selectors.gallery import get_gallery_access_context
@@ -101,48 +105,57 @@ class TestGalleryHierarchy:
 
 @pytest.mark.django_db
 class TestRealBlockIntegration:
-    @pytest.mark.parametrize(
-        "block_direction",
-        [
-            "owner_blocks_viewer",
-            "viewer_blocks_owner",
-        ],
-    )
-    def test_block_is_detected_in_both_directions(
+    def test_owner_blocking_viewer_hides_profile(
         self,
         rf,
         owner,
         stranger,
-        block_direction,
-        monkeypatch,
     ):
-        if block_direction == "owner_blocks_viewer":
-            UserBlock.objects.create(
-                blocker=owner,
-                blocked=stranger,
-            )
-        else:
-            UserBlock.objects.create(
-                blocker=stranger,
-                blocked=owner,
-            )
+        UserBlock.objects.create(
+            blocker=owner,
+            blocked=stranger,
+        )
 
         owner.settings.profile_visibility = UserSettings.AccessLevel.EVERYONE
+        owner.settings.save(
+            update_fields=[
+                "profile_visibility",
+            ]
+        )
+
+        request = rf.get("/")
+        request.user = stranger
+
+        with pytest.raises(Http404):
+            ProfileContextBuilder.build_profile(
+                request,
+                owner.pk,
+            )
+
+    def test_viewer_blocking_owner_keeps_profile_but_closes_interactions(
+        self,
+        rf,
+        owner,
+        stranger,
+    ):
+        UserBlock.objects.create(
+            blocker=stranger,
+            blocked=owner,
+        )
+
+        owner.settings.profile_visibility = UserSettings.AccessLevel.EVERYONE
+        owner.settings.friends_visibility = UserSettings.AccessLevel.EVERYONE
         owner.settings.message_permission = UserSettings.AccessLevel.EVERYONE
         owner.settings.wall_enabled = True
         owner.settings.wall_post_permission = UserSettings.AccessLevel.EVERYONE
         owner.settings.save(
             update_fields=[
                 "profile_visibility",
+                "friends_visibility",
                 "message_permission",
                 "wall_enabled",
                 "wall_post_permission",
             ]
-        )
-
-        monkeypatch.setattr(
-            "users.services.profile_context.get_profile_albums",
-            lambda **kwargs: ([], 0),
         )
 
         request = rf.get("/")
@@ -154,8 +167,13 @@ class TestRealBlockIntegration:
         )
 
         assert context["is_blocked"] is True
+        assert context["viewer_has_blocked"] is True
+        assert context["target_has_blocked"] is False
 
+        assert context["access"]["can_view_profile"] is True
+        assert context["access"]["can_view_friends"] is False
         assert context["access"]["can_send_message"] is False
+        assert context["access"]["can_view_wall"] is False
         assert context["access"]["can_post_on_wall"] is False
 
 

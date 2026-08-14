@@ -3,38 +3,7 @@
 {% if all_albums %}
     <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {% for album in all_albums %}
-            <a href="{% url 'gallery:album_detail' profile_user.pk album.pk %}"
-               class="group block overflow-hidden rounded-xl border border-slate-200 bg-slate-50 transition hover:shadow-md">
-
-                <div class="flex aspect-square items-center justify-center bg-slate-100 text-slate-300">
-                    {% with cover=album.preview_photos.0 %}
-                        {% if cover %}
-                            {% render_image cover.image variant="avatar_md" alt=album.title reveal=False css_class="h-full w-full object-cover transition duration-200 group-hover:scale-105" %}
-                        {% else %}
-                            <svg class="h-12 w-12"
-                                 fill="none"
-                                 stroke="currentColor"
-                                 stroke-width="1.5"
-                                 viewBox="0 0 24 24"
-                                 aria-hidden="true">
-                                <path stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                        {% endif %}
-                    {% endwith %}
-                </div>
-
-                <div class="px-3 py-2">
-                    <p class="truncate text-sm font-medium text-slate-800">
-                        {{ album.title }}
-                    </p>
-
-                    <p class="text-xs text-slate-500">
-                        {{ album.photos_count }} {% trans "photos" %}
-                    </p>
-                </div>
-            </a>
+            {% include "gallery/components/_album_card.html" with album=album profile_user=profile_user only %}
         {% endfor %}
     </div>
 

@@ -1,5 +1,7 @@
 # src/posts/views/post.py
 
+"""Views for displaying, creating, updating, and deleting wall posts."""
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
@@ -14,62 +16,16 @@ from posts.selectors.post import (
     get_wall_owner,
     get_wall_posts,
 )
-from posts.services.access import PostAccessService
+from posts.services.access.context import (
+    build_post_access,
+    get_post_permissions,
+)
 from posts.services.media import (
     PostMediaLimitError,
     PostMediaPermissionError,
     PostMediaService,
 )
 from posts.services.post import PostService
-from users.services.access import ProfileAccessService
-from users.services.friendship_service import FriendshipService
-from users.services.user_block import UserBlockService
-
-
-def _build_post_access(*, viewer, target):
-    """
-    Build post access rules for the viewer and wall owner.
-
-    Relationship queries are resolved once and then passed into
-    the access services as simple boolean facts.
-    """
-
-    if not viewer.is_authenticated or viewer == target:
-        is_friend = False
-        is_blocked = False
-    else:
-        is_friend = FriendshipService.are_friends(
-            viewer,
-            target,
-        )
-
-        is_blocked = UserBlockService.is_blocked(
-            viewer,
-            target,
-        )
-
-    profile_access = ProfileAccessService(
-        viewer=viewer,
-        target=target,
-        is_friend=is_friend,
-    )
-
-    return PostAccessService(
-        viewer=viewer,
-        target=target,
-        is_friend=is_friend,
-        is_blocked=is_blocked,
-        can_view_profile=profile_access.can_view_profile(),
-    )
-
-
-def _get_post_permissions(*, access, post):
-    """Return UI permissions for one post."""
-
-    return {
-        "can_edit": access.can_edit_post(post),
-        "can_delete": access.can_delete_post(post),
-    }
 
 
 def _render_post(request, *, post, access):
@@ -81,7 +37,7 @@ def _render_post(request, *, post, access):
         {
             "post": post,
             "profile_user": post.owner,
-            "post_permissions": _get_post_permissions(
+            "post_permissions": get_post_permissions(
                 access=access,
                 post=post,
             ),
@@ -148,7 +104,7 @@ class WallPostsView(LoginRequiredMixin, View):
             user_id=user_id,
         )
 
-        access = _build_post_access(
+        access = build_post_access(
             viewer=request.user,
             target=target,
         )
@@ -165,12 +121,14 @@ class WallPostsView(LoginRequiredMixin, View):
             self.PAGE_SIZE,
         )
 
-        page_obj = paginator.get_page(request.GET.get("page", 1))
+        page_obj = paginator.get_page(
+            request.GET.get("page", 1),
+        )
 
         post_items = [
             {
                 "post": post,
-                "permissions": _get_post_permissions(
+                "permissions": get_post_permissions(
                     access=access,
                     post=post,
                 ),
@@ -199,7 +157,7 @@ class PostDetailView(LoginRequiredMixin, View):
             post_id=post_id,
         )
 
-        access = _build_post_access(
+        access = build_post_access(
             viewer=request.user,
             target=post.owner,
         )
@@ -224,7 +182,7 @@ class CreatePostView(LoginRequiredMixin, View):
             user_id=user_id,
         )
 
-        access = _build_post_access(
+        access = build_post_access(
             viewer=request.user,
             target=target,
         )
@@ -301,7 +259,7 @@ class UpdatePostView(LoginRequiredMixin, View):
             post_id=post_id,
         )
 
-        access = _build_post_access(
+        access = build_post_access(
             viewer=request.user,
             target=post.owner,
         )
@@ -328,7 +286,7 @@ class UpdatePostView(LoginRequiredMixin, View):
             post_id=post_id,
         )
 
-        access = _build_post_access(
+        access = build_post_access(
             viewer=request.user,
             target=post.owner,
         )
@@ -376,7 +334,7 @@ class DeletePostView(LoginRequiredMixin, View):
             post_id=post_id,
         )
 
-        access = _build_post_access(
+        access = build_post_access(
             viewer=request.user,
             target=post.owner,
         )

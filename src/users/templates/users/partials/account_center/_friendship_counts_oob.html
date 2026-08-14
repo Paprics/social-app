@@ -1,0 +1,19 @@
+{# src/users/templates/users/partials/account_center/_friendship_counts_oob.html #}
+
+<span id="account-friends-count"
+      class="ml-1 text-xs text-slate-400"
+      hx-swap-oob="outerHTML">
+    {{ friendship_counts.friends }}
+</span>
+
+<span id="account-incoming-count"
+      class="ml-1 text-xs text-slate-400"
+      hx-swap-oob="outerHTML">
+    {{ friendship_counts.incoming }}
+</span>
+
+<span id="account-outgoing-count"
+      class="ml-1 text-xs text-slate-400"
+      hx-swap-oob="outerHTML">
+    {{ friendship_counts.outgoing }}
+</span>

@@ -1,0 +1,36 @@
+{# src/users/templates/users/partials/account_center/_blacklist_pagination.html #}
+{% load i18n %}
+
+{% if page_obj.paginator.num_pages > 1 %}
+    <div class="flex items-center justify-between border-t border-slate-100 px-6 py-4">
+
+        <div class="text-sm text-slate-500">
+            {% blocktrans with current=page_obj.number total=page_obj.paginator.num_pages %}
+                Page {{ current }} of {{ total }}
+            {% endblocktrans %}
+        </div>
+
+        <div class="flex gap-2">
+            {% if page_obj.has_previous %}
+                <button type="button"
+                        hx-get="{{ pagination_url }}?page={{ page_obj.previous_page_number }}"
+                        hx-target="closest [data-blacklist-content]"
+                        hx-swap="outerHTML"
+                        class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50">
+                    {% trans "Previous" %}
+                </button>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+                <button type="button"
+                        hx-get="{{ pagination_url }}?page={{ page_obj.next_page_number }}"
+                        hx-target="closest [data-blacklist-content]"
+                        hx-swap="outerHTML"
+                        class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition hover:bg-slate-50">
+                    {% trans "Next" %}
+                </button>
+            {% endif %}
+        </div>
+
+    </div>
+{% endif %}

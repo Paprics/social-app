@@ -19,7 +19,6 @@ from gallery.selectors.photos import (
 from gallery.services.photo_comment_access import PhotoCommentAccessService
 from posts.forms.comment import CommentForm
 from posts.services.comment import CommentService
-from users.services.user_block import UserBlockService
 
 PAGE_SIZE = 10
 
@@ -56,20 +55,12 @@ def _get_photo_state(*, request, photo_pk):
     if photo is None:
         raise Http404
 
-    is_blocked = False
-
-    if request.user.is_authenticated and request.user.pk != target.pk:
-        is_blocked = UserBlockService.is_blocked(
-            request.user,
-            target,
-        )
-
     comment_access = PhotoCommentAccessService(
         viewer=request.user,
         target=target,
         gallery_access=gallery_state["gallery_access"],
         is_friend=gallery_state["is_friend"],
-        is_blocked=is_blocked,
+        is_blocked=gallery_state["is_blocked"],
         can_view_profile=gallery_state["can_view_profile"],
     )
 

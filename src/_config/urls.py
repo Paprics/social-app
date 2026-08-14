@@ -20,6 +20,7 @@ urlpatterns += i18n_patterns(
     path("messenger/", include("messenger.urls")),
     path("search/", include("search.urls")),
     path("gallery/", include("gallery.urls")),
+    path("staff/analytics/", include("analytics.urls", namespace="analytics")),
 )
 
 if settings.DEBUG:

@@ -170,7 +170,7 @@
         {# ── Действия, требующие доступа к профилю ── #}
         {% if access.can_view_profile %}
 
-            {% include "users/partials/friendship_actions.html" with profile_user=target_user %}
+            {% include "users/partials/friendship_actions.html" with target_user=target_user %}
 
             {% include "users/partials/favorite_button.html" with favorite_url=favorite_url is_favorite=is_favorite %}
 

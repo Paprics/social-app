@@ -5,16 +5,9 @@
          class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
 
         {% for photo in all_photos %}
-            <div class="photo-thumb block aspect-square w-full cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-slate-100 transition hover:opacity-90"
-                 data-photo-index="{{ forloop.counter0 }}"
-                 data-photo-url="{{ photo.image.url }}"
-                 data-photo-title="{{ photo.title|default:'' }}"
-                 data-photo-id="{{ photo.pk }}">
-
-                {% render_image photo.image variant="avatar_md" alt=photo.title reveal=True css_class="media-image--compact h-full w-full object-cover" %}
-
-            </div>
+            {% include "gallery/components/_photo_card.html" with photo=photo only %}
         {% endfor %}
+
     </div>
 
     {% if page_obj.has_other_pages %}

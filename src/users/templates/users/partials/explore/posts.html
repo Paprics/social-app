@@ -1,0 +1,48 @@
+{# src/users/templates/users/partials/explore/posts.html #}
+
+{% load i18n %}
+
+{% if not can_view_wall %}
+
+    <div class="py-12 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "Posts are not available." %}
+        </p>
+    </div>
+
+{% elif paginator.count == 0 %}
+
+    <div class="py-12 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "This user has no posts yet." %}
+        </p>
+    </div>
+
+{% else %}
+
+    <div class="space-y-4">
+
+        {% for item in post_items %}
+            {% include "posts/partials/post.html" with post=item.post post_permissions=item.permissions only %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <div data-explore-posts-more
+                 class="flex justify-center py-5">
+
+                <button
+                    type="button"
+                    hx-get="{% url 'users:profile_explore_posts' target_user.pk %}?page={{ page_obj.next_page_number }}"
+                    hx-target="closest [data-explore-posts-more]"
+                    hx-swap="outerHTML"
+                    class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+                >
+                    {% trans "Show more posts" %}
+                </button>
+
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endif %}

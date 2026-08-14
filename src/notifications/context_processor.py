@@ -1,12 +1,12 @@
 # notifications/context_processor.py
-from users.services.friendship_service import FriendshipService
+from users.selectors.friendship import get_incoming_requests_count
 
 
 def notifications_context(request):
     if not request.user.is_authenticated:
         return {}
 
-    friend_requests = FriendshipService.get_incoming_requests_count(request.user)
+    friend_requests = get_incoming_requests_count(request.user)
 
     unread_messages = 0
     gifts = 0

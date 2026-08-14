@@ -1,6 +1,8 @@
+{# src/users/templates/users/partials/account_center/friends_section.html #}
 {% load i18n %}
 
-<section id="friends" class="bg-white border border-slate-200 rounded-xl overflow-hidden scroll-mt-20">
+<section id="friends"
+         class="bg-white border border-slate-200 rounded-xl overflow-hidden scroll-mt-20">
 
     <div class="px-6 py-4 border-b border-slate-100">
         <h2 class="text-base font-semibold text-slate-900">
@@ -13,62 +15,62 @@
     </div>
 
     <div class="border-b border-slate-100 px-6 pt-3">
+        <div class="flex gap-6 text-sm font-medium"
+             data-account-tabs>
 
-        <div
-            class="flex gap-6 text-sm font-medium"
-            data-account-tabs
-        >
-
-            <button
-                data-account-tab
-                data-tab="friends"
-                class="pb-2 border-b-2 border-blue-600 text-blue-600"
-                hx-get="{% url 'users:account_center_friends_list' %}"
-                hx-target="#friends-content"
-                hx-swap="innerHTML">
+            <button data-account-tab
+                    data-tab="friends"
+                    class="pb-2 border-b-2 border-blue-600 text-blue-600"
+                    hx-get="{% url 'users:account_center_friends_list' %}"
+                    hx-target="#friends-content"
+                    hx-swap="innerHTML">
 
                 {% trans "Friends" %}
-
+                <span id="account-friends-count"
+                      class="ml-1 text-xs text-slate-400">
+                    {{ friendship_counts.friends }}
+                </span>
             </button>
 
-            <button
-                data-account-tab
-                data-tab="incoming"
-                class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
-                hx-get="{% url 'users:account_center_friends_incoming' %}"
-                hx-target="#friends-content"
-                hx-swap="innerHTML">
+            <button data-account-tab
+                    data-tab="incoming"
+                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                    hx-get="{% url 'users:account_center_friends_incoming' %}"
+                    hx-target="#friends-content"
+                    hx-swap="innerHTML">
 
                 {% trans "Incoming Requests" %}
-
+                <span id="account-incoming-count"
+                      class="ml-1 text-xs text-slate-400">
+                    {{ friendship_counts.incoming }}
+                </span>
             </button>
 
-            <button
-                data-account-tab
-                data-tab="outgoing"
-                class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
-                hx-get="{% url 'users:account_center_friends_outgoing' %}"
-                hx-target="#friends-content"
-                hx-swap="innerHTML">
+            <button data-account-tab
+                    data-tab="outgoing"
+                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                    hx-get="{% url 'users:account_center_friends_outgoing' %}"
+                    hx-target="#friends-content"
+                    hx-swap="innerHTML">
 
                 {% trans "Outgoing Requests" %}
-
+                <span id="account-outgoing-count"
+                      class="ml-1 text-xs text-slate-400">
+                    {{ friendship_counts.outgoing }}
+                </span>
             </button>
 
         </div>
-
     </div>
 
-    <div
-        id="friends-content"
-        hx-get="{% url 'users:account_center_friends_list' %}"
-        hx-trigger="revealed once"
-        hx-swap="innerHTML">
+    <div id="friends-content"
+         hx-get="{% url 'users:account_center_friends_list' %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
 
         <div class="p-6 text-center text-slate-400">
             {% trans "Loading..." %}
         </div>
-
     </div>
 
 </section>

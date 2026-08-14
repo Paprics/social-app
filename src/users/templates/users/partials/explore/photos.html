@@ -1,0 +1,54 @@
+{# src/users/templates/users/partials/explore/photos.html #}
+
+{% load i18n %}
+
+{% if not can_view_gallery %}
+
+    <div class="py-12 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "Photos are not available." %}
+        </p>
+    </div>
+
+{% elif paginator.count == 0 %}
+
+    <div class="py-12 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "No photos uploaded yet." %}
+        </p>
+    </div>
+
+{% else %}
+
+    {% if page_obj.number == 1 %}
+        <div id="explore-photos-grid"
+             data-lightbox-group
+             class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+    {% endif %}
+
+        {% for photo in photos %}
+            {% include "gallery/components/_photo_card.html" with photo=photo only %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <div data-explore-photos-more
+                 class="col-span-full flex justify-center py-5">
+
+                <button
+                    type="button"
+                    hx-get="{% url 'users:profile_explore_photos' target_user.pk %}?page={{ page_obj.next_page_number }}"
+                    hx-target="closest [data-explore-photos-more]"
+                    hx-swap="outerHTML"
+                    class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-700"
+                >
+                    {% trans "Show more photos" %}
+                </button>
+
+            </div>
+        {% endif %}
+
+    {% if page_obj.number == 1 %}
+        </div>
+    {% endif %}
+
+{% endif %}

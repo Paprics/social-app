@@ -1,59 +1,71 @@
-{% load static i18n %}
+{# src/users/templates/users/partials/account_center/outgoing_requests_tab.html #}
+{% load i18n render_image %}
 
-<div class="divide-y divide-slate-100">
+<div data-friendship-tab-content
+     hx-get="{{ pagination_url }}?page={% if page_obj.number > 1 and page_obj.object_list|length == 1 %}{{ page_obj.previous_page_number }}{% else %}{{ page_obj.number }}{% endif %}"
+     hx-trigger="friendshipChanged from:body"
+     hx-swap="outerHTML">
 
-    {% for friendship in friend_requests %}
+    <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div class="font-medium">
+            {% trans "Outgoing friend requests" %}
+        </div>
+        <div class="text-sm text-slate-500">
+            {{ total_count }}
+        </div>
+    </div>
 
-        <div class="flex items-center gap-4 px-6 py-4">
+    <div class="divide-y divide-slate-100">
 
-            <a
-                href="{% url 'users:profile' friendship.to_user.pk %}"
-                class="flex flex-1 items-center gap-4 rounded-lg hover:bg-slate-50 transition p-2 -m-2">
+        {% for friendship in friend_requests %}
 
-                <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-200 shrink-0">
-                    {% if friendship.to_user.profile.avatar_photo %}
-                        <img
-                            src="{{ friendship.to_user.profile.avatar_photo.image.url }}"
-                            alt="{{ friendship.to_user.username }}"
-                            class="w-full h-full object-cover">
-                    {% else %}
-                        <img
-                            src="{% static 'images/default-avatar.svg' %}"
-                            alt="{% trans 'Default avatar' %}"
-                            class="w-full h-full object-cover">
-                    {% endif %}
-                </div>
+            <div data-friendship-row
+                 class="flex items-center gap-4 px-6 py-4">
 
-                <div class="flex-1">
-                    <div class="font-medium">
-                        {{ friendship.to_user.username }}
+                <a href="{% url 'users:profile' friendship.to_user.pk %}"
+                   class="flex flex-1 items-center gap-4 rounded-lg hover:bg-slate-50 transition p-2 -m-2">
+
+                    {% render_image friendship.to_user.profile.avatar_photo.image variant="avatar_sm" alt=friendship.to_user.username shape="circle" css_class="h-12 w-12 object-cover shrink-0" %}
+
+                    <div class="flex-1">
+                        <div class="font-medium">
+                            {{ friendship.to_user.username }}
+                        </div>
+
+                        <div class="text-sm text-slate-500">
+                            {{ friendship.created_at|date:"d.m.Y H:i" }}
+                        </div>
                     </div>
 
-                    <div class="text-sm text-slate-500">
-                        {{ friendship.created_at|date:"d.m.Y H:i" }}
-                    </div>
-                </div>
+                </a>
 
-            </a>
+                <form hx-post="{% url 'users:friend_request_cancel' friendship.to_user.pk %}?context=account_center"
+                      hx-target="closest [data-friendship-row]"
+                      hx-swap="outerHTML"
+                      hx-disabled-elt="button"
+                      class="shrink-0">
 
-            <div class="shrink-0">
-                <button
-                    type="button"
-                    class="px-3 py-2 rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition">
-                    {% trans "Cancel request" %}
-                </button>
+                    {% csrf_token %}
+
+                    <button type="submit"
+                            class="px-3 py-2 rounded-lg border border-red-300 text-red-600 hover:bg-red-50 transition">
+                        {% trans "Cancel request" %}
+                    </button>
+
+                </form>
+
             </div>
 
-        </div>
+        {% empty %}
 
-    {% empty %}
+            <div class="p-8 text-center text-slate-500">
+                {% trans "No outgoing friend requests." %}
+            </div>
 
-        <div class="p-8 text-center text-slate-500">
-            {% trans "No outgoing friend requests." %}
-        </div>
+        {% endfor %}
 
-    {% endfor %}
+    </div>
+
+    {% include "users/partials/account_center/_friendship_pagination.html" %}
 
 </div>
-
-{% include "users/partials/pagination.html" %}

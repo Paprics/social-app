@@ -1,0 +1,56 @@
+{# src/users/templates/users/partials/account_center/blacklist_list.html #}
+{% load i18n render_image %}
+
+<div data-blacklist-content
+     hx-get="{{ pagination_url }}?page={% if page_obj.number > 1 and page_obj.object_list|length == 1 %}{{ page_obj.previous_page_number }}{% else %}{{ page_obj.number }}{% endif %}"
+     hx-trigger="blockChanged from:body"
+     hx-swap="outerHTML">
+
+    <div class="divide-y divide-slate-100">
+        {% for block in blocks %}
+            {% with blocked_user=block.blocked %}
+                <div data-blacklist-row
+                     class="flex items-center gap-4 px-6 py-4">
+
+                    <a href="{% url 'users:profile' blocked_user.pk %}"
+                       class="flex min-w-0 flex-1 items-center gap-4 rounded-lg p-2 -m-2 transition hover:bg-slate-50">
+
+                        {% render_image blocked_user.profile.avatar_photo.image variant="avatar_sm" alt=blocked_user.username shape="circle" css_class="h-12 w-12 shrink-0 object-cover" %}
+
+                        <div class="min-w-0 flex-1">
+                            <div class="truncate font-medium text-slate-900">
+                                {{ blocked_user.username }}
+                            </div>
+
+                            <div class="text-sm text-slate-500">
+                                {% blocktrans with blocked_at=block.created_at|date:"d.m.Y H:i" %}
+                                    Blocked on {{ blocked_at }}
+                                {% endblocktrans %}
+                            </div>
+                        </div>
+                    </a>
+
+                    <form hx-post="{% url 'users:unblock' blocked_user.pk %}?context=account_center"
+                          hx-target="closest [data-blacklist-row]"
+                          hx-swap="outerHTML"
+                          hx-disabled-elt="button"
+                          class="shrink-0">
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                            {% trans "Unblock" %}
+                        </button>
+                    </form>
+
+                </div>
+            {% endwith %}
+        {% empty %}
+            <div class="px-6 py-10 text-center text-sm text-slate-500">
+                {% trans "Your blacklist is empty." %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% include "users/partials/account_center/_blacklist_pagination.html" %}
+</div>

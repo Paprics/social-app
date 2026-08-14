@@ -1,0 +1,77 @@
+{# src/users/templates/users/profile_explore/_summary_card.html #}
+
+{% load i18n render_image gender_icon %}
+
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+    <div class="flex items-start gap-4">
+
+        <a href="{% url 'users:profile' target_user.pk %}"
+           class="shrink-0">
+
+            {% render_image target_user.profile.avatar_photo.image variant="avatar_sm" alt=target_user.username shape="circle" css_class="h-16 w-16 object-cover border border-slate-200" %}
+
+        </a>
+
+        <div class="min-w-0 flex-1">
+
+            {# Username #}
+            <a href="{% url 'users:profile' target_user.pk %}"
+               class="block truncate text-base font-semibold text-slate-900 hover:text-blue-600 transition">
+                {{ target_user.username }}
+            </a>
+
+            {# Gender #}
+            <div class="mt-1 flex items-center gap-1.5 text-sm text-slate-600">
+                {% gender_icon target_user.profile.gender size=16 %}
+                <span>
+                    {{ target_user.profile.get_gender_display|default:"—" }}
+                </span>
+            </div>
+
+            {# City #}
+            <div class="mt-1 text-sm text-slate-500">
+                {% if target_user.profile.city %}
+                    {{ target_user.profile.city.get_name }}
+                {% else %}
+                    —
+                {% endif %}
+            </div>
+
+            {# Online status #}
+            <div class="mt-2 text-xs">
+
+                {% if target_user.settings.show_online_status or is_owner %}
+
+                    {% if target_user.profile.is_online %}
+                        <span class="font-medium text-emerald-600">
+                            {% trans "Online" %}
+                        </span>
+
+                    {% elif target_user.profile.last_seen %}
+                        <span class="text-slate-500">
+                            {% trans "Last seen" %}
+                            {{ target_user.profile.last_seen|date:"d.m.Y H:i" }}
+                        </span>
+
+                    {% else %}
+                        <span class="text-slate-400">
+                            {% trans "Offline" %}
+                        </span>
+                    {% endif %}
+
+                {% else %}
+
+                    <span class="text-slate-400">
+                        {% trans "Online status hidden" %}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

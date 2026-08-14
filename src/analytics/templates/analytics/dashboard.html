@@ -1,0 +1,692 @@
+{% load analytics_tags humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222536;
+    --border: #2e3147;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --accent: #6366f1;
+    --accent2: #8b5cf6;
+    --green: #10b981;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --cyan: #06b6d4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card-sm { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .stat-value { font-size: 2rem; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .delta-up { color: var(--green); }
+  .delta-down { color: var(--red); }
+  .delta-neutral { color: var(--muted); }
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; border-radius: 4px; padding: 2px 7px; }
+  .badge-accent { background: rgba(99,102,241,0.15); color: var(--accent); }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .tab-btn { padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none; background: transparent; color: var(--muted); transition: all .15s; }
+  .tab-btn.active, .tab-btn:hover { background: var(--surface2); color: var(--text); }
+  .tab-btn.active { color: var(--accent); }
+  .period-btn { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all .15s; }
+  .period-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .period-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .table-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .table-row:last-child { border-bottom: none; }
+  .bar-bg { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width .4s ease; }
+  .funnel-step { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; background: var(--surface2); margin-bottom: 6px; }
+  .funnel-bar { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--cyan)); transition: width .5s ease; }
+  .health-warning { color: var(--yellow); }
+  .health-danger { color: var(--red); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .matrix-table th { padding: 8px 12px; text-align: left; color: var(--muted); border-bottom: 1px solid var(--border); font-weight: 600; }
+  .matrix-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .matrix-table tr:last-child td { border-bottom: none; }
+  .storage-ring { position: relative; width: 120px; height: 120px; }
+  .nav-sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 24px; height: fit-content; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all .15s; text-decoration: none; border: none; background: none; width: 100%; text-align: left; }
+  .nav-item:hover, .nav-item.active { background: var(--surface2); color: var(--text); }
+  .nav-item.active { color: var(--accent); }
+  .section { scroll-margin-top: 80px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--surface2); color: var(--muted); }
+  canvas { max-height: 220px; }
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .nav-sidebar { display: none; }
+  }
+  @media (max-width: 600px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Topbar ─────────────────────────────────────────────────────── -->
+<div style="background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:100;">
+  <div style="max-width:1400px;margin:0 auto;height:60px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <span style="font-size:18px;font-weight:700;">📊 Analytics</span>
+      <span class="chip">{{ data.period.start|date:"d M Y" }} – {{ data.period.end|date:"d M Y" }}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      {% with periods="24h:24h,7d:7d,30d:30d,90d:90d" %}
+      <a href="?period=24h" class="period-btn {% if period_label == '24h' %}active{% endif %}">24h</a>
+      <a href="?period=7d"  class="period-btn {% if period_label == '7d' %}active{% endif %}">7 days</a>
+      <a href="?period=30d" class="period-btn {% if period_label == '30d' %}active{% endif %}">30 days</a>
+      <a href="?period=90d" class="period-btn {% if period_label == '90d' %}active{% endif %}">90 days</a>
+      <a href="?period=year" class="period-btn {% if period_label == 'year' %}active{% endif %}">Year</a>
+      <a href="?period=all" class="period-btn {% if period_label == 'all' %}active{% endif %}">All time</a>
+      {% endwith %}
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1400px;margin:0 auto;padding:24px;display:flex;gap:24px;">
+
+  <!-- ── Sidebar nav ───────────────────────────────────────────────── -->
+  <nav class="nav-sidebar">
+    <div class="card" style="padding:12px;">
+      <a href="#overview"     class="nav-item">📈 Overview</a>
+      <a href="#growth"       class="nav-item">🌱 Growth</a>
+      <a href="#audience"     class="nav-item">👥 Audience</a>
+      <a href="#geography"    class="nav-item">🌍 Geography</a>
+      <a href="#activity"     class="nav-item">⏱ Activity</a>
+      <a href="#media"        class="nav-item">🖼 Media &amp; Storage</a>
+      <a href="#social"       class="nav-item">🤝 Social</a>
+      <a href="#messaging"    class="nav-item">💬 Messaging</a>
+      <a href="#content"      class="nav-item">📝 Content</a>
+      <a href="#funnel"       class="nav-item">🔽 Funnel</a>
+      <a href="#health"       class="nav-item">❤️ Health</a>
+    </div>
+  </nav>
+
+  <!-- ── Main content ─────────────────────────────────────────────── -->
+  <main style="flex:1;min-width:0;">
+
+    <!-- ── OVERVIEW ─────────────────────────────────────────────── -->
+    <section id="overview" class="section" style="margin-bottom:32px;">
+      <div class="section-title">Overview</div>
+      <div class="grid-4">
+        {% for card in data.overview %}
+        <div class="card-sm">
+          <div class="stat-label">{{ card.label }}</div>
+          <div class="stat-value" style="margin-top:8px;">
+            {% if card.fmt == "size" %}{{ card.value|filesizeformat }}
+            {% else %}{{ card.value|intcomma }}{% endif %}
+          </div>
+          {% if card.prev_value %}
+          <div style="margin-top:6px;font-size:12px;" class="{% if card.delta_positive %}delta-up{% else %}delta-down{% endif %}">
+            {% if card.delta_positive %}↑{% else %}↓{% endif %}
+            {{ card.delta|floatformat:1 }}%
+            <span style="color:var(--muted);margin-left:4px;">vs prev</span>
+          </div>
+          {% endif %}
+          {% if card.unit %}<div class="stat-label" style="margin-top:4px;">{{ card.unit }}</div>{% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Дополнительные карточки из content/media/social -->
+        {% for card in data.messaging_stats %}
+          {% if forloop.counter <= 2 %}
+          <div class="card-sm">
+            <div class="stat-label">{{ card.label }}</div>
+            <div class="stat-value" style="margin-top:8px;">{{ card.value|intcomma }}</div>
+            {% if card.prev_value %}
+            <div style="margin-top:6px;font-size:12px;" class="{% if card.delta_positive %}delta-up{% else %}delta-down{% endif %}">
+              {% if card.delta_positive %}↑{% else %}↓{% endif %}{{ card.delta|floatformat:1 }}%
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+
+        {% for card in data.content_stats %}
+          {% if forloop.counter <= 2 %}
+          <div class="card-sm">
+            <div class="stat-label">{{ card.label }}</div>
+            <div class="stat-value" style="margin-top:8px;">{{ card.value|intcomma }}</div>
+            {% if card.prev_value %}
+            <div style="margin-top:6px;font-size:12px;" class="{% if card.delta_positive %}delta-up{% else %}delta-down{% endif %}">
+              {% if card.delta_positive %}↑{% else %}↓{% endif %}{{ card.delta|floatformat:1 }}%
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ── GROWTH ──────────────────────────────────────────────── -->
+    <section id="growth" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">User Growth</div>
+      <div class="grid-2">
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Registrations</div>
+          <canvas id="chartReg"></canvas>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Active users (last_seen)</div>
+          <canvas id="chartActive"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AUDIENCE ────────────────────────────────────────────── -->
+    <section id="audience" class="section" style="margin-bottom:24px;">
+      <div class="section-title">Audience</div>
+      <div class="grid-3">
+
+        <!-- Gender -->
+        <div class="card">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Gender</div>
+          <canvas id="chartGender" style="max-height:180px;"></canvas>
+          <div style="margin-top:12px;">
+            {% for row in data.gender_rows %}
+            <div class="table-row">
+              <span style="flex:0 0 90px;font-size:13px;">{{ row.label }}</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:{{ row.pct }}%;"></div></div>
+              <span style="font-size:12px;color:var(--muted);min-width:38px;text-align:right;">{{ row.pct }}%</span>
+              <span style="font-size:12px;min-width:50px;text-align:right;">{{ row.count|intcomma }}</span>
+            </div>
+            {% empty %}
+            <div style="color:var(--muted);font-size:13px;">No data</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Age -->
+        <div class="card">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Age groups</div>
+          <canvas id="chartAge" style="max-height:180px;"></canvas>
+          <div style="margin-top:12px;">
+            {% for row in data.age_rows %}
+            <div class="table-row">
+              <span style="flex:0 0 60px;font-size:13px;">{{ row.label }}</span>
+              <div class="bar-bg"><div class="bar-fill" style="width:{{ row.pct }}%;background:linear-gradient(90deg,var(--cyan),var(--accent));"></div></div>
+              <span style="font-size:12px;color:var(--muted);min-width:38px;text-align:right;">{{ row.pct }}%</span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Looking for matrix -->
+        <div class="card">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">
+            Gender × Looking for
+          </div>
+
+          {% if data.looking_for_matrix %}
+          <div style="overflow-x:auto;">
+            <table class="matrix-table">
+              <thead>
+              <tr>
+                <th>From ↓ / To →</th>
+
+                {% for col in looking_for_columns %}
+                <th>{{ col }}</th>
+                {% endfor %}
+              </tr>
+              </thead>
+
+              <tbody>
+              {% for from_gender, targets in data.looking_for_matrix.items %}
+              <tr>
+                <td style="font-weight:600;color:var(--accent);">
+                  {{ from_gender }}
+                </td>
+
+                {% for to_gender, pct in targets.items %}
+                <td>
+                  <span
+                          style="
+                      {% if pct > 50 %}
+                        color:var(--green);
+                      {% elif pct > 25 %}
+                        color:var(--yellow);
+                      {% else %}
+                        color:var(--muted);
+                      {% endif %}
+                      font-weight:{% if pct > 40 %}600{% else %}400{% endif %};
+                    "
+                  >
+                    {{ pct }}%
+                  </span>
+                </td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div style="color:var(--muted);font-size:13px;">
+            No data
+          </div>
+          {% endif %}
+        </div>
+
+    <!-- ── GEOGRAPHY ───────────────────────────────────────────── -->
+    <section id="geography" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">Geography</div>
+      <div class="grid-3">
+
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">🌐 Countries</div>
+          {% for row in data.top_countries %}
+          <div class="table-row">
+            <span style="flex:1;font-size:13px;">{{ row.name }}</span>
+            <div class="bar-bg" style="flex:0 0 80px;"><div class="bar-fill" style="width:{{ row.pct }}%;background:linear-gradient(90deg,var(--green),var(--cyan));"></div></div>
+            <span style="font-size:12px;color:var(--muted);min-width:38px;text-align:right;">{{ row.pct }}%</span>
+          </div>
+          {% empty %}
+          <div style="color:var(--muted);font-size:13px;">No geo data</div>
+          {% endfor %}
+        </div>
+
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">🗺 Regions</div>
+          {% for row in data.top_regions %}
+          <div class="table-row">
+            <span style="flex:1;font-size:13px;">{{ row.name }}</span>
+            <div class="bar-bg" style="flex:0 0 80px;"><div class="bar-fill" style="width:{{ row.pct }}%;background:linear-gradient(90deg,var(--accent),var(--accent2));"></div></div>
+            <span style="font-size:12px;color:var(--muted);min-width:38px;text-align:right;">{{ row.pct }}%</span>
+          </div>
+          {% empty %}
+          <div style="color:var(--muted);font-size:13px;">No geo data</div>
+          {% endfor %}
+        </div>
+
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">🏙 Cities</div>
+          {% for row in data.top_cities %}
+          <div class="table-row">
+            <span style="flex:1;font-size:13px;">{{ row.name }}</span>
+            <span style="font-size:12px;color:var(--muted);">{{ row.count|intcomma }}</span>
+            <span class="badge badge-accent">{{ row.pct }}%</span>
+          </div>
+          {% empty %}
+          <div style="color:var(--muted);font-size:13px;">No geo data</div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── ACTIVITY ─────────────────────────────────────────────── -->
+    <section id="activity" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">Activity</div>
+      <div class="grid-2">
+
+        <!-- Online buckets -->
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Online segments</div>
+          {% for card in data.online_buckets %}
+          <div class="table-row">
+            <span style="flex:1;font-size:13px;">{{ card.label }}</span>
+            <span style="font-size:14px;font-weight:600;">{{ card.value|intcomma }}</span>
+            <span class="badge badge-accent">{{ card.unit }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Hourly heatmap -->
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">Activity by hour of day</div>
+          <canvas id="chartHours"></canvas>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── MEDIA & STORAGE ──────────────────────────────────────── -->
+    <section id="media" class="section" style="margin-bottom:24px;">
+      <div class="section-title">Media &amp; Storage</div>
+      <div class="grid-2" style="margin-bottom:16px;">
+
+        <!-- Media stats -->
+        <div class="card">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">📷 Photos &amp; Albums</div>
+          {% for card in data.media_stats %}
+          <div class="table-row">
+            <span style="flex:1;font-size:13px;">{{ card.label }}</span>
+            <span style="font-size:14px;font-weight:600;">{{ card.value|intcomma }}</span>
+            {% if card.prev_value %}
+            <span class="{% if card.delta_positive %}delta-up{% else %}delta-down{% endif %}" style="font-size:11px;">
+              {% if card.delta_positive %}↑{% else %}↓{% endif %}{{ card.delta|floatformat:1 }}%
+            </span>
+            {% endif %}
+            {% if card.unit %}<span class="badge badge-accent">{{ card.unit }}</span>{% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Storage -->
+        {% if data.storage %}
+        <div class="card">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;">💾 Disk Storage</div>
+          <div style="display:flex;gap:24px;align-items:center;">
+            <canvas id="chartStorage" style="max-width:120px;max-height:120px;"></canvas>
+            <div style="flex:1;">
+              <div class="table-row">
+                <span style="flex:1;font-size:13px;">Total files</span>
+                <span style="font-weight:600;">{{ data.storage.files_count|intcomma }}</span>
+              </div>
+              <div class="table-row">
+                <span style="flex:1;font-size:13px;">Total size</span>
+                <span style="font-weight:600;">{{ data.storage.total_bytes|filesizeformat }}</span>
+              </div>
+              <div class="table-row">
+                <span style="flex:1;font-size:13px;">Photos</span>
+                <span style="font-weight:600;color:var(--accent);">{{ data.storage.media_bytes|filesizeformat }}</span>
+              </div>
+              <div class="table-row">
+                <span style="flex:1;font-size:13px;">Avatars</span>
+                <span style="font-weight:600;color:var(--cyan);">{{ data.storage.avatars_bytes|filesizeformat }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </section>
+
+    <!-- ── SOCIAL ───────────────────────────────────────────────── -->
+    <section id="social" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">Social Graph</div>
+      <div class="grid-4">
+        {% for card in data.social_stats %}
+        <div class="card-sm" style="background:var(--surface2);">
+          <div class="stat-label">{{ card.label }}</div>
+          <div class="stat-value" style="margin-top:6px;font-size:1.5rem;">{{ card.value|intcomma }}</div>
+          {% if card.prev_value %}
+          <div style="font-size:11px;margin-top:4px;" class="{% if card.delta_positive %}delta-up{% else %}delta-down{% endif %}">
+            {% if card.delta_positive %}↑{% else %}↓{% endif %}{{ card.delta|floatformat:1 }}%
+          </div>
+          {% endif %}
+          {% if card.unit %}<div class="stat-label">{{ card.unit }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ── MESSAGING ────────────────────────────────────────────── -->
+    <section id="messaging" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">Messaging</div>
+      <div class="grid-3">
+        {% for card in data.messaging_stats %}
+        <div class="card-sm" style="background:var(--surface2);">
+          <div class="stat-label">{{ card.label }}</div>
+          <div class="stat-value" style="margin-top:6px;font-size:1.5rem;">{{ card.value|intcomma }}</div>
+          {% if card.prev_value %}
+          <div style="font-size:11px;margin-top:4px;" class="{% if card.delta_positive %}delta-up{% else %}delta-down{% endif %}">
+            {% if card.delta_positive %}↑{% else %}↓{% endif %}{{ card.delta|floatformat:1 }}%
+          </div>
+          {% endif %}
+          {% if card.unit %}<div class="stat-label" style="color:var(--green);">{{ card.unit }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ── CONTENT ──────────────────────────────────────────────── -->
+    <section id="content" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">Content — Posts &amp; Comments</div>
+      <div class="grid-3">
+        {% for card in data.content_stats %}
+        <div class="card-sm" style="background:var(--surface2);">
+          <div class="stat-label">{{ card.label }}</div>
+          <div class="stat-value" style="margin-top:6px;font-size:1.5rem;">{{ card.value|intcomma }}</div>
+          {% if card.prev_value %}
+          <div style="font-size:11px;margin-top:4px;" class="{% if card.delta_positive %}delta-up{% else %}delta-down{% endif %}">
+            {% if card.delta_positive %}↑{% else %}↓{% endif %}{{ card.delta|floatformat:1 }}%
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- ── FUNNEL ───────────────────────────────────────────────── -->
+    <section id="funnel" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">Registration → Engagement Funnel</div>
+      {% if data.funnel %}
+      {% with max_count=data.funnel.0.count %}
+      {% for step in data.funnel %}
+      <div class="funnel-step">
+        <span style="flex:0 0 180px;font-size:13px;font-weight:{% if forloop.first %}700{% else %}400{% endif %};">
+          {{ step.label }}
+        </span>
+        <div style="flex:1;background:var(--border);border-radius:4px;height:8px;overflow:hidden;">
+          <div class="funnel-bar" style="width:{{ step.pct }}%;"></div>
+        </div>
+        <span style="font-size:14px;font-weight:600;min-width:70px;text-align:right;">{{ step.count|intcomma }}</span>
+        <span class="badge {% if step.pct > 50 %}badge-green{% else %}badge-accent{% endif %}" style="min-width:48px;text-align:center;">
+          {{ step.pct }}%
+        </span>
+      </div>
+      {% endfor %}
+      {% endwith %}
+      {% else %}
+      <div style="color:var(--muted);">No data</div>
+      {% endif %}
+    </section>
+
+    <!-- ── HEALTH ───────────────────────────────────────────────── -->
+    <section id="health" class="section card" style="margin-bottom:24px;">
+      <div class="section-title">Database Health</div>
+      <div class="grid-2">
+        {% for row in data.health_rows %}
+        <div class="table-row">
+          <span style="flex:1;font-size:13px;">{{ row.label }}</span>
+          <div class="bar-bg" style="flex:0 0 100px;">
+            <div class="bar-fill" style="width:{{ row.pct }}%;background:{% if row.pct > 50 %}var(--red){% elif row.pct > 25 %}var(--yellow){% else %}var(--green){% endif %};"></div>
+          </div>
+          <span style="font-size:13px;font-weight:600;min-width:55px;text-align:right;
+            {% if row.pct > 50 %}color:var(--red);{% elif row.pct > 25 %}color:var(--yellow);{% else %}color:var(--green);{% endif %}">
+            {{ row.count|intcomma }}
+          </span>
+          <span class="badge {% if row.pct > 50 %}badge-red{% else %}badge-accent{% endif %}" style="min-width:42px;text-align:center;">
+            {{ row.pct }}%
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <div style="text-align:center;padding:24px 0;color:var(--muted);font-size:12px;">
+      Generated at {% now "d M Y H:i" %} UTC &nbsp;·&nbsp; All times are server-local
+    </div>
+
+  </main>
+</div>
+
+<!-- ── Charts JS ──────────────────────────────────────────────────── -->
+<script>
+const ACCENT  = '#6366f1';
+const ACCENT2 = '#8b5cf6';
+const CYAN    = '#06b6d4';
+const GREEN   = '#10b981';
+const RED     = '#ef4444';
+const YELLOW  = '#f59e0b';
+const MUTED   = '#64748b';
+const SURFACE = '#1a1d27';
+const BORDER  = '#2e3147';
+
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = BORDER;
+Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+Chart.defaults.font.size = 11;
+
+function lineChart(id, data, color) {
+  const ctx = document.getElementById(id);
+  if (!ctx || !data.labels.length) return;
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.labels,
+      datasets: [{
+        data: data.values,
+        borderColor: color || ACCENT,
+        backgroundColor: (color || ACCENT) + '20',
+        fill: true,
+        tension: 0.4,
+        pointRadius: data.labels.length > 60 ? 0 : 3,
+        pointHoverRadius: 5,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { grid: { color: BORDER }, ticks: { maxTicksLimit: 10, maxRotation: 0 } },
+        y: { grid: { color: BORDER }, beginAtZero: true },
+      }
+    }
+  });
+}
+
+function barChart(id, data, color) {
+  const ctx = document.getElementById(id);
+  if (!ctx || !data.labels.length) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.labels,
+      datasets: [{
+        data: data.values,
+        backgroundColor: color || ACCENT + 'cc',
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 24, maxRotation: 0 } },
+        y: { grid: { color: BORDER }, beginAtZero: true },
+      }
+    }
+  });
+}
+
+// Регистрации
+lineChart('chartReg', {{ chart_registrations|safe }}, ACCENT);
+
+// Активные пользователи
+lineChart('chartActive', {{ chart_active|safe }}, CYAN);
+
+// По часам
+barChart('chartHours', {{ chart_hours|safe }}, ACCENT2 + 'cc');
+
+// Gender doughnut
+(function() {
+  const ctx = document.getElementById('chartGender');
+  if (!ctx) return;
+  const labels = {{ gender_labels|safe }};
+  const values = {{ gender_values|safe }};
+  if (!labels.length) return;
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: [ACCENT, CYAN, GREEN, YELLOW, RED],
+        borderColor: SURFACE,
+        borderWidth: 3,
+      }]
+    },
+    options: {
+      cutout: '65%',
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12 } } }
+    }
+  });
+})();
+
+// Age histogram
+(function() {
+  const ctx = document.getElementById('chartAge');
+  if (!ctx) return;
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: {{ age_labels|safe }},
+      datasets: [{
+        data: {{ age_values|safe }},
+        backgroundColor: CYAN + 'cc',
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false } },
+        y: { grid: { color: BORDER }, beginAtZero: true },
+      }
+    }
+  });
+})();
+
+// Storage pie
+(function() {
+  const ctx = document.getElementById('chartStorage');
+  if (!ctx) return;
+  const photos = {{ data.storage.media_bytes|default:0 }};
+  const avatars = {{ data.storage.avatars_bytes|default:0 }};
+  const total   = {{ data.storage.total_bytes|default:0 }};
+  const other   = Math.max(0, total - photos);
+  if (!total) return;
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Photos', 'Other'],
+      datasets: [{
+        data: [photos, other],
+        backgroundColor: [ACCENT, MUTED],
+        borderColor: SURFACE,
+        borderWidth: 3,
+      }]
+    },
+    options: {
+      cutout: '60%',
+      plugins: { legend: { display: false } }
+    }
+  });
+})();
+
+// Активная навигация при скролле
+const navLinks = document.querySelectorAll('.nav-item[href^="#"]');
+const sections = [...navLinks].map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+
+window.addEventListener('scroll', () => {
+  let cur = '';
+  for (const s of sections) {
+    if (window.scrollY >= s.offsetTop - 80) cur = '#' + s.id;
+  }
+  navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === cur));
+}, { passive: true });
+</script>
+</body>
+</html>

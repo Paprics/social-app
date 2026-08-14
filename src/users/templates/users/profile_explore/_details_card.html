@@ -1,0 +1,95 @@
+{# src/users/templates/users/profile_explore/_details_card.html #}
+
+{% load i18n %}
+
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+
+    <h3 class="mb-4 text-sm font-semibold text-slate-900">
+        {% trans "Profile details" %}
+    </h3>
+
+    <div class="space-y-3 text-sm">
+
+        {# Age #}
+        <div class="flex justify-between gap-4">
+            <span class="text-slate-500">
+                {% trans "Age" %}
+            </span>
+
+            <span class="text-right font-medium text-slate-800">
+                {{ target_user.profile.age|default:"—" }}
+            </span>
+        </div>
+
+        {# Region / Country #}
+        <div class="flex justify-between gap-4">
+            <span class="text-slate-500">
+                {% trans "Region" %}
+            </span>
+
+            <span class="text-right font-medium text-slate-800">
+                {% if target_user.profile.region %}
+                    {{ target_user.profile.region.get_name }}
+                {% endif %}
+
+                {% if target_user.profile.country %}
+                    {% if target_user.profile.region %}, {% endif %}
+                    {{ target_user.profile.country.get_name }}
+                {% endif %}
+
+                {% if not target_user.profile.region and not target_user.profile.country %}
+                    —
+                {% endif %}
+            </span>
+        </div>
+
+        {# Page status #}
+        <div class="flex justify-between gap-4">
+            <span class="text-slate-500">
+                {% trans "Page status" %}
+            </span>
+
+            <span class="text-right font-medium text-slate-800">
+                {{ target_user.profile.page_status|default:"Active" }}
+            </span>
+        </div>
+
+        {# Looking for #}
+        <div class="border-t border-slate-100 pt-3">
+            <div class="text-slate-500">
+                {% trans "Looking to meet" %}
+            </div>
+
+            <div class="mt-1 font-medium text-slate-800">
+                {% if target_user.profile.looking_for_labels %}
+                    {{ target_user.profile.looking_for_labels|join:", " }}
+                {% else %}
+                    —
+                {% endif %}
+            </div>
+        </div>
+
+        {# Special flags #}
+        {% if target_user.profile.open_to_gifts or target_user.profile.financial_meetings_only %}
+
+            <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+
+                {% if target_user.profile.open_to_gifts %}
+                    <span class="rounded-full border border-pink-200 bg-pink-50 px-2.5 py-1 text-xs font-medium text-pink-700">
+                        {% trans "Open to gifts" %}
+                    </span>
+                {% endif %}
+
+                {% if target_user.profile.financial_meetings_only %}
+                    <span class="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                        {% trans "Financial meetings" %}
+                    </span>
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>

@@ -15,9 +15,9 @@ from posts.selectors.comment import (
 from posts.selectors.post import get_post
 from posts.services.access.comment import CommentAccessService
 from posts.services.comment import CommentService
+from users.selectors.user_block import get_block_state
 from users.services.access import ProfileAccessService
 from users.services.friendship_service import FriendshipService
-from users.services.user_block import UserBlockService
 
 
 def _build_comment_access(*, viewer, target):
@@ -25,29 +25,38 @@ def _build_comment_access(*, viewer, target):
 
     if not viewer.is_authenticated or viewer == target:
         is_friend = False
-        is_blocked = False
+        block_state = {
+            "is_blocked": False,
+            "target_has_blocked": False,
+        }
     else:
-        is_friend = FriendshipService.are_friends(
+        block_state = get_block_state(
             viewer,
             target,
         )
 
-        is_blocked = UserBlockService.is_blocked(
-            viewer,
-            target,
+        is_friend = (
+            False
+            if block_state["is_blocked"]
+            else FriendshipService.are_friends(
+                viewer,
+                target,
+            )
         )
 
     profile_access = ProfileAccessService(
         viewer=viewer,
         target=target,
         is_friend=is_friend,
+        is_blocked=block_state["is_blocked"],
+        target_has_blocked=block_state["target_has_blocked"],
     )
 
     return CommentAccessService(
         viewer=viewer,
         target=target,
         is_friend=is_friend,
-        is_blocked=is_blocked,
+        is_blocked=block_state["is_blocked"],
         can_view_profile=profile_access.can_view_profile(),
     )
 

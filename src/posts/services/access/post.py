@@ -1,4 +1,5 @@
 # src/posts/services/access/post.py
+"""Access rules for user walls and wall posts."""
 
 from users.models.preferences import UserSettings
 
@@ -19,21 +20,19 @@ class PostAccessService:
         self.target = target
 
         self.is_authenticated = bool(getattr(viewer, "is_authenticated", False))
-
         self.is_owner = self.is_authenticated and viewer.pk == target.pk
 
         self.is_friend = bool(is_friend)
         self.is_blocked = bool(is_blocked)
         self.can_view_profile = bool(can_view_profile)
 
-    # -------------------------------------------------------------------------
-    # Wall
-    # -------------------------------------------------------------------------
-
     def can_view_wall(self) -> bool:
         """Return whether viewer may access the target user's wall."""
 
         if not self.can_view_profile:
+            return False
+
+        if self.is_blocked and not self.is_owner:
             return False
 
         return self.target.settings.wall_enabled
@@ -66,10 +65,6 @@ class PostAccessService:
 
         return False
 
-    # -------------------------------------------------------------------------
-    # Post
-    # -------------------------------------------------------------------------
-
     def can_view_post(self, post) -> bool:
         """Return whether viewer may access the given wall post."""
 
@@ -99,15 +94,16 @@ class PostAccessService:
         """
         Return whether viewer may delete the post.
 
-        A post may be deleted by:
-            - the post author;
-            - the owner of the wall where the post was published.
+        A post may be deleted by the post author or the wall owner.
         """
 
         if not self.is_authenticated:
             return False
 
         if post.owner_id != self.target.pk:
+            return False
+
+        if self.is_blocked and not self.is_owner:
             return False
 
         return post.author_id == self.viewer.pk or post.owner_id == self.viewer.pk

@@ -1,0 +1,18 @@
+{# src/users/templates/users/components/_user_card.html #}
+
+{% load render_image %}
+
+<a href="{% url 'users:profile' user.pk %}"
+   class="group block overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-blue-300 hover:shadow-sm">
+
+    <div class="aspect-square overflow-hidden bg-slate-100">
+        {% render_image user.profile.avatar_photo.image variant="avatar_md" alt=user.username css_class="h-full w-full object-cover transition duration-200 group-hover:scale-105" %}
+    </div>
+
+    <div class="px-3 py-2">
+        <p class="truncate text-center text-sm font-medium text-slate-700 group-hover:text-blue-700">
+            {{ user.username }}
+        </p>
+    </div>
+
+</a>

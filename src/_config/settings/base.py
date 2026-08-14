@@ -31,6 +31,8 @@ INSTALLED_APPS = [
     "search.apps.SearchConfig",
     "easy_thumbnails",
     "gallery.apps.GalleryConfig",
+    "django.contrib.humanize",
+    "analytics.apps.AnalyticsConfig",
 ]
 
 MIDDLEWARE = [
@@ -254,3 +256,10 @@ THUMBNAIL_ALIASES = {
 }
 
 POST_MAX_IMAGES = 10
+# Gallery
+GALLERY_ALBUMS_PER_PAGE = 24
+GALLERY_PHOTOS_PER_PAGE = 24
+PROFILE_EXPLORE_FRIENDS_PER_PAGE = 24
+PROFILE_EXPLORE_POSTS_PER_PAGE = 10
+ACCOUNT_CENTER_FRIENDSHIP_PAGE_SIZE = 10
+ACCOUNT_CENTER_BLACKLIST_PAGE_SIZE = 10

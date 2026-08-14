@@ -118,7 +118,7 @@
         {% elif friendship.can_send_request %}
 
             <form
-                hx-post="{% url 'users:friend_request_send' profile_user.pk %}"
+                hx-post="{% url 'users:friend_request_send' target_user.pk %}"
                 hx-target="#friendship-actions"
                 hx-swap="outerHTML">
 

@@ -1,0 +1,49 @@
+{# src/users/templates/users/profile_blocked.html #}
+{% extends "base.html" %}
+{% load i18n %}
+
+
+{% block title %}
+    {% trans "Profile unavailable" %} — Social Network
+{% endblock %}
+
+
+{% block meta_description %}
+    {% trans "This profile is unavailable to you." %}
+{% endblock %}
+
+
+{% block page %}
+    <section class="mx-auto max-w-3xl px-4 py-10 sm:py-16">
+
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+            <div class="px-6 py-12 text-center sm:px-10 sm:py-16">
+
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+                    <svg class="h-8 w-8 text-slate-500"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.7"
+                         viewBox="0 0 24 24"
+                         aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path stroke-linecap="round"
+                              d="M5.65 18.35 18.35 5.65"></path>
+                    </svg>
+                </div>
+
+                <h1 class="mt-5 text-xl font-semibold text-slate-900 sm:text-2xl">
+                    {% trans "Profile unavailable" %}
+                </h1>
+
+                <p class="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500 sm:text-base">
+                    {% trans "This user has blocked you. You cannot view this profile or interact with this user." %}
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+{% endblock %}

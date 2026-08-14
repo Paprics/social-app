@@ -1,148 +1,248 @@
 {% extends "base.html" %}
 {% load i18n static %}
 
-{% block title %}{{ profile_user.username }} — {% trans "Explore" %}{% endblock %}
+{% block title %}{{ target_user.username }} — {% trans "Explore" %}{% endblock %}
 
 {% block page %}
-<div class="bg-slate-50 min-h-screen py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-slate-50 py-8">
 
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+        {# Back to profile #}
         <div class="mb-6">
-            <a href="{% url 'users:profile' profile_user.pk %}"
-               class="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
+            <a href="{% url 'users:profile' target_user.pk %}"
+               class="inline-flex items-center gap-1.5 text-sm text-slate-500 transition hover:text-slate-700">
+
+                <svg class="h-4 w-4"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
                           d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
+
                 {% trans "Back to profile" %}
             </a>
         </div>
 
-        <div class="flex flex-col lg:flex-row gap-6">
 
-            {# ───────────────── ЛЕВАЯ КОЛОНКА ───────────────── #}
-            <aside class="lg:w-72 shrink-0 space-y-4">
-                <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-                    <div class="flex items-center gap-4">
-                        <div class="shrink-0">
-                            {% if profile_user.profile.avatar_photo %}
-                                <img
-                                    src="{{ profile_user.profile.avatar_photo.image.url }}"
-                                    alt="{{ profile_user.username }}"
-                                    class="w-16 h-16 rounded-full object-cover border border-slate-200"
-                                >
-                            {% else %}
-                                <img
-                                    src="{% static 'images/default-avatar.svg' %}"
-                                    alt="{% trans 'Default avatar' %}"
-                                    class="w-16 h-16 rounded-full object-cover border border-slate-200"
-                                >
-                            {% endif %}
-                        </div>
-                        <div>
-                            <h2 class="text-base font-semibold text-slate-900">
-                                {{ profile_user.username }}
-                            </h2>
-                            <p class="text-sm text-slate-500">
-                                {{ profile_user.profile.status|default:_("No status") }}
+        <div class="flex flex-col gap-6 lg:flex-row">
+
+            {# ───────────────── LEFT COLUMN ───────────────── #}
+            <aside class="shrink-0 space-y-4 lg:w-72">
+
+                {# Basic user information is always visible #}
+                {% include "users/profile_explore/_summary_card.html" %}
+
+
+                {% if access.can_view_profile %}
+
+                    {# Status and bio #}
+                    {% include "users/profile_explore/_about_card.html" %}
+
+                    {# Remaining profile information #}
+                    {% include "users/profile_explore/_details_card.html" %}
+
+                {% else %}
+
+                    {# Private profile notice #}
+                    <div class="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+
+                        <div class="flex items-start gap-2.5">
+
+                            <svg class="mt-0.5 h-4 w-4 shrink-0 text-slate-400"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="1.8"
+                                 viewBox="0 0 24 24"
+                                 aria-hidden="true">
+
+                                <rect x="5"
+                                      y="10"
+                                      width="14"
+                                      height="10"
+                                      rx="2"/>
+
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M8 10V7a4 4 0 018 0v3"/>
+                            </svg>
+
+                            <p class="text-xs leading-5 text-slate-500">
+                                {% trans "Profile information is hidden by the user's privacy settings." %}
                             </p>
+
                         </div>
+
                     </div>
-                </div>
+
+                {% endif %}
+
             </aside>
 
-            {# ───────────────── ПРАВАЯ КОЛОНКА ───────────────── #}
-            <div class="flex-1 min-w-0">
-                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
 
-                    <div class="border-b border-slate-200 px-5">
-                        <nav id="explore-tabs" class="flex gap-6 overflow-x-auto">
+            {# ───────────────── RIGHT COLUMN ───────────────── #}
+            <div class="min-w-0 flex-1">
 
-                            <a
-                                href="#albums"
-                                class="explore-tab py-3 border-b-2 border-transparent text-slate-600 font-medium whitespace-nowrap transition"
-                                data-tab="albums"
-                                _hx-get="#"
-                                hx-target="#explore-content"
-                                hx-swap="innerHTML"
-                            >
-                                {% trans "Albums" %}
-                            </a>
+                {% if access.can_view_profile %}
 
-                            <a
-                                href="#photos"
-                                class="explore-tab py-3 border-b-2 border-transparent text-slate-600 font-medium whitespace-nowrap transition"
-                                data-tab="photos"
-                                _hx-get="#"
-                                hx-target="#explore-content"
-                                hx-swap="innerHTML"
-                            >
-                                {% trans "Photos" %}
-                            </a>
+                    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 
-                            <a
-                                href="#friends"
-                                class="explore-tab py-3 border-b-2 border-transparent text-slate-600 font-medium whitespace-nowrap transition"
-                                data-tab="friends"
-                                _hx-get="#"
-                                hx-target="#explore-content"
-                                hx-swap="innerHTML"
-                            >
-                                {% trans "Friends" %}
-                            </a>
+                        {# Explore tabs #}
+                        <div class="border-b border-slate-200 px-5">
 
-                            <a
-                                href="#mutual"
-                                class="explore-tab py-3 border-b-2 border-transparent text-slate-600 font-medium whitespace-nowrap transition"
-                                data-tab="mutual"
-                                _hx-get="#"
-                                hx-target="#explore-content"
-                                hx-swap="innerHTML"
-                            >
-                                {% trans "Mutual friends" %}
-                            </a>
+                            <nav id="explore-tabs"
+                                 class="flex gap-6 overflow-x-auto">
 
-                            <a
-                                href="#posts"
-                                class="explore-tab py-3 border-b-2 border-transparent text-slate-600 font-medium whitespace-nowrap transition"
-                                data-tab="posts"
-                                _hx-get="#"
-                                hx-target="#explore-content"
-                                hx-swap="innerHTML"
-                            >
-                                {% trans "Posts" %}
-                            </a>
+                                {# Albums #}
+                                <a href="#albums"
+                                   class="explore-tab whitespace-nowrap border-b-2 border-transparent py-3 font-medium text-slate-600 transition"
+                                   data-tab="albums"
+                                   hx-get="{% url 'users:profile_explore_albums' target_user.pk %}"
+                                   hx-trigger="load, click"
+                                   hx-target="#explore-content"
+                                   hx-swap="innerHTML">
+                                    {% trans "Albums" %}
+                                </a>
 
-                            <a
-                                href="#videos"
-                                class="explore-tab py-3 border-b-2 border-transparent text-slate-600 font-medium whitespace-nowrap transition"
-                                data-tab="videos"
-                                _hx-get="#"
-                                hx-target="#explore-content"
-                                hx-swap="innerHTML"
-                            >
-                                {% trans "Videos" %}
-                            </a>
 
-                        </nav>
-                    </div>
+                                {# Photos #}
+                                <a href="#photos"
+                                   class="explore-tab whitespace-nowrap border-b-2 border-transparent py-3 font-medium text-slate-600 transition"
+                                   data-tab="photos"
+                                   hx-get="{% url 'users:profile_explore_photos' target_user.pk %}"
+                                   hx-target="#explore-content"
+                                   hx-swap="innerHTML">
+                                    {% trans "Photos" %}
+                                </a>
 
-                    <div id="explore-content" class="p-5">
-                        <div class="text-center text-slate-500 py-12">
-                            {% trans "Loading..." %}
+
+                                {# Friends #}
+                                <a href="#friends"
+                                   class="explore-tab whitespace-nowrap border-b-2 border-transparent py-3 font-medium text-slate-600 transition"
+                                   data-tab="friends"
+                                   hx-get="{% url 'users:profile_explore_friends' target_user.pk %}"
+                                   hx-target="#explore-content"
+                                   hx-swap="innerHTML">
+                                    {% trans "Friends" %}
+                                </a>
+
+
+                                {# Mutual friends #}
+                                {% if mutual_friends_count %}
+                                    <a href="#mutual"
+                                       class="explore-tab whitespace-nowrap border-b-2 border-transparent py-3 font-medium text-slate-600 transition"
+                                       data-tab="mutual"
+                                       hx-get="{% url 'users:profile_explore_mutual_friends' target_user.pk %}"
+                                       hx-target="#explore-content"
+                                       hx-swap="innerHTML">
+
+                                        {% trans "Mutual friends" %}
+
+                                        <span class="ml-1 text-xs text-slate-400">
+                                            {{ mutual_friends_count }}
+                                        </span>
+
+                                    </a>
+                                {% endif %}
+
+
+                                {# Posts #}
+                                <a href="#posts"
+                                   class="explore-tab whitespace-nowrap border-b-2 border-transparent py-3 font-medium text-slate-600 transition"
+                                   data-tab="posts"
+                                   hx-get="{% url 'users:profile_explore_posts' target_user.pk %}"
+                                   hx-target="#explore-content"
+                                   hx-swap="innerHTML">
+                                    {% trans "Posts" %}
+                                </a>
+
+
+                                {# Videos — not implemented yet #}
+                                <button type="button"
+                                        disabled
+                                        class="explore-tab cursor-not-allowed whitespace-nowrap border-b-2 border-transparent py-3 font-medium text-slate-300"
+                                        aria-disabled="true">
+                                    {% trans "Videos" %}
+                                </button>
+
+                            </nav>
+
                         </div>
+
+
+                        {# HTMX content #}
+                        <div id="explore-content"
+                             class="p-5">
+
+                            <div class="py-12 text-center text-slate-500">
+                                {% trans "Loading..." %}
+                            </div>
+
+                        </div>
+
                     </div>
 
-                </div>
+                {% else %}
+
+                    {# Private profile content placeholder #}
+                    <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+
+                        <div class="flex min-h-48 items-center justify-center px-6 py-12">
+
+                            <div class="max-w-sm text-center">
+
+                                <svg class="mx-auto h-6 w-6 text-slate-300"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.5"
+                                     viewBox="0 0 24 24"
+                                     aria-hidden="true">
+
+                                    <rect x="5"
+                                          y="10"
+                                          width="14"
+                                          height="10"
+                                          rx="2"/>
+
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M8 10V7a4 4 0 018 0v3"/>
+                                </svg>
+
+                                <p class="mt-3 text-sm font-medium text-slate-600">
+                                    {% trans "This profile is private" %}
+                                </p>
+
+                                <p class="mt-1 text-xs leading-5 text-slate-400">
+                                    {% trans "The user has restricted access to profile information in their privacy settings." %}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
             </div>
 
         </div>
+
     </div>
+
 </div>
 
+
 {% include "gallery/components/lightbox.html" %}
+
 {% endblock %}
 
+
 {% block extra_js %}
-<script src="{% static 'js/explore.js' %}"></script>
+    <script src="{% static 'js/explore.js' %}"></script>
+    <script src="{% static 'gallery/js/lightbox.js' %}"></script>
 {% endblock %}
