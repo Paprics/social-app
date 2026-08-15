@@ -1,0 +1,186 @@
+{% load i18n render_image %}
+
+{% for notification in notification_items %}
+
+    <div class="flex items-center gap-4 border-b border-slate-100 px-6 py-4 last:border-b-0
+                {% if not notification.is_read %}bg-blue-50/40{% endif %}">
+
+        {# Actor avatar #}
+        <div class="h-11 w-11 shrink-0 overflow-hidden rounded-full bg-slate-100">
+
+            {% if notification.actor %}
+
+                <a href="{% url 'users:profile' notification.actor.pk %}">
+
+                    {% render_image notification.actor.profile.avatar_photo.image variant="avatar_sm" alt=notification.actor.username shape="circle" css_class="h-11 w-11 object-cover" %}
+
+                </a>
+
+            {% else %}
+
+                <div class="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-slate-400">
+                    ?
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        {# Notification content #}
+        <div class="min-w-0 flex-1">
+
+            <p class="text-sm text-slate-700">
+
+                {% if notification.actor %}
+
+                    <a href="{% url 'users:profile' notification.actor.pk %}"
+                       class="font-semibold text-slate-900 transition hover:text-blue-600">
+
+                        {{ notification.actor.username }}
+
+                    </a>
+
+                {% else %}
+
+                    <span class="font-semibold text-slate-500">
+                        {% trans "Deleted user" %}
+                    </span>
+
+                {% endif %}
+
+
+                {% if notification.kind == "photo_like" %}
+
+                    {% trans "liked your photo" %}
+
+                {% elif notification.kind == "photo_comment" %}
+
+                    {% if notification.comment.parent_id and notification.comment.parent.author_id == request.user.pk %}
+
+                        {% trans "replied to your comment" %}
+
+                    {% else %}
+
+                        {% trans "commented on your photo" %}
+
+                    {% endif %}
+
+                {% endif %}
+
+            </p>
+
+            <p class="mt-1 text-xs text-slate-400">
+                {{ notification.last_triggered_at|timesince }}
+                {% trans "ago" %}
+            </p>
+
+        </div>
+
+
+        {# Photo thumbnail #}
+        {% if notification.photo %}
+
+            <div class="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+
+                {% render_image notification.photo.image variant="avatar_sm" alt=notification.photo.title css_class="h-14 w-14 object-cover" %}
+
+            </div>
+
+        {% endif %}
+
+
+        {# Mark one notification as read #}
+        {% if not notification.is_read %}
+
+            <form method="post"
+                  hx-post="{% url 'notifications:mark_read' notification.pk %}"
+                  hx-swap="none"
+                  class="shrink-0">
+
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-blue-100"
+                        title="{% trans 'Mark as read' %}"
+                        aria-label="{% trans 'Mark as read' %}">
+
+                    <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span>
+
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+{% empty %}
+
+    <div class="px-6 py-10 text-center">
+
+        <p class="text-sm text-slate-500">
+            {% trans "No notifications yet." %}
+        </p>
+
+    </div>
+
+{% endfor %}
+
+
+{% if page_obj.paginator.num_pages > 1 %}
+
+    <div class="flex items-center justify-between gap-4 border-t border-slate-100 px-6 py-4">
+
+        <div class="min-w-24">
+
+            {% if page_obj.has_previous %}
+
+                <button
+                    type="button"
+                    hx-get="{% url 'notifications:list' %}?{% if current_kind %}kind={{ current_kind }}&{% endif %}page={{ page_obj.previous_page_number }}"
+                    hx-target="#notifications-content"
+                    hx-swap="innerHTML"
+                    class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2
+                           text-sm font-medium text-slate-600 transition
+                           hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900">
+
+                    {% trans "Previous" %}
+
+                </button>
+
+            {% endif %}
+
+        </div>
+
+        <div class="shrink-0 text-sm text-slate-500">
+            {% trans "Page" %}
+            <span class="font-medium text-slate-700">{{ page_obj.number }}</span>
+            {% trans "of" %}
+            <span class="font-medium text-slate-700">{{ page_obj.paginator.num_pages }}</span>
+        </div>
+
+        <div class="flex min-w-24 justify-end">
+
+            {% if page_obj.has_next %}
+
+                <button
+                    type="button"
+                    hx-get="{% url 'notifications:list' %}?{% if current_kind %}kind={{ current_kind }}&{% endif %}page={{ page_obj.next_page_number }}"
+                    hx-target="#notifications-content"
+                    hx-swap="innerHTML"
+                    class="inline-flex items-center rounded-lg border border-slate-200 bg-white px-4 py-2
+                           text-sm font-medium text-slate-600 transition
+                           hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900">
+
+                    {% trans "Next" %}
+
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endif %}

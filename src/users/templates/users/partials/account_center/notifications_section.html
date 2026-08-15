@@ -12,12 +12,25 @@
             </p>
         </div>
 
-        <button
-                {# hx-post="#" #}
-                {# hx-swap="none" #}
-                class="text-xs text-blue-600 hover:text-blue-800 font-medium transition">
-            {% trans "Mark all as read" %}
-        </button>
+        <form method="post"
+              hx-post="{% url 'notifications:mark_all_read' %}"
+              hx-swap="none">
+
+            {% csrf_token %}
+
+            {% if request.GET.notification_tab == "likes" %}
+            <input type="hidden" name="tab" value="likes">
+            {% endif %}
+
+            <button type="submit"
+                    class="text-xs font-medium text-blue-600 transition hover:text-blue-800">
+
+                {% trans "Mark all as read" %}
+
+            </button>
+
+        </form>
+
     </div>
 
     <div class="border-b border-slate-100 px-6 pt-3">
@@ -25,29 +38,65 @@
 
             <button
                     data-account-tab
-                    class="pb-2 border-b-2 border-blue-600 text-blue-600"
-                    {# hx-get="#" #}
-                    {# hx-target="#notifications-content" #}
-                    {# hx-swap="innerHTML" #}>
+                    data-tab="all"
+                    class="pb-2 border-b-2
+               {% if request.GET.notification_tab == 'likes' %}
+                   border-transparent text-slate-500 hover:text-slate-700
+               {% else %}
+                   border-blue-600 text-blue-600
+               {% endif %}"
+                    hx-get="{% url 'notifications:list' %}"
+                    hx-target="#notifications-content"
+                    hx-swap="innerHTML">
+
                 {% trans "All" %}
+
             </button>
 
             <button
                     data-account-tab
-                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
-                    {# hx-get="#" #}
-                    {# hx-target="#notifications-content" #}
-                    {# hx-swap="innerHTML" #}>
+                    data-tab="likes"
+                    class="pb-2 border-b-2
+               {% if request.GET.notification_tab == 'likes' %}
+                   border-blue-600 text-blue-600
+               {% else %}
+                   border-transparent text-slate-500 hover:text-slate-700
+               {% endif %}"
+                    hx-get="{% url 'notifications:list' %}?kind=photo_like"
+                    hx-target="#notifications-content"
+                    hx-swap="innerHTML">
+
                 {% trans "Likes" %}
+
+                {% if notifications.likes %}
+                    <span class="ml-1 text-xs text-red-500">
+                        {{ notifications.likes }}
+                    </span>
+                {% endif %}
+
             </button>
 
             <button
                     data-account-tab
-                    class="pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700"
-                    {# hx-get="#" #}
-                    {# hx-target="#notifications-content" #}
-                    {# hx-swap="innerHTML" #}>
+                    data-tab="comments"
+                    hx-get="{% url 'notifications:list' %}?kind=photo_comment"
+                    hx-target="#notifications-content"
+                    hx-swap="innerHTML"
+                    class="pb-2 border-b-2
+               {% if request.GET.notification_tab == 'comments' %}
+                   border-blue-600 text-blue-600
+               {% else %}
+                   border-transparent text-slate-500 hover:text-slate-700
+               {% endif %}">
+
                 {% trans "Comments" %}
+
+                {% if notifications.comments %}
+                <span class="ml-1 text-xs text-purple-600">
+            {{ notifications.comments }}
+        </span>
+                {% endif %}
+
             </button>
 
             <button
@@ -71,11 +120,10 @@
         </div>
     </div>
 
-    <div id="notifications-content">
-
-        {# hx-get="#" #}
-        {# hx-trigger="revealed once" #}
-        {# hx-swap="innerHTML" #}
+    <div id="notifications-content"
+         hx-get="{% url 'notifications:list' %}{% if request.GET.notification_tab == 'likes' %}?kind=photo_like{% elif request.GET.notification_tab == 'comments' %}?kind=photo_comment{% endif %}"
+         hx-trigger="load"
+         hx-swap="innerHTML">
 
         <div class="p-6 text-center text-slate-400">
             {% trans "Loading..." %}

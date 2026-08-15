@@ -1,5 +1,8 @@
 # src/gallery/views/comments.py
 
+"""HTTP views for gallery photo comments."""
+
+from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.http import Http404
@@ -17,10 +20,8 @@ from gallery.selectors.photos import (
     get_photo_target_user,
 )
 from gallery.services.photo_comment_access import PhotoCommentAccessService
+from gallery.services.photo_comments import PhotoCommentService
 from posts.forms.comment import CommentForm
-from posts.services.comment import CommentService
-
-PAGE_SIZE = 10
 
 
 def _get_photo_state(*, request, photo_pk):
@@ -156,7 +157,7 @@ class PhotoCommentListView(View):
 
         paginator = Paginator(
             comments,
-            PAGE_SIZE,
+            settings.GALLERY_COMMENTS_PAGE_SIZE,
         )
 
         page_obj = paginator.get_page(
@@ -249,7 +250,7 @@ class PhotoCommentCreateView(View):
             )
 
         try:
-            comment = CommentService.create(
+            comment = PhotoCommentService.create(
                 author=request.user,
                 content=form.cleaned_data["content"],
                 photo=photo,
@@ -351,7 +352,7 @@ class PhotoCommentReplyView(View):
             )
 
         try:
-            comment = CommentService.create(
+            comment = PhotoCommentService.create(
                 author=request.user,
                 content=form.cleaned_data["content"],
                 photo=photo,
@@ -453,7 +454,7 @@ class PhotoCommentUpdateView(View):
             )
 
         try:
-            CommentService.update(
+            PhotoCommentService.update(
                 comment=comment,
                 content=form.cleaned_data["content"],
             )
@@ -506,7 +507,7 @@ class PhotoCommentDeleteView(View):
         if not access.can_delete_comment(comment):
             raise PermissionDenied
 
-        CommentService.delete(
+        PhotoCommentService.delete(
             comment=comment,
         )
 

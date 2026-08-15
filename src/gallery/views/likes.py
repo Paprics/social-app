@@ -2,6 +2,7 @@
 
 """Views for gallery photo likes."""
 
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
@@ -87,7 +88,7 @@ class PhotoLikesListView(LoginRequiredMixin, View):
     """Return users who liked a photo."""
 
     template_name = "gallery/partials/likes/_users_page.html"
-    paginate_by = 20
+    paginate_by = settings.NOTIFICATIONS_PAGE_SIZE
 
     def get(self, request, photo_pk):
         photo = _get_accessible_photo(

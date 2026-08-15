@@ -21,6 +21,7 @@ urlpatterns += i18n_patterns(
     path("search/", include("search.urls")),
     path("gallery/", include("gallery.urls")),
     path("staff/analytics/", include("analytics.urls", namespace="analytics")),
+    path("notifications/", include("notifications.urls")),
 )
 
 if settings.DEBUG:

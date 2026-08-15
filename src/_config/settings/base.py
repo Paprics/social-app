@@ -255,16 +255,26 @@ THUMBNAIL_ALIASES = {
     },
 }
 
-POST_MAX_IMAGES = 10
 # Gallery
-GALLERY_ALBUMS_PER_PAGE = 24
-GALLERY_PHOTOS_PER_PAGE = 24
-PROFILE_EXPLORE_FRIENDS_PER_PAGE = 24
-PROFILE_EXPLORE_POSTS_PER_PAGE = 10
-ACCOUNT_CENTER_FRIENDSHIP_PAGE_SIZE = 10
-ACCOUNT_CENTER_BLACKLIST_PAGE_SIZE = 10
-ACCOUNT_CENTER_FAVORITE_PHOTOS_PAGE_SIZE = 12
-ACCOUNT_CENTER_FAVORITE_PROFILES_PAGE_SIZE = 10
+# Posts
+POST_MAX_IMAGES = 10  # Максимальное количество изображений в одном посте.
+
 # Gallery
-GALLERY_ALLOW_ANONYMOUS_VIEW = False
-ACCOUNT_CENTER_LIKED_PHOTOS_PAGE_SIZE = 12
+GALLERY_ALLOW_ANONYMOUS_VIEW = False  # Разрешён ли просмотр галереи неавторизованным пользователям.
+GALLERY_ALBUMS_PER_PAGE = 24  # Количество альбомов на одной странице галереи.
+GALLERY_PHOTOS_PER_PAGE = 24  # Количество фотографий на одной странице галереи.
+GALLERY_COMMENTS_PAGE_SIZE = 10  # Количество корневых комментариев к фото на одной странице.
+
+# Profile explore
+PROFILE_EXPLORE_FRIENDS_PER_PAGE = 24  # Количество друзей на одной странице вкладки Friends в Explore профиля.
+PROFILE_EXPLORE_POSTS_PER_PAGE = 10  # Количество постов на одной странице вкладки Posts в Explore профиля.
+
+# Account Center
+ACCOUNT_CENTER_FRIENDSHIP_PAGE_SIZE = 10  # Количество заявок/друзей на одной странице раздела дружбы.
+ACCOUNT_CENTER_BLACKLIST_PAGE_SIZE = 10  # Количество заблокированных пользователей на одной странице Blacklist.
+ACCOUNT_CENTER_FAVORITE_PHOTOS_PAGE_SIZE = 12  # Количество избранных фотографий на одной странице.
+ACCOUNT_CENTER_FAVORITE_PROFILES_PAGE_SIZE = 10  # Количество избранных профилей на одной странице.
+ACCOUNT_CENTER_LIKED_PHOTOS_PAGE_SIZE = 12  # Количество понравившихся пользователю фотографий на одной странице.
+
+# Notifications
+NOTIFICATIONS_PAGE_SIZE = 7  # Количество уведомлений на одной странице All / Likes / Comments в Account Center.7
