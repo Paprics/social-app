@@ -46,11 +46,7 @@ class GalleryAccessService:
 
             GALLERY_ALLOW_ANONYMOUS_VIEW = True
         """
-        return getattr(
-            settings,
-            "GALLERY_ALLOW_ANONYMOUS_VIEW",
-            False,
-        )
+        return settings.GALLERY_ALLOW_ANONYMOUS_VIEW
 
     @property
     def allowed_album_visibilities(self) -> tuple[str, ...]:

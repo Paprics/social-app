@@ -185,3 +185,41 @@ class Photo(models.Model):
 
     def __str__(self):
         return self.title or f"Photo #{self.pk}"
+
+
+class Like(models.Model):
+    """Like placed by a user on a gallery photo."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="gallery_likes",
+        verbose_name=_("User"),
+    )
+
+    photo = models.ForeignKey(
+        Photo,
+        on_delete=models.CASCADE,
+        related_name="likes",
+        verbose_name=_("Photo"),
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_("Created"),
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = _("Like")
+        verbose_name_plural = _("Likes")
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "photo"],
+                name="unique_user_photo_like",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.user} likes photo #{self.photo_id}"

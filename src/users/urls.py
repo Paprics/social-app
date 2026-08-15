@@ -48,6 +48,7 @@ from users.views.account_center import (
     AccountCenterBlacklistListView,
     AccountCenterFavoritePhotosView,
     AccountCenterFavoriteProfilesView,
+    AccountCenterLikedPhotosView,
 )
 
 app_name = "users"
@@ -119,6 +120,11 @@ account_center_urlpatterns = [
         "account-center/favorites/profiles/",
         AccountCenterFavoriteProfilesView.as_view(),
         name="account_center_favorite_profiles",
+    ),
+    path(
+        "account-center/likes/photos/",
+        AccountCenterLikedPhotosView.as_view(),
+        name="account_center_liked_photos",
     ),
 ]
 

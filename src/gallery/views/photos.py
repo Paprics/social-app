@@ -14,6 +14,10 @@ from gallery.selectors.photos import (
 )
 from gallery.services.photo_service import PhotoService
 from users.services.favorite_service import FavoriteService
+from gallery.selectors.likes import (
+    get_photo_likes_count,
+    is_photo_liked_by_user,
+)
 
 
 class PhotoLightboxDetailView(View):
@@ -45,6 +49,14 @@ class PhotoLightboxDetailView(View):
             photo_id=photo_pk,
             access=access,
         )
+        likes_count = get_photo_likes_count(
+            photo=photo,
+        )
+
+        is_liked = is_photo_liked_by_user(
+            photo=photo,
+            user=request.user,
+        )
 
         if photo is None:
             raise Http404
@@ -64,6 +76,8 @@ class PhotoLightboxDetailView(View):
                 "photo": photo,
                 "photo_owner": target,
                 "is_favorite": is_favorite,
+                "is_liked": is_liked,
+                "likes_count": likes_count,
             },
         )
 

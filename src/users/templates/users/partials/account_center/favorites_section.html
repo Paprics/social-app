@@ -9,7 +9,7 @@
         </h2>
 
         <p class="mt-0.5 text-sm text-slate-500">
-            {% trans "Your saved photos and profiles." %}
+            {% trans "Your saved and liked photos and profiles." %}
         </p>
     </div>
 
@@ -27,6 +27,12 @@
                     class="tab-btn border-b-2 border-transparent pb-2 text-slate-500 hover:text-slate-700"
                     data-target="fav-profiles">
                 {% trans "Profiles" %}
+            </button>
+
+            <button type="button"
+                    class="tab-btn border-b-2 border-transparent pb-2 text-slate-500 hover:text-slate-700"
+                    data-target="liked-photos">
+                {% trans "Likes" %}
             </button>
 
         </div>
@@ -54,6 +60,18 @@
 
             <div class="py-8 text-center text-sm text-slate-400">
                 {% trans "Loading favorite profiles..." %}
+            </div>
+
+        </div>
+
+        <div id="liked-photos"
+             class="tab-pane hidden"
+             hx-get="{% url 'users:account_center_liked_photos' %}"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+
+            <div class="py-8 text-center text-sm text-slate-400">
+                {% trans "Loading liked photos..." %}
             </div>
 
         </div>

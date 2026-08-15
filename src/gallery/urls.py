@@ -19,6 +19,8 @@ from gallery.views import (
     PhotoCommentListView,
     PhotoCommentReplyView,
     PhotoCommentUpdateView,
+    PhotoLikesListView,
+    PhotoLikeToggleView,
 )
 
 app_name = "gallery"
@@ -89,6 +91,16 @@ urlpatterns = [
         AlbumCreateView.as_view(),
         {"album_type": "video"},
         name="video_album_create",
+    ),
+    path(
+        "photos/<int:photo_pk>/like/",
+        PhotoLikeToggleView.as_view(),
+        name="photo_like_toggle",
+    ),
+    path(
+        "photos/<int:photo_pk>/likes/",
+        PhotoLikesListView.as_view(),
+        name="photo_likes_list",
     ),
     # Photo comments
     path(

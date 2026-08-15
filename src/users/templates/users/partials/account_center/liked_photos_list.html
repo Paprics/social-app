@@ -1,0 +1,47 @@
+{% load i18n %}
+
+{% if photos %}
+
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4"
+         data-lightbox-group>
+
+        {% for photo in photos %}
+
+            <div id="liked-photo-{{ photo.pk }}"
+                 class="relative">
+
+                {% include "gallery/components/_photo_card.html" with photo=photo %}
+
+                <button type="button"
+                        hx-post="{% url 'gallery:photo_like_toggle' photo.pk %}"
+                        hx-target="#liked-photo-{{ photo.pk }}"
+                        hx-swap="delete"
+                        class="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-rose-500 shadow transition hover:bg-white hover:text-rose-600"
+                        title="{% trans 'Unlike' %}"
+                        aria-label="{% trans 'Unlike' %}">
+
+                    <svg viewBox="0 0 24 24"
+                         class="h-4 w-4 fill-current"
+                         aria-hidden="true">
+                        <path d="M12 21s-7-4.35-9.5-8.5C.5 9.15 2.2 5 6.2 5c2.05 0 3.35 1.15 4.15 2.25C11.15 6.15 12.45 5 14.5 5c4 0 5.7 4.15 3.7 7.5C15.7 16.65 12 21 12 21Z"/>
+                    </svg>
+
+                </button>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% include "users/partials/account_center/_favorites_pagination.html" %}
+
+{% else %}
+
+    <div class="py-8 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "You have not liked any photos yet." %}
+        </p>
+    </div>
+
+{% endif %}

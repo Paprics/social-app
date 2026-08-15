@@ -1,0 +1,88 @@
+{# src/gallery/templates/gallery/partials/likes/_button.html #}
+
+{% load i18n %}
+
+<div id="photo-like-{{ photo.pk }}"
+     class="group relative inline-flex items-center"
+     {% if request.user.is_authenticated and likes_count %}
+         hx-get="{% url 'gallery:photo_likes_list' photo.pk %}"
+         hx-trigger="mouseenter once"
+         hx-target="#photo-likers-{{ photo.pk }}"
+         hx-swap="innerHTML"
+     {% endif %}>
+
+    {% if request.user.is_authenticated %}
+
+        <button type="button"
+                hx-post="{% url 'gallery:photo_like_toggle' photo.pk %}"
+                hx-target="#photo-like-{{ photo.pk }}"
+                hx-swap="outerHTML"
+                class="inline-flex items-center gap-1.5 text-slate-500 transition hover:text-rose-500"
+                aria-label="{% trans 'Like' %}"
+                aria-pressed="{% if is_liked %}true{% else %}false{% endif %}">
+
+            {% if is_liked %}
+
+                <svg viewBox="0 0 24 24"
+                     class="h-5 w-5 fill-rose-500 text-rose-500"
+                     aria-hidden="true">
+                    <path d="M12 21s-7-4.35-9.5-8.5C.5 9.15 2.2 5 6.2 5c2.05 0 3.35 1.15 4.15 2.25C11.15 6.15 12.45 5 14.5 5c4 0 5.7 4.15 3.7 7.5C15.7 16.65 12 21 12 21Z"/>
+                </svg>
+
+            {% else %}
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.8"
+                     class="h-5 w-5"
+                     aria-hidden="true">
+                    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+                </svg>
+
+            {% endif %}
+
+            <span>{{ likes_count }}</span>
+
+        </button>
+
+        {% if likes_count %}
+
+            <div class="absolute bottom-full left-1/2 z-[100]
+                        hidden w-64 -translate-x-1/2 pb-2
+                        group-hover:block">
+
+                <div id="photo-likers-{{ photo.pk }}"
+                     class="overflow-hidden rounded-xl border border-slate-200
+                            bg-white shadow-xl">
+
+                    <div class="px-3 py-3 text-sm text-slate-400">
+                        {% trans "Loading..." %}
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="inline-flex items-center gap-1.5 text-slate-500">
+
+            <svg viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="1.8"
+                 class="h-5 w-5"
+                 aria-hidden="true">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/>
+            </svg>
+
+            <span>{{ likes_count }}</span>
+
+        </div>
+
+    {% endif %}
+
+</div>

@@ -9,6 +9,7 @@ from django.views.generic import ListView, TemplateView
 from gallery.models import Photo
 from gallery.selectors.gallery import get_gallery_access_context
 from gallery.selectors.photos import get_photo_for_view
+from gallery.selectors.likes import get_user_liked_photos
 
 from users.models import ProfileVisit
 from users.selectors.friendship import (
@@ -274,6 +275,57 @@ class AccountCenterFavoritePhotosView(LoginRequiredMixin, ListView):
             "users:account_center_favorite_photos",
         )
         context["pagination_target"] = "#fav-photos"
+
+        return context
+
+
+class AccountCenterLikedPhotosView(LoginRequiredMixin, ListView):
+    """Display paginated photos liked by the current user."""
+
+    template_name = "users/partials/account_center/liked_photos_list.html"
+    context_object_name = "liked_photos"
+    paginate_by = settings.ACCOUNT_CENTER_LIKED_PHOTOS_PAGE_SIZE
+
+    def get_queryset(self):
+        return get_user_liked_photos(
+            user=self.request.user,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        photos = []
+
+        for photo in context["liked_photos"]:
+            target = photo.album.user
+
+            access = get_gallery_access_context(
+                viewer=self.request.user,
+                target=target,
+            )
+
+            if not access["can_view_profile"]:
+                continue
+
+            if not access["can_view_gallery"]:
+                continue
+
+            accessible_photo = get_photo_for_view(
+                target=target,
+                photo_id=photo.pk,
+                access=access,
+            )
+
+            if accessible_photo is None:
+                continue
+
+            photos.append(accessible_photo)
+
+        context["photos"] = photos
+        context["pagination_url"] = reverse(
+            "users:account_center_liked_photos",
+        )
+        context["pagination_target"] = "#liked-photos"
 
         return context
 

@@ -25,6 +25,10 @@ from gallery.views.comments import (
     PhotoCommentReplyView,
     PhotoCommentUpdateView,
 )
+from gallery.views.likes import (
+    PhotoLikesListView,
+    PhotoLikeToggleView,
+)
 
 __all__ = [
     "AlbumCreateView",
@@ -43,4 +47,6 @@ __all__ = [
     "PhotoCommentListView",
     "PhotoCommentReplyView",
     "PhotoCommentUpdateView",
+    "PhotoLikesListView",
+    "PhotoLikeToggleView",
 ]
