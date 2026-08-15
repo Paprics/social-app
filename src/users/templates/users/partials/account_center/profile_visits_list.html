@@ -1,4 +1,4 @@
-{% load static i18n %}
+{% load static i18n render_image %}
 
 {% if visits %}
     <div class="space-y-2.5">
@@ -7,17 +7,7 @@
 
                 {# Аватар пользователя #}
                 <a href="{% url 'users:profile' visit.visitor.pk %}">
-                    {% if visit.visitor.profile.avatar_photo %}
-                        <img
-                            src="{{ visit.visitor.profile.avatar_photo.image.url }}"
-                            class="w-10 h-10 rounded-full object-cover"
-                            alt="{{ visit.visitor.username }}">
-                    {% else %}
-                        <img
-                                src="{% static 'images/default-avatar.svg' %}"
-                                alt="{% trans 'Default avatar' %}"
-                                class="w-full h-full object-cover">
-                    {% endif %}
+                    {% render_image visit.visitor.profile.avatar_photo.image variant="avatar_sm" alt=visit.visitor.username shape="circle" css_class="w-10 h-10 object-cover" %}
                 </a>
 
                 {# Информация о посетителе #}
@@ -28,6 +18,7 @@
                     >
                         {{ visit.visitor.username }}
                     </a>
+
                     <p class="text-xs text-slate-500">
                         {{ visit.visited_at }}
                     </p>
@@ -38,26 +29,79 @@
     </div>
 
     {# Пагинация и Premium-защита #}
-    {% if page_obj.has_next %}
-        {% if is_premium %}
-            <div
-                hx-get="?page={{ page_obj.next_page_number }}"
-                hx-trigger="revealed"
-                hx-target="#profile-visits-content"
-                hx-swap="beforeend"
-                class="py-4 text-center text-sm text-slate-400"
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        {% if is_premium or request.user.is_staff %}
+
+            <nav
+                class="mt-5 flex items-center justify-center gap-2"
+                aria-label="{% trans 'Pagination' %}"
             >
-                {% trans "Loading more..." %}
-            </div>
+
+                {# Предыдущая страница #}
+                {% if page_obj.has_previous %}
+                    <button
+                        type="button"
+                        hx-get="{% url 'users:account_center_profile_visits' %}?page={{ page_obj.previous_page_number }}"
+                        hx-target="#profile-visits-content"
+                        hx-swap="innerHTML"
+                        class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-700 hover:bg-slate-50 transition"
+                    >
+                        ←
+                    </button>
+                {% endif %}
+
+                {# Номера страниц #}
+                {% for page_number in page_obj.paginator.page_range %}
+                    {% if page_number == page_obj.number %}
+                        <span
+                            class="min-w-9 px-3 py-2 rounded-lg bg-blue-600 text-white text-sm text-center"
+                            aria-current="page"
+                        >
+                            {{ page_number }}
+                        </span>
+                    {% else %}
+                        <button
+                            type="button"
+                            hx-get="{% url 'users:account_center_profile_visits' %}?page={{ page_number }}"
+                            hx-target="#profile-visits-content"
+                            hx-swap="innerHTML"
+                            class="min-w-9 px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-700 text-center hover:bg-slate-50 transition"
+                        >
+                            {{ page_number }}
+                        </button>
+                    {% endif %}
+                {% endfor %}
+
+                {# Следующая страница #}
+                {% if page_obj.has_next %}
+                    <button
+                        type="button"
+                        hx-get="{% url 'users:account_center_profile_visits' %}?page={{ page_obj.next_page_number }}"
+                        hx-target="#profile-visits-content"
+                        hx-swap="innerHTML"
+                        class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-700 hover:bg-slate-50 transition"
+                    >
+                        →
+                    </button>
+                {% endif %}
+
+            </nav>
+
         {% else %}
-            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-700">
+
+            <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-700">
                 {% trans "Detailed visitor list is a Premium feature." %}
             </div>
+
         {% endif %}
+
     {% endif %}
 
 {% else %}
+
     <p class="text-sm text-slate-500">
         {% trans "No profile visits yet." %}
     </p>
+
 {% endif %}

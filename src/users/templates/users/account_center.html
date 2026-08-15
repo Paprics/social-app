@@ -191,8 +191,12 @@
     }
 </style>
 
-{% block extra_js %}
-<script src="{% static 'js/account_center.js' %}"></script>
-{% endblock %}
+{% include "gallery/components/lightbox.html" %}
 
 {% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/account_center.js' %}"></script>
+<script src="{% static 'gallery/js/lightbox.js' %}"></script>
+{% endblock %}
+

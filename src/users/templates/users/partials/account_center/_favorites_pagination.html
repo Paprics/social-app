@@ -1,0 +1,37 @@
+{% load i18n %}
+
+{% if page_obj.has_other_pages %}
+
+    <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+
+        <div>
+            {% if page_obj.has_previous %}
+                <button type="button"
+                        hx-get="{{ pagination_url }}?page={{ page_obj.previous_page_number }}"
+                        hx-target="{{ pagination_target }}"
+                        hx-swap="innerHTML"
+                        class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50">
+                    {% trans "Previous" %}
+                </button>
+            {% endif %}
+        </div>
+
+        <span class="text-xs text-slate-400">
+            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        <div>
+            {% if page_obj.has_next %}
+                <button type="button"
+                        hx-get="{{ pagination_url }}?page={{ page_obj.next_page_number }}"
+                        hx-target="{{ pagination_target }}"
+                        hx-swap="innerHTML"
+                        class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 transition hover:bg-slate-50">
+                    {% trans "Next" %}
+                </button>
+            {% endif %}
+        </div>
+
+    </div>
+
+{% endif %}

@@ -2,9 +2,13 @@
 """Account Center pages and paginated user relationship sections."""
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic import ListView, TemplateView
+from gallery.models import Photo
+from gallery.selectors.gallery import get_gallery_access_context
+from gallery.selectors.photos import get_photo_for_view
 
 from users.models import ProfileVisit
 from users.selectors.friendship import (
@@ -19,6 +23,14 @@ from users.selectors.user_block import (
     get_blockers_count,
     get_user_block_counts,
 )
+from users.selectors.favorite import (
+    get_favorite_photos,
+    get_favorite_profiles,
+    get_favorites_count,
+    get_profile_favorites_count,
+)
+
+User = get_user_model()
 
 
 class AccountCenterProfileVisitsView(LoginRequiredMixin, ListView):
@@ -62,7 +74,7 @@ class AccountCenterStatisticsView(LoginRequiredMixin, TemplateView):
             "registration_date": user.date_joined,
             "friends_count": get_friends_count(user),
             "profile_views": 0,
-            "favorites_count": 13,
+            "favorites_count": get_favorites_count(user),
             "gifts_received": 0,
             "blockers_count": get_blockers_count(user),
         }
@@ -178,5 +190,160 @@ class AccountCenterView(LoginRequiredMixin, TemplateView):
         context["block_counts"] = get_user_block_counts(
             self.request.user,
         )
+
+        return context
+
+
+class AccountCenterFavoritePhotosView(LoginRequiredMixin, ListView):
+    """Display paginated favorite photos."""
+
+    template_name = "users/partials/account_center/favorite_photos_list.html"
+    context_object_name = "favorite_relations"
+
+    def get_paginate_by(self, queryset):
+        return getattr(
+            settings,
+            "ACCOUNT_CENTER_FAVORITE_PHOTOS_PAGE_SIZE",
+            12,
+        )
+
+    def get_queryset(self):
+        return get_favorite_photos(
+            self.request.user,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        relations = list(
+            context["favorite_relations"],
+        )
+
+        photo_ids = [relation.object_id for relation in relations]
+
+        photos_by_id = (
+            Photo.objects.filter(pk__in=photo_ids)
+            .select_related(
+                "album",
+                "album__user",
+                "album__user__profile",
+                "album__user__settings",
+            )
+            .in_bulk()
+        )
+
+        photos = []
+
+        for relation in relations:
+            photo = photos_by_id.get(
+                relation.object_id,
+            )
+
+            # Удалённая фотография → orphan Favorite.
+            if photo is None:
+                continue
+
+            target = photo.album.user
+
+            access = get_gallery_access_context(
+                viewer=self.request.user,
+                target=target,
+            )
+
+            if not access["can_view_profile"]:
+                continue
+
+            if not access["can_view_gallery"]:
+                continue
+
+            accessible_photo = get_photo_for_view(
+                target=target,
+                photo_id=photo.pk,
+                access=access,
+            )
+
+            if accessible_photo is None:
+                continue
+
+            photos.append(
+                accessible_photo,
+            )
+
+        context["photos"] = photos
+        context["pagination_url"] = reverse(
+            "users:account_center_favorite_photos",
+        )
+        context["pagination_target"] = "#fav-photos"
+
+        return context
+
+
+class AccountCenterFavoriteProfilesView(LoginRequiredMixin, ListView):
+    """Display paginated favorite profiles."""
+
+    template_name = "users/partials/account_center/favorite_profiles_list.html"
+    context_object_name = "favorite_relations"
+
+    def get_paginate_by(self, queryset):
+        return getattr(
+            settings,
+            "ACCOUNT_CENTER_FAVORITE_PROFILES_PAGE_SIZE",
+            10,
+        )
+
+    def get_queryset(self):
+        return get_favorite_profiles(
+            self.request.user,
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        relations = list(
+            context["favorite_relations"],
+        )
+
+        user_ids = [relation.object_id for relation in relations]
+
+        users_by_id = (
+            User.objects.filter(pk__in=user_ids)
+            .select_related(
+                "profile",
+                "profile__avatar_photo",
+            )
+            .in_bulk()
+        )
+
+        context["favorite_profiles"] = [
+            users_by_id[relation.object_id] for relation in relations if relation.object_id in users_by_id
+        ]
+
+        context["pagination_url"] = reverse(
+            "users:account_center_favorite_profiles",
+        )
+        context["pagination_target"] = "#fav-profiles"
+
+        return context
+
+
+class AccountCenterStatisticsView(LoginRequiredMixin, TemplateView):
+    """Display account statistics."""
+
+    template_name = "users/partials/account_center/statistics_content.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+
+        context |= {
+            "registration_date": user.date_joined,
+            "friends_count": get_friends_count(user),
+            "profile_views": 0,
+            "favorites_count": get_favorites_count(user),
+            "profile_favorites_count": get_profile_favorites_count(user),
+            "gifts_received": 0,
+            "blockers_count": get_blockers_count(user),
+        }
 
         return context

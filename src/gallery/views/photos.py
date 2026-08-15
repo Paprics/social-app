@@ -13,6 +13,7 @@ from gallery.selectors.photos import (
     get_photo_target_user,
 )
 from gallery.services.photo_service import PhotoService
+from users.services.favorite_service import FavoriteService
 
 
 class PhotoLightboxDetailView(View):
@@ -48,11 +49,21 @@ class PhotoLightboxDetailView(View):
         if photo is None:
             raise Http404
 
+        is_favorite = False
+
+        if request.user.is_authenticated:
+            is_favorite = FavoriteService.is_favorite(
+                request.user,
+                photo,
+            )
+
         return render(
             request,
             self.template_name,
             {
                 "photo": photo,
+                "photo_owner": target,
+                "is_favorite": is_favorite,
             },
         )
 

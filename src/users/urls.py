@@ -44,7 +44,11 @@ from users.views import (
     ProfileExplorePostsView,
     ProfileExploreVideosView,
 )
-from users.views.account_center import AccountCenterBlacklistListView
+from users.views.account_center import (
+    AccountCenterBlacklistListView,
+    AccountCenterFavoritePhotosView,
+    AccountCenterFavoriteProfilesView,
+)
 
 app_name = "users"
 
@@ -105,6 +109,16 @@ account_center_urlpatterns = [
         "account-center/profile-visits/",
         AccountCenterProfileVisitsView.as_view(),
         name="account_center_profile_visits",
+    ),
+    path(
+        "account-center/favorites/photos/",
+        AccountCenterFavoritePhotosView.as_view(),
+        name="account_center_favorite_photos",
+    ),
+    path(
+        "account-center/favorites/profiles/",
+        AccountCenterFavoriteProfilesView.as_view(),
+        name="account_center_favorite_profiles",
     ),
 ]
 

@@ -47,13 +47,9 @@ def get_gallery_access_context(*, viewer, target):
             target,
         )
 
-    friendship = (
-        None
-        if block_state["is_blocked"]
-        else _get_friendship(
-            viewer=viewer,
-            target=target,
-        )
+    friendship = _get_friendship(
+        viewer=viewer,
+        target=target,
     )
 
     is_friend = friendship["is_friend"] if friendship else False
@@ -74,17 +70,15 @@ def get_gallery_access_context(*, viewer, target):
 
     can_view_profile = profile_access.can_view_profile()
 
-    can_view_gallery = (
-        can_view_profile
-        and not block_state["is_blocked"]
-        and gallery_access.can_view_gallery()
-    )
+    can_view_gallery = can_view_profile and gallery_access.can_view_gallery()
 
     return {
         "friendship": friendship,
         "is_friend": is_friend,
         "is_owner": gallery_access.is_owner,
         "is_blocked": block_state["is_blocked"],
+        "viewer_has_blocked": block_state["viewer_has_blocked"],
+        "target_has_blocked": block_state["target_has_blocked"],
         "can_view_profile": can_view_profile,
         "can_view_gallery": can_view_gallery,
         "gallery_access": gallery_access,

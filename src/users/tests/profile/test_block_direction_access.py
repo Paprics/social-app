@@ -9,6 +9,7 @@ from users.models.preferences import UserSettings
 from users.models.user_block import UserBlock
 from users.services.profile_context import ProfileContextBuilder
 from gallery.models import UserAlbum
+from gallery.selectors.gallery import get_gallery_access_context
 
 
 def _open_profile_settings(user):
@@ -298,3 +299,24 @@ def test_viewer_blocking_target_keeps_public_albums_visible(
 
     assert album.pk in album_ids
     assert response.context["albums_count"] == 1
+
+
+@pytest.mark.django_db
+def test_viewer_blocking_target_does_not_close_gallery_access(
+    owner,
+    stranger,
+):
+    _open_profile_settings(owner)
+
+    UserBlock.objects.create(
+        blocker=stranger,
+        blocked=owner,
+    )
+
+    access = get_gallery_access_context(
+        viewer=stranger,
+        target=owner,
+    )
+
+    assert access["can_view_profile"] is True
+    assert access["can_view_gallery"] is True

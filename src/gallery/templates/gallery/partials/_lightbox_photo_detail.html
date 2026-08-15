@@ -2,9 +2,25 @@
 
 {# gallery/partials/_lightbox_photo_detail.html #}
 
-{# Actions — пока UI-заглушки #}
+{# ── Photo metadata ───────────────────────────────────────────── #}
+<div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-4 py-3 sm:px-6">
+
+    <a href="{% url 'users:profile' photo_owner.pk %}"
+       class="text-sm font-semibold text-slate-900 transition hover:text-blue-600">
+        {{ photo_owner.username }}
+    </a>
+
+    <time datetime="{{ photo.created_at|date:'c' }}"
+          class="text-xs text-slate-400">
+        {% trans "Uploaded" %} {{ photo.created_at|date:"d.m.Y H:i" }}
+    </time>
+
+</div>
+
+{# ── Actions ─────────────────────────────────────────────────── #}
 <div class="flex items-center gap-5 border-b border-slate-200 px-4 py-4 sm:px-6">
 
+    {# Like — пока UI-заглушка #}
     <button type="button"
             class="flex items-center gap-2 text-sm text-slate-600 transition hover:text-slate-900"
             title="{% trans 'Like' %}">
@@ -24,6 +40,7 @@
     </button>
 
 
+    {# Views — пока UI-заглушка #}
     <div class="flex items-center gap-2 text-sm text-slate-500"
          title="{% trans 'Views' %}">
         <svg xmlns="http://www.w3.org/2000/svg"
@@ -45,28 +62,15 @@
     </div>
 
 
-    <button type="button"
-            class="ml-auto flex items-center gap-2 text-sm text-slate-600 transition hover:text-slate-900"
-            title="{% trans 'Save' %}">
-        <svg xmlns="http://www.w3.org/2000/svg"
-             class="h-5 w-5"
-             fill="none"
-             viewBox="0 0 24 24"
-             stroke="currentColor"
-             stroke-width="2"
-             aria-hidden="true">
-            <path stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
-        </svg>
-
-        <span>0</span>
-    </button>
+    {# Favorite #}
+    {% if request.user.is_authenticated %}
+        {% include "users/partials/photo_favorite_button.html" with photo=photo is_favorite=is_favorite %}
+    {% endif %}
 
 </div>
 
 
-{# Title фотографии намеренно не выводим. #}
+{# ── Description ─────────────────────────────────────────────── #}
 {% if photo.description %}
     <div class="border-b border-slate-200 px-4 py-4 sm:px-6">
         <p class="whitespace-pre-line break-words text-sm leading-relaxed text-slate-700">
@@ -76,6 +80,7 @@
 {% endif %}
 
 
+{# ── Comments ────────────────────────────────────────────────── #}
 {% if photo.album.user.settings.comments_enabled or request.user == photo.album.user %}
 
     <section id="lb-comments-section"

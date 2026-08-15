@@ -9,7 +9,10 @@ class FavoriteQuerySet(models.QuerySet):
 
     def for_model(self, model):
         """Фильтр по типу модели."""
-        content_type = ContentType.objects.get_for_model(model)
+        content_type = ContentType.objects.get_for_model(
+            model,
+            for_concrete_model=False,
+        )
 
         return self.filter(content_type=content_type)
 

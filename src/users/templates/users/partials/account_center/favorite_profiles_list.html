@@ -1,0 +1,59 @@
+{% load i18n render_image %}
+
+{% if favorite_profiles %}
+
+    <div class="space-y-3">
+
+        {% for favorite_user in favorite_profiles %}
+
+            <div id="favorite-profile-{{ favorite_user.pk }}"
+                 class="flex items-center gap-3 rounded-xl bg-slate-50 p-3">
+
+                <a href="{% url 'users:profile' favorite_user.pk %}"
+                   class="flex min-w-0 items-center gap-3">
+
+                    <div class="shrink-0">
+                        {% render_image favorite_user.profile.avatar_photo.image variant="avatar_sm" alt=favorite_user.username shape="circle" css_class="h-10 w-10 object-cover" %}
+                    </div>
+
+                    <span class="truncate text-sm font-medium text-slate-900 transition hover:text-blue-600">
+                        {{ favorite_user.username }}
+                    </span>
+
+                </a>
+
+                <button type="button"
+                        hx-post="{% url 'users:user_favorite_toggle' favorite_user.pk %}"
+                        hx-target="#favorite-profile-{{ favorite_user.pk }}"
+                        hx-swap="delete"
+                        class="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-amber-500 shadow-sm transition hover:text-amber-600"
+                        title="{% trans 'Remove from favorites' %}"
+                        aria-label="{% trans 'Remove from favorites' %}">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-4 w-4"
+                         viewBox="0 0 24 24"
+                         fill="currentColor"
+                         aria-hidden="true">
+                        <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.562.562 0 00-.586 0l-4.725 2.885a.562.562 0 01-.84-.61l1.285-5.385a.562.562 0 00-.182-.557L3.04 10.385a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345l2.125-5.111z"/>
+                    </svg>
+
+                </button>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% include "users/partials/account_center/_favorites_pagination.html" %}
+
+{% else %}
+
+    <div class="py-8 text-center">
+        <p class="text-sm text-slate-500">
+            {% trans "You have no favorite profiles yet." %}
+        </p>
+    </div>
+
+{% endif %}
