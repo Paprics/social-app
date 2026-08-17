@@ -156,14 +156,10 @@ class DialogDetailView(
         last_message = dialog.messages.order_by("-id").first()
 
         if last_message:
-            participant = Participant.objects.get(
-                dialog=dialog,
-                user=self.request.user,
-            )
-
-            ReadService.mark_as_read(
-                participant,
-                last_message,
+            ReadService.mark_read_up_to(
+                dialog_id=dialog.id,
+                user_id=self.request.user.id,
+                message_id=last_message.id,
             )
 
         return dialog
