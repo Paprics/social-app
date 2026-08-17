@@ -1,20 +1,82 @@
 {# src/messenger/templates/messenger/partials/dialog/header.html #}
 
-{% load i18n %}
+{% load i18n render_image %}
 
-<header class="flex items-center justify-between border-b px-6 py-4">
+<header
+    class="
+        flex
+        h-16
+        shrink-0
+        items-center
+        justify-between
+        border-b
+        border-slate-200
+        px-3
+        sm:px-4
+    "
+>
 
-    <div class="flex items-center gap-3">
+    <div class="flex min-w-0 items-center gap-3">
+
+        <a
+            href="{% url 'messenger:dialog_list' %}"
+            class="
+                inline-flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-lg
+                text-slate-500
+                transition
+                duration-200
+
+                hover:bg-slate-100
+                hover:text-slate-900
+
+                focus:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-blue-600
+
+                lg:hidden
+            "
+            aria-label="{% trans 'Back to dialogs' %}"
+        >
+
+            <svg
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+            >
+                <path d="m15 18-6-6 6-6"></path>
+            </svg>
+
+        </a>
 
         {% if other_user %}
 
-            {% include "users/components/avatar.html" with profile=other_user.profile %}
+            <div class="h-10 w-10 shrink-0">
+                {% render_image other_user.profile.avatar_photo.image variant="avatar_xs" alt=other_user.username reveal=True shape="circle" css_class="media-image--compact h-full w-full object-cover" %}
+            </div>
 
         {% endif %}
 
-        <div>
+        <div class="min-w-0">
 
-            <h2 class="font-semibold">
+            <h2
+                class="
+                    truncate
+                    text-sm
+                    font-semibold
+                    text-slate-900
+                "
+            >
 
                 {% if other_user %}
 
@@ -30,12 +92,23 @@
 
             {% if show_online_status %}
 
-                <p class="text-sm text-base-content/70">
+                <div class="mt-0.5 text-xs text-slate-500">
 
                     {% if is_online %}
 
-                        <span class="font-medium text-green-600">
-                            ● {% trans "Online" %}
+                        <span class="inline-flex items-center gap-1.5">
+
+                            <span
+                                class="
+                                    h-1.5
+                                    w-1.5
+                                    rounded-full
+                                    bg-green-600
+                                "
+                            ></span>
+
+                            {% trans "Online" %}
+
                         </span>
 
                     {% elif last_seen %}
@@ -46,17 +119,15 @@
 
                     {% else %}
 
-                        <span class="italic text-base-content/45">
-                            {% trans "Status unavailable" %}
-                        </span>
+                        {% trans "Status unavailable" %}
 
                     {% endif %}
 
-                </p>
+                </div>
 
             {% else %}
 
-                <p class="text-sm italic text-base-content/45">
+                <p class="mt-0.5 text-xs text-slate-400">
                     {% trans "Status hidden" %}
                 </p>
 

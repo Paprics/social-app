@@ -1,19 +1,56 @@
 {# src/messenger/templates/messenger/components/empty_state.html #}
 
-<div class="flex h-full flex-col items-center justify-center p-8 text-center">
+<div
+    class="
+        flex
+        h-full
+        flex-col
+        items-center
+        justify-center
+        p-8
+        text-center
+    "
+>
 
-    <div class="mb-4 text-5xl">
-        💬
+    <div
+        class="
+            mb-4
+            flex
+            h-12
+            w-12
+            items-center
+            justify-center
+            rounded-xl
+            bg-slate-100
+            text-slate-500
+        "
+    >
+
+        <svg
+            class="h-6 w-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+        >
+            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+        </svg>
+
     </div>
 
-    <h2 class="text-lg font-semibold">
+    <h2 class="text-base font-semibold text-slate-900">
         {{ title }}
     </h2>
 
     {% if description %}
-        <p class="mt-2 max-w-sm text-sm opacity-70">
+
+        <p class="mt-2 max-w-sm text-sm text-slate-500">
             {{ description }}
         </p>
+
     {% endif %}
 
 </div>

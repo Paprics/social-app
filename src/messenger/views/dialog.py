@@ -1,10 +1,18 @@
 # src/messenger/views/dialog.py
 
 """
-HTTP views for dialogs.
+HTTP views для работы с диалогами.
+
+Модуль отвечает за:
+- страницу списка диалогов;
+- страницу открытого диалога;
+- динамическую загрузку sidebar;
+- постраничную подгрузку диалогов;
+- удаление диалогов.
 """
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Page, Paginator
 from django.http import Http404, HttpResponse
 from django.template.response import TemplateResponse
 from django.views import View
@@ -20,6 +28,49 @@ from messenger.services.dialog import DialogService
 from messenger.services.dialog_page import DialogPageService
 from messenger.services.read import ReadService
 
+DIALOGS_PAGE_SIZE = 15
+
+
+def _bind_current_user(dialogs, user) -> None:
+    """
+    Привязывает текущего пользователя к объектам Dialog.
+
+    Используется свойствами Dialog.other_user
+    и Dialog.current_participant.
+    """
+
+    for dialog in dialogs:
+        dialog._current_user = user
+
+
+def _get_dialogs_page(
+    *,
+    user,
+    page_number,
+) -> Page:
+    """
+    Возвращает одну страницу диалогов пользователя.
+
+    Диалоги загружаются порциями по DIALOGS_PAGE_SIZE.
+    Для каждого объекта устанавливается текущий пользователь.
+    """
+
+    paginator = Paginator(
+        get_user_dialogs(user),
+        DIALOGS_PAGE_SIZE,
+    )
+
+    page_obj = paginator.get_page(
+        page_number,
+    )
+
+    _bind_current_user(
+        page_obj.object_list,
+        user,
+    )
+
+    return page_obj
+
 
 class DialogListView(
     LoginRequiredMixin,
@@ -27,24 +78,39 @@ class DialogListView(
 ):
     """
     Отображает список диалогов пользователя.
+
+    На первой загрузке возвращает только первую
+    страницу диалогов.
     """
 
     template_name = "messenger/dialog_list.html"
     context_object_name = "dialogs"
+    paginate_by = DIALOGS_PAGE_SIZE
 
     def get_queryset(self):
         """
-        Загружает диалоги текущего пользователя.
+        Возвращает queryset активных диалогов пользователя.
         """
 
-        dialogs = get_user_dialogs(
+        return get_user_dialogs(
             self.request.user,
         )
 
-        for dialog in dialogs:
-            dialog._current_user = self.request.user
+    def get_context_data(self, **kwargs):
+        """
+        Формирует контекст страницы списка диалогов.
+        """
 
-        return dialogs
+        context = super().get_context_data(
+            **kwargs,
+        )
+
+        _bind_current_user(
+            context["dialogs"],
+            self.request.user,
+        )
+
+        return context
 
 
 class DialogDetailView(
@@ -92,18 +158,22 @@ class DialogDetailView(
     def get_context_data(self, **kwargs):
         """
         Формирует контекст страницы диалога.
+
+        Sidebar получает только первую страницу
+        диалогов пользователя.
         """
 
-        context = super().get_context_data(**kwargs)
-
-        dialogs = get_user_dialogs(
-            self.request.user,
+        context = super().get_context_data(
+            **kwargs,
         )
 
-        for dialog in dialogs:
-            dialog._current_user = self.request.user
+        page_obj = _get_dialogs_page(
+            user=self.request.user,
+            page_number=1,
+        )
 
-        context["dialogs"] = dialogs
+        context["dialogs"] = page_obj.object_list
+        context["page_obj"] = page_obj
 
         context.update(
             DialogPageService.build(
@@ -120,31 +190,65 @@ class DialogSidebarView(
     View,
 ):
     """
-    Возвращает HTML списка диалогов.
+    Возвращает полный HTML sidebar.
 
-    Используется для динамического
-    обновления sidebar.
+    Используется JavaScript-клиентом для обновления
+    списка диалогов после событий messenger.
     """
 
     http_method_names = ["get"]
 
     def get(self, request):
         """
-        Формирует и возвращает sidebar.
+        Возвращает sidebar с первой страницей диалогов.
         """
 
-        dialogs = get_user_dialogs(
-            request.user,
+        page_obj = _get_dialogs_page(
+            user=request.user,
+            page_number=1,
         )
-
-        for dialog in dialogs:
-            dialog._current_user = request.user
 
         return TemplateResponse(
             request,
             "messenger/partials/sidebar.html",
             {
-                "dialogs": dialogs,
+                "dialogs": page_obj.object_list,
+                "page_obj": page_obj,
+                "hide_sidebar_mobile": True,
+            },
+        )
+
+
+class DialogSidebarPageView(
+    LoginRequiredMixin,
+    View,
+):
+    """
+    Возвращает следующую страницу элементов sidebar.
+
+    Используется HTMX для ленивой загрузки
+    диалогов при прокрутке списка.
+    """
+
+    http_method_names = ["get"]
+
+    def get(self, request):
+        """
+        Возвращает порцию диалогов для добавления
+        в конец текущего списка.
+        """
+
+        page_obj = _get_dialogs_page(
+            user=request.user,
+            page_number=request.GET.get("page", 1),
+        )
+
+        return TemplateResponse(
+            request,
+            "messenger/partials/dialog_list_items.html",
+            {
+                "dialogs": page_obj.object_list,
+                "page_obj": page_obj,
             },
         )
 
@@ -165,7 +269,8 @@ class DialogDeleteView(
         public_id: str,
     ) -> HttpResponse:
         """
-        Проверяет доступ и удаляет диалог.
+        Проверяет доступ пользователя
+        и удаляет указанный диалог.
         """
 
         try:

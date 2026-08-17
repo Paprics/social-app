@@ -1,0 +1,19 @@
+{# src/messenger/templates/messenger/partials/dialog_list_items.html #}
+
+{% for dialog in dialogs %}
+
+    {% include "messenger/partials/dialog_item.html" %}
+
+{% endfor %}
+
+{% if page_obj.has_next %}
+
+    <div
+        hx-get="{% url 'messenger:sidebar_page' %}?page={{ page_obj.next_page_number }}"
+        hx-trigger="intersect once root:#messenger-dialog-scroll"
+        hx-swap="outerHTML"
+        class="h-px"
+        aria-hidden="true"
+    ></div>
+
+{% endif %}

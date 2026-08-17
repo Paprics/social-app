@@ -1,19 +1,30 @@
 {# src/messenger/templates/messenger/partials/dialog_item.html #}
 
+{% load i18n render_image %}
+
 <div
     id="dialog-{{ dialog.public_id }}"
-    class="border-b"
+    class="
+        group
+        border-b
+        border-slate-100
+        last:border-b-0
+    "
 >
+
     <div
         class="
             flex
             items-center
-            gap-3
-            p-4
+            gap-2
+            px-3
+            py-2.5
             transition
-            hover:bg-base-200
+            duration-200
+            hover:bg-slate-50
         "
     >
+
         <a
             href="{% url 'messenger:dialog_detail' dialog.public_id %}"
             class="
@@ -22,31 +33,51 @@
                 flex-1
                 items-center
                 gap-3
+                rounded-lg
                 focus:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-blue-600
+                focus-visible:ring-offset-2
             "
         >
+
             <div class="shrink-0">
 
                 {% if dialog.is_private and dialog.other_user %}
 
-                    {% include "users/components/avatar.html" with profile=dialog.other_user.profile class="h-14 w-14 rounded-full object-cover" %}
+                    {% render_image dialog.other_user.profile.avatar_photo.image variant="avatar_xs" alt=dialog.other_user.username reveal=True shape="circle" css_class="media-image--compact h-10 w-10 sm:h-11 sm:w-11 object-cover" %}
 
                 {% else %}
 
                     <div
                         class="
                             flex
-                            h-14
-                            w-14
+                            h-11
+                            w-11
                             items-center
                             justify-center
                             rounded-full
-                            bg-base-300
-                            text-lg
-                            font-semibold
+                            bg-slate-100
+                            text-slate-500
                         "
                     >
-                        👥
+
+                        <svg
+                            class="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            aria-hidden="true"
+                        >
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+
                     </div>
 
                 {% endif %}
@@ -55,15 +86,18 @@
 
             <div class="min-w-0 flex-1">
 
-                <div
-                    class="
-                        flex
-                        items-center
-                        justify-between
-                        gap-2
-                    "
-                >
-                    <h3 class="min-w-0 flex-1 truncate font-semibold">
+                <div class="flex min-w-0 items-center gap-2">
+
+                    <h3
+                        class="
+                            min-w-0
+                            flex-1
+                            truncate
+                            text-sm
+                            font-semibold
+                            text-slate-900
+                        "
+                    >
 
                         {% if dialog.is_private and dialog.other_user %}
 
@@ -71,7 +105,7 @@
 
                         {% else %}
 
-                            {{ dialog.title|default:"Групповой чат" }}
+                            {{ dialog.title|default:_("Group chat") }}
 
                         {% endif %}
 
@@ -79,30 +113,23 @@
 
                     {% if dialog.last_message %}
 
-                        <span
+                        <time
+                            datetime="{{ dialog.last_message.created_at|date:'c' }}"
                             class="
                                 shrink-0
-                                text-xs
-                                text-base-content/60
+                                text-[11px]
+                                text-slate-400
                             "
                         >
                             {{ dialog.last_message.created_at|date:"H:i" }}
-                        </span>
+                        </time>
 
                     {% endif %}
 
                 </div>
 
-                <div
-                    class="
-                        mt-1
-                        flex
-                        min-w-0
-                        items-center
-                        justify-between
-                        gap-2
-                    "
-                >
+                <div class="mt-0.5 flex min-w-0 items-center gap-2">
+
                     {% if dialog.last_message %}
 
                         <p
@@ -110,15 +137,18 @@
                                 min-w-0
                                 flex-1
                                 truncate
-                                text-sm
-                                text-base-content/70
+                                text-xs
+                                leading-5
+                                text-slate-500
                             "
                         >
-                            <span class="font-medium">
+
+                            <span class="font-medium text-slate-600">
                                 {{ dialog.last_message.sender.username }}:
                             </span>
 
                             {{ dialog.last_message.text }}
+
                         </p>
 
                     {% else %}
@@ -127,40 +157,43 @@
                             class="
                                 min-w-0
                                 flex-1
-                                text-sm
-                                text-base-content/50
+                                truncate
+                                text-xs
+                                leading-5
+                                text-slate-400
                             "
                         >
-                            Сообщений пока нет
+                            {% trans "No messages yet" %}
                         </p>
 
                     {% endif %}
 
-                    {% if dialog.current_participant.unread_count %}
+                    {% if dialog.unread_count %}
 
                         <span
                             class="
                                 inline-flex
-                                h-6
-                                min-w-6
+                                h-5
+                                min-w-5
                                 shrink-0
                                 items-center
                                 justify-center
                                 rounded-full
                                 bg-blue-600
                                 px-1.5
-                                text-xs
-                                font-bold
+                                text-[11px]
+                                font-semibold
                                 leading-none
                                 text-white
-                                shadow-sm
                             "
                         >
-                            {% if dialog.current_participant.unread_count > 99 %}
+
+                            {% if dialog.unread_count > 99 %}
                                 99+
                             {% else %}
-                                {{ dialog.current_participant.unread_count }}
+                                {{ dialog.unread_count }}
                             {% endif %}
+
                         </span>
 
                     {% endif %}
@@ -168,6 +201,7 @@
                 </div>
 
             </div>
+
         </a>
 
         <button
@@ -180,25 +214,32 @@
                 shrink-0
                 items-center
                 justify-center
-                rounded-md
-                text-base-content/50
+                rounded-lg
+                text-slate-400
                 transition
-                hover:bg-error/10
-                hover:text-error
+                duration-200
+
+                hover:bg-red-50
+                hover:text-red-600
+
                 focus:outline-none
-                focus:ring-2
-                focus:ring-error/30
+                focus-visible:ring-2
+                focus-visible:ring-red-600
+
+                sm:opacity-0
+                sm:group-hover:opacity-100
+                sm:focus:opacity-100
             "
-            title="Удалить диалог"
-            aria-label="Удалить диалог"
+            title="{% trans 'Delete dialog' %}"
+            aria-label="{% trans 'Delete dialog' %}"
         >
+
             <svg
-                xmlns="http://www.w3.org/2000/svg"
                 class="h-4 w-4"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
+                stroke-width="1.8"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 aria-hidden="true"
@@ -209,6 +250,9 @@
                 <path d="M10 11v5"></path>
                 <path d="M14 11v5"></path>
             </svg>
+
         </button>
+
     </div>
+
 </div>

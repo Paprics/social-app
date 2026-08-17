@@ -147,6 +147,12 @@ export async function reloadSidebar() {
             newSidebar,
         );
 
+        if (window.htmx) {
+            window.htmx.process(
+                newSidebar,
+            );
+        }
+
     } catch (error) {
 
         messengerDebug(

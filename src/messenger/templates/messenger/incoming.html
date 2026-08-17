@@ -1,20 +1,38 @@
-{# Чужие сообщения #}
+{# src/messenger/templates/messenger/incoming.html #}
 
-<div id="message-{{ message.id }}" class="flex justify-start gap-3">
+{% load render_image %}
 
-    {% include "users/components/avatar.html" with profile=message.sender.profile %}
+<div
+    id="message-{{ message.id }}"
+    class="flex justify-start gap-3"
+    data-message-id="{{ message.id }}"
+>
 
-    <div class="max-w-[75%] rounded-2xl bg-gray-200 px-4 py-2 dark:bg-gray-700">
+    <div class="h-9 w-9 shrink-0 sm:h-10 sm:w-10">
+        {% render_image message.sender.profile.avatar_photo.image variant="avatar_xs" alt=message.sender.username reveal=True shape="circle" css_class="media-image--compact h-full w-full object-cover" %}
+    </div>
 
-        <div class="text-sm font-semibold">
+
+    <div
+        class="
+            max-w-[75%]
+            rounded-2xl
+            bg-slate-100
+            px-4
+            py-2.5
+            text-slate-900
+        "
+    >
+
+        <div class="text-sm font-semibold text-slate-900">
             {{ message.sender.username }}
         </div>
 
-        <div class="mt-1">
+        <div class="mt-1 text-sm leading-relaxed text-slate-800">
             {{ message.text|linebreaksbr }}
         </div>
 
-        <div class="mt-1 text-right text-xs opacity-70">
+        <div class="mt-1 text-right text-xs text-slate-500">
             {{ message.created_at|date:"H:i" }}
         </div>
 

@@ -1,35 +1,62 @@
 {# src/messenger/templates/messenger/partials/sidebar.html #}
 
+{% load i18n %}
+
 <aside
     id="messenger-sidebar"
-    class="flex h-full flex-col border-r bg-base-100"
+    class="
+        {% if hide_sidebar_mobile %}
+            hidden lg:flex
+        {% else %}
+            flex
+        {% endif %}
+
+        h-full
+        min-h-0
+        min-w-0
+        flex-col
+        bg-white
+
+        lg:border-r
+        lg:border-slate-200
+    "
 >
 
-    <!-- Заголовок -->
+    <header
+        class="
+            flex
+            h-16
+            shrink-0
+            items-center
+            border-b
+            border-slate-200
+            px-4
+        "
+    >
 
-    <header class="border-b p-4">
-
-        <h1 class="text-xl font-bold">
-            Сообщения
+        <h1 class="text-base font-semibold text-slate-900">
+            {% trans "Messages" %}
         </h1>
 
     </header>
 
-    <!-- Список диалогов -->
-
-    <div class="flex-1 overflow-y-auto">
+    <div
+        id="messenger-dialog-scroll"
+        class="
+            min-h-0
+            flex-1
+            overflow-y-auto
+            overscroll-contain
+        "
+    >
 
         {% if dialogs %}
 
-            {% for dialog in dialogs %}
-
-                {% include "messenger/partials/dialog_item.html" %}
-
-            {% endfor %}
+            {% include "messenger/partials/dialog_list_items.html" %}
 
         {% else %}
 
-            {% include "messenger/components/empty_state.html" with title="Нет диалогов" description="Начните общение с другим пользователем." %}
+            {% include "messenger/components/empty_state.html" with title=_("No dialogs") description=_("Start a conversation with another user.") %}
 
         {% endif %}
 

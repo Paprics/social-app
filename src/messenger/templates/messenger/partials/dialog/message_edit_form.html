@@ -1,4 +1,6 @@
-{# src/messenger/templates/partials/dialog/message_edit_form.html #}
+{# src/messenger/templates/messenger/partials/dialog/message_edit_form.html #}
+
+{% load i18n %}
 
 <form
     method="post"
@@ -6,32 +8,82 @@
     hx-target="closest .message"
     hx-swap="outerHTML"
 >
+
     {% csrf_token %}
 
     <textarea
         name="text"
         rows="3"
         maxlength="5000"
-        class="textarea textarea-bordered w-full"
+        class="
+            w-full
+            resize-none
+            rounded-xl
+            border
+            border-slate-300
+            bg-white
+            px-3
+            py-2
+            text-sm
+            text-slate-900
+            outline-none
+            placeholder:text-slate-400
+
+            focus:border-blue-600
+            focus:ring-2
+            focus:ring-blue-600/10
+        "
     >{{ message.text }}</textarea>
 
     <div class="mt-3 flex justify-end gap-2">
 
         <button
             type="button"
-            class="btn btn-ghost"
+            class="
+                inline-flex
+                h-9
+                items-center
+                justify-center
+                rounded-lg
+                border
+                border-slate-200
+                bg-white
+                px-3
+                text-sm
+                font-medium
+                text-slate-700
+                transition
+                duration-200
+
+                hover:bg-slate-50
+            "
             hx-get="{% url 'messenger:message_item' message.id %}"
             hx-target="closest .message"
             hx-swap="outerHTML"
         >
-            Отмена
+            {% trans "Cancel" %}
         </button>
 
         <button
             type="submit"
-            class="btn btn-primary"
+            class="
+                inline-flex
+                h-9
+                items-center
+                justify-center
+                rounded-lg
+                bg-blue-600
+                px-3
+                text-sm
+                font-medium
+                text-white
+                transition
+                duration-200
+
+                hover:bg-blue-700
+            "
         >
-            Сохранить
+            {% trans "Save" %}
         </button>
 
     </div>

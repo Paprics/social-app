@@ -7,20 +7,47 @@ Selectors для работы с диалогами.
 Изменение данных выполняется через services.
 """
 
-from django.db.models import OuterRef, Subquery, Count, IntegerField
 from django.contrib.auth import get_user_model
 from django.db.models import (
-    Prefetch,
-    QuerySet,
     Count,
+    F,
+    OuterRef,
+    Prefetch,
     Q,
+    QuerySet,
+    Subquery,
+    Value,
 )
-from messenger.models import Dialog, Participant, Message
+from django.db.models.functions import Coalesce
+
+from messenger.models import Dialog, Participant
+from messenger.models.dialog import DialogType
 
 User = get_user_model()
 
 
 def get_user_dialogs(user: User) -> QuerySet[Dialog]:
+    """
+    Возвращает активные диалоги пользователя.
+
+    Диалоги сортируются по времени последней активности:
+    самый недавно активный диалог отображается первым.
+
+    Направление последнего сообщения значения не имеет:
+    входящее и исходящее сообщение одинаково обновляют
+    активность соответствующего диалога.
+
+    Для каждого диалога вычисляет количество непрочитанных
+    входящих сообщений с учётом last_read_message текущего
+    участника.
+
+    Архивированные и неактивные участия исключаются.
+    """
+
+    current_participant = Participant.objects.filter(
+        dialog_id=OuterRef("pk"),
+        user=user,
+    )
 
     return (
         Dialog.objects.filter(
@@ -28,7 +55,28 @@ def get_user_dialogs(user: User) -> QuerySet[Dialog]:
             participants__is_active=True,
             participants__is_archived=False,
         )
-        .annotate(unread_count=Count("messages", filter=Q(messages__id__gt=0) & ~Q(messages__sender=user)))
+        .annotate(
+            _last_read_message_id=Subquery(
+                current_participant.values(
+                    "last_read_message_id",
+                )[:1]
+            )
+        )
+        .annotate(
+            unread_count=Count(
+                "messages",
+                filter=(
+                    ~Q(messages__sender=user)
+                    & Q(
+                        messages__id__gt=Coalesce(
+                            F("_last_read_message_id"),
+                            Value(0),
+                        )
+                    )
+                ),
+                distinct=True,
+            )
+        )
         .select_related(
             "last_message",
             "last_message__sender",
@@ -44,17 +92,19 @@ def get_user_dialogs(user: User) -> QuerySet[Dialog]:
             ),
         )
         .distinct()
+        .order_by(
+            "-last_activity_at",
+            "-id",
+        )
     )
 
 
 def get_dialog(dialog_id: int) -> Dialog:
     """
-    Получение диалога по внутреннему ID.
+    Возвращает диалог по внутреннему ID.
 
-    Используется для:
-    - создания сообщений;
-    - проверки доступа;
-    - WebSocket.
+    Используется для создания сообщений,
+    проверки доступа и WebSocket-операций.
     """
 
     return (
@@ -72,7 +122,10 @@ def get_dialog(dialog_id: int) -> Dialog:
 
 def get_dialog_by_public_id(public_id: str) -> Dialog:
     """
-    Получение диалога по публичному ID из URL.
+    Возвращает диалог по публичному ID.
+
+    Публичный идентификатор используется в URL вместо
+    внутреннего первичного ключа диалога.
     """
 
     return (
@@ -92,10 +145,10 @@ def get_dialog_with_messages(public_id: str) -> Dialog:
     """
     Возвращает диалог вместе с сообщениями.
 
-    Используется при открытии страницы чата.
+    Предзагружает участников, отправителей сообщений
+    и вложения для отображения страницы чата.
 
-    URL работает через public_id.
-    Внутренний id не используется.
+    Диалог определяется по публичному ID.
     """
 
     return Dialog.objects.prefetch_related(
@@ -107,21 +160,29 @@ def get_dialog_with_messages(public_id: str) -> Dialog:
     )
 
 
-def get_private_dialog(user1, user2):
+def get_private_dialog(
+    user1: User,
+    user2: User,
+) -> Dialog | None:
     """
     Возвращает существующий приватный диалог
     между двумя пользователями.
 
-    Если диалог отсутствует —
+    Групповые диалоги исключаются из поиска.
+
+    Если приватный диалог отсутствует,
     возвращает None.
     """
 
     return (
         Dialog.objects.filter(
+            dialog_type=DialogType.PRIVATE,
             participants__user=user1,
+            participants__is_active=True,
         )
         .filter(
             participants__user=user2,
+            participants__is_active=True,
         )
         .distinct()
         .first()

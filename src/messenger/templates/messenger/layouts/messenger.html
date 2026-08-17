@@ -1,17 +1,47 @@
 {# src/messenger/templates/messenger/layouts/messenger.html #}
+
 {% extends "base.html" %}
 
 {% load static i18n %}
 
 {% block content %}
 
-<div class="h-[calc(100vh-4rem)]">
+<div class="mx-auto h-[calc(100dvh-4rem)] w-full max-w-7xl sm:px-4 sm:py-4 lg:px-6">
 
-    <div class="grid h-full lg:grid-cols-[360px_1fr]">
+    <div
+        class="
+            grid
+            h-full
+            min-h-0
+            overflow-hidden
+            bg-white
 
-        {% include "messenger/partials/sidebar.html" %}
+            sm:rounded-xl
+            sm:border
+            sm:border-slate-200
+            sm:shadow-sm
 
-        <main class="flex min-w-0 min-h-0 flex-col">
+            lg:grid-cols-[20rem_minmax(0,1fr)]
+            xl:grid-cols-[22rem_minmax(0,1fr)]
+        "
+    >
+
+        {% include "messenger/partials/sidebar.html" with hide_sidebar_mobile=dialog %}
+
+        <main
+            class="
+                {% if dialog %}
+                    flex
+                {% else %}
+                    hidden lg:flex
+                {% endif %}
+
+                min-h-0
+                min-w-0
+                flex-col
+                bg-white
+            "
+        >
 
             {% block messenger_content %}
             {% endblock %}

@@ -1,5 +1,10 @@
+# src/messenger/urls.py
+
 """
-URL configuration for messenger.
+URL configuration для messenger.
+
+Модуль содержит маршруты страниц диалогов,
+сообщений и вспомогательных HTMX endpoints.
 """
 
 from django.urls import path
@@ -13,6 +18,7 @@ from messenger.views.dialog import (
     DialogDeleteView,
     DialogDetailView,
     DialogListView,
+    DialogSidebarPageView,
     DialogSidebarView,
 )
 from messenger.views.message import (
@@ -34,6 +40,11 @@ urlpatterns = [
         "sidebar/",
         DialogSidebarView.as_view(),
         name="sidebar",
+    ),
+    path(
+        "sidebar/page/",
+        DialogSidebarPageView.as_view(),
+        name="sidebar_page",
     ),
     path(
         "messages/<int:message_id>/delete/",
