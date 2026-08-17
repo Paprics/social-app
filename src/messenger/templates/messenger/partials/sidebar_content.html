@@ -1,0 +1,13 @@
+{# src/messenger/templates/messenger/partials/sidebar_content.html #}
+
+{% load i18n %}
+
+{% if dialogs %}
+
+    {% include "messenger/partials/dialog_list_items.html" %}
+
+{% else %}
+
+    {% include "messenger/components/empty_state.html" with title=_("No dialogs") description=_("Start a conversation with another user.") %}
+
+{% endif %}

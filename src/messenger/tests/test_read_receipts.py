@@ -13,7 +13,7 @@
   в уже открытом диалоге.
 """
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, call, patch
 
 import pytest
 from asgiref.sync import async_to_sync
@@ -167,14 +167,27 @@ def test_notify_messages_read_sends_expected_group_event(
             last_read_message_id=message.id,
         )
 
-    channel_layer.group_send.assert_awaited_once_with(
-        f"dialog_{dialog.id}",
-        {
-            "type": "messages_read",
-            "reader_id": reader.id,
-            "last_read_message_id": message.id,
-        },
+    channel_layer.group_send.assert_has_awaits(
+        [
+            call(
+                f"dialog_{dialog.id}",
+                {
+                    "type": "messages_read",
+                    "reader_id": reader.id,
+                    "last_read_message_id": message.id,
+                },
+            ),
+            call(
+                f"messenger_user_{reader.id}",
+                {
+                    "type": "inbox_changed",
+                    "reason": "messages.read",
+                },
+            ),
+        ]
     )
+
+    assert channel_layer.group_send.await_count == 2
 
 
 def test_dialog_consumer_converts_read_event_to_client_payload():

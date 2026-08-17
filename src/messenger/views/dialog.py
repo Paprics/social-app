@@ -210,11 +210,10 @@ class DialogSidebarView(
 
         return TemplateResponse(
             request,
-            "messenger/partials/sidebar.html",
+            "messenger/partials/sidebar_content.html",
             {
                 "dialogs": page_obj.object_list,
                 "page_obj": page_obj,
-                "hide_sidebar_mobile": True,
             },
         )
 

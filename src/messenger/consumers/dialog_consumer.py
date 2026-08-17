@@ -18,7 +18,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
 
-from messenger.models import Dialog, Message, Participant
+from messenger.models import Dialog
 from messenger.services.dialog import DialogService
 from messenger.services.read import ReadService
 
@@ -102,33 +102,39 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
                 close_code,
             )
 
+    async def receive_json(
+        self,
+        content,
+        **kwargs,
+    ):
+        if content.get("type") != "message.read":
+            return
+
+        message_id = content.get("message_id")
+
+        if (
+            isinstance(message_id, bool)
+            or not isinstance(message_id, int)
+            or message_id <= 0
+        ):
+            return
+
+        await self.mark_message_as_read(
+            message_id=message_id,
+            user_id=self.scope["user"].id,
+        )
+
     async def chat_message(
         self,
         event,
     ):
-        """
-        Обрабатывает новое сообщение.
-
-        Если сообщение отправлено другим пользователем,
-        наличие этого WebSocket означает, что данный
-        диалог сейчас открыт у получателя.
-
-        Поэтому сообщение сразу считается прочитанным.
-        """
+        """Обрабатывает событие создания сообщения."""
 
         message_id = event["message_id"]
-
         sender_id = event["sender_id"]
-
         current_user_id = self.scope["user"].id
-
         is_own = sender_id == current_user_id
 
-        if not is_own:
-            await self.mark_message_as_read(
-                message_id=message_id,
-                user_id=current_user_id,
-            )
 
         await self.send_json(
             {
@@ -156,15 +162,9 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
         self,
         event,
     ):
-        """
-        Передает отправителю статус прочтения.
-
-        Самому читателю его собственное событие
-        read receipt не отправляется.
-        """
+        """Передает read receipt только противоположной стороне."""
 
         current_user_id = self.scope["user"].id
-
         reader_id = event["reader_id"]
 
         if reader_id == current_user_id:
@@ -174,7 +174,7 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             {
                 "type": "messages.read",
                 "reader_id": reader_id,
-                "last_read_message_id": (event["last_read_message_id"]),
+                "last_read_message_id": event["last_read_message_id"],
             },
         )
 
@@ -185,25 +185,12 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
         message_id: int,
         user_id: int,
     ) -> None:
-        """
-        Отмечает входящее сообщение прочитанным
-        текущим участником открытого диалога.
-        """
+        """Делегирует изменение read-state application service."""
 
-        message = Message.objects.get(
-            pk=message_id,
-            dialog_id=self.dialog_id,
-        )
-
-        participant = Participant.objects.get(
+        return ReadService.mark_read_up_to(
             dialog_id=self.dialog_id,
             user_id=user_id,
-            is_active=True,
-        )
-
-        ReadService.mark_as_read(
-            participant,
-            message,
+            message_id=message_id,
         )
 
     @database_sync_to_async

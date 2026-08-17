@@ -244,11 +244,11 @@ async function loadOlderMessages(list) {
 
 export async function reloadSidebar() {
 
-    const sidebar = document.getElementById(
-        "messenger-sidebar",
+    const dialogScroll = document.getElementById(
+        "messenger-dialog-scroll",
     );
 
-    if (!sidebar) {
+    if (!dialogScroll) {
         return;
     }
 
@@ -256,6 +256,11 @@ export async function reloadSidebar() {
 
         const response = await fetch(
             `${getLangPrefix()}/messenger/sidebar/`,
+            {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            },
         );
 
         if (!response.ok) {
@@ -266,39 +271,15 @@ export async function reloadSidebar() {
             );
 
             return;
-
         }
 
         const html = await response.text();
 
-        const parser = new DOMParser();
-
-        const documentFragment = parser.parseFromString(
-            html,
-            "text/html",
-        );
-
-        const newSidebar = documentFragment.getElementById(
-            "messenger-sidebar",
-        );
-
-        if (!newSidebar) {
-
-            messengerDebug(
-                "New sidebar not found",
-            );
-
-            return;
-
-        }
-
-        sidebar.replaceWith(
-            newSidebar,
-        );
+        dialogScroll.innerHTML = html;
 
         if (window.htmx) {
             window.htmx.process(
-                newSidebar,
+                dialogScroll,
             );
         }
 

@@ -27,7 +27,86 @@ const dialogPage = document.getElementById(
     "dialog-page",
 );
 
+const DIALOG_RECONNECT_MAX_DELAY = 30000;
+
 let socket = null;
+let pendingReadMessageId = null;
+let dialogReconnectTimer = null;
+let dialogReconnectAttempts = 0;
+let allowDialogReconnect = true;
+
+
+function clearDialogReconnectTimer() {
+
+    if (dialogReconnectTimer === null) {
+        return;
+    }
+
+    window.clearTimeout(
+        dialogReconnectTimer,
+    );
+
+    dialogReconnectTimer = null;
+
+}
+
+
+function scheduleDialogReconnect() {
+
+    if (
+        !allowDialogReconnect
+        || !dialogPage
+        || dialogReconnectTimer !== null
+    ) {
+        return;
+    }
+
+    const delay = Math.min(
+        1000 * (2 ** dialogReconnectAttempts),
+        DIALOG_RECONNECT_MAX_DELAY,
+    );
+
+    dialogReconnectAttempts += 1;
+
+    messengerDebug(
+        "Dialog WS reconnect scheduled",
+        delay,
+    );
+
+    dialogReconnectTimer = window.setTimeout(
+        () => {
+            dialogReconnectTimer = null;
+            initDialogSocket();
+        },
+        delay,
+    );
+
+}
+
+
+function reconnectDialogNow() {
+
+    if (
+        !allowDialogReconnect
+        || !dialogPage
+    ) {
+        return;
+    }
+
+    if (
+        socket
+        && (
+            socket.readyState === WebSocket.OPEN
+            || socket.readyState === WebSocket.CONNECTING
+        )
+    ) {
+        return;
+    }
+
+    clearDialogReconnectTimer();
+    initDialogSocket();
+
+}
 
 
 function initDialogSocket() {
@@ -38,6 +117,16 @@ function initDialogSocket() {
             "Dialog page not found",
         );
 
+        return;
+    }
+
+    if (
+        socket
+        && (
+            socket.readyState === WebSocket.OPEN
+            || socket.readyState === WebSocket.CONNECTING
+        )
+    ) {
         return;
     }
 
@@ -64,10 +153,15 @@ function initDialogSocket() {
 
     socket.onopen = () => {
 
+        dialogReconnectAttempts = 0;
+        clearDialogReconnectTimer();
+
         messengerDebug(
             "WS connected",
             dialogPublicId,
         );
+
+        flushPendingRead();
 
     };
 
@@ -77,6 +171,10 @@ function initDialogSocket() {
             "WS disconnected",
             event.code,
         );
+
+        socket = null;
+
+        scheduleDialogReconnect();
 
     };
 
@@ -187,23 +285,23 @@ async function handleMessageCreated(data) {
     }
 
     /*
-     * Свое сообщение уже рендерится ответом формы.
-     * WebSocket нужен здесь только для синхронизации
-     * sidebar.
+     * HTTP POST создания сообщения возвращает 204 и ничего
+     * не вставляет в DOM. Поэтому message.created является
+     * единым realtime-путём рендера как чужого, так и своего
+     * сообщения. Проверка existingMessage защищает от дублей.
      */
-    if (data.is_own === true) {
-
-        await reloadSidebar();
-
-        return;
-    }
-
     const existingMessage =
         document.getElementById(
             `message-${messageId}`,
         );
 
     if (existingMessage) {
+
+        if (data.is_own !== true) {
+            queueMessageRead(
+                messageId,
+            );
+        }
 
         await reloadSidebar();
 
@@ -254,6 +352,12 @@ async function handleMessageCreated(data) {
             html,
         );
 
+        if (data.is_own !== true) {
+            queueMessageRead(
+                messageId,
+            );
+        }
+
         scrollMessagesToBottom();
 
         await reloadSidebar();
@@ -268,6 +372,70 @@ async function handleMessageCreated(data) {
     }
 
 }
+
+
+
+// =====================================================
+// Explicit read receipt
+// =====================================================
+
+function canMarkMessagesRead() {
+    return (
+        document.visibilityState === "visible"
+        && document.hasFocus()
+    );
+}
+
+function queueMessageRead(messageId) {
+    if (!Number.isInteger(messageId) || messageId <= 0) {
+        return;
+    }
+
+    pendingReadMessageId = Math.max(
+        pendingReadMessageId ?? 0,
+        messageId,
+    );
+
+    flushPendingRead();
+}
+
+function flushPendingRead() {
+    if (
+        pendingReadMessageId === null
+        || !canMarkMessagesRead()
+        || !socket
+        || socket.readyState !== WebSocket.OPEN
+    ) {
+        return;
+    }
+
+    const messageId = pendingReadMessageId;
+
+    socket.send(
+        JSON.stringify(
+            {
+                type: "message.read",
+                message_id: messageId,
+            },
+        ),
+    );
+
+    pendingReadMessageId = null;
+}
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (document.visibilityState === "visible") {
+            flushPendingRead();
+        }
+    },
+);
+
+window.addEventListener(
+    "focus",
+    flushPendingRead,
+);
 
 
 // =====================================================
@@ -351,6 +519,45 @@ function handleMessagesRead(data) {
     );
 
 }
+
+
+// =====================================================
+// Reconnect lifecycle
+// =====================================================
+
+window.addEventListener(
+    "online",
+    reconnectDialogNow,
+);
+
+
+window.addEventListener(
+    "focus",
+    reconnectDialogNow,
+);
+
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (document.visibilityState === "visible") {
+            reconnectDialogNow();
+        }
+    },
+);
+
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+        allowDialogReconnect = false;
+        clearDialogReconnectTimer();
+
+        if (socket) {
+            socket.close();
+        }
+    },
+);
 
 
 // =====================================================

@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from messenger.models import Dialog, Participant
 from messenger.selectors.participant import is_user_participant
+from messenger.services.read import ReadService
 
 
 class DialogService:
@@ -119,9 +120,7 @@ class DialogService:
 
     @staticmethod
     def user_has_access(dialog_id, user_id):
-        """
-        Проверяет доступ пользователя к диалогу.
-        """
+        """Проверяет доступ пользователя к диалогу."""
 
         return is_user_participant(
             dialog_id=dialog_id,
@@ -129,15 +128,15 @@ class DialogService:
         )
 
     @staticmethod
-    @transaction.atomic
     def mark_as_read(
         dialog,
         user,
     ):
         """
-        Помечает сообщения диалога как прочитанные.
+        Compatibility adapter.
 
-        Используется при открытии страницы диалога.
+        Read cursor изменяет только ReadService.
+        После миграции всех callers этот метод можно удалить.
         """
 
         participant = (
@@ -145,29 +144,37 @@ class DialogService:
             .filter(
                 dialog=dialog,
                 user=user,
+                is_active=True,
             )
-            .select_for_update()
             .first()
         )
 
-        if not participant:
+        if participant is None:
             return None
 
-        last_message = (
+        last_message_id = (
             dialog.messages
             .order_by("-id")
-            .only("id")
+            .values_list(
+                "id",
+                flat=True,
+            )
             .first()
         )
 
-        if not last_message:
+        if last_message_id is None:
             return participant
 
-        participant.last_read_message = last_message
-        participant.save(
-            update_fields=[
+        ReadService.mark_read_up_to(
+            dialog_id=dialog.id,
+            user_id=user.id,
+            message_id=last_message_id,
+        )
+
+        participant.refresh_from_db(
+            fields=[
                 "last_read_message",
-            ]
+            ],
         )
 
         return participant
