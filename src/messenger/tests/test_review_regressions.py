@@ -1,5 +1,7 @@
 import pytest
 
+from django.urls import reverse
+
 from messenger.models import Message, Participant
 from messenger.models.dialog import Dialog, DialogType
 from messenger.selectors.dialog import get_private_dialog, get_user_dialogs
@@ -108,3 +110,65 @@ def test_get_private_dialog_does_not_return_group_dialog(users):
     dialog = get_private_dialog(user_a, user_b)
 
     assert dialog is None
+
+
+@pytest.mark.django_db
+def test_conversation_without_dialog_renders_new_conversation_page(
+    users,
+    client,
+):
+    """
+    Страница начала переписки не должна рендерить dialog_detail
+    без существующего Dialog/public_id.
+    """
+    user_a, user_b, _ = users
+
+    client.force_login(user_a)
+
+    response = client.get(
+        reverse(
+            "messenger:conversation",
+            kwargs={
+                "user_id": user_b.id,
+            },
+        )
+    )
+
+    assert response.status_code == 200
+    assert get_private_dialog(user_a, user_b) is None
+    assert b'id="conversation-page"' in response.content
+
+
+@pytest.mark.django_db
+def test_conversation_with_existing_dialog_redirects_to_dialog_detail(
+    users,
+    client,
+):
+    """Существующая личная переписка открывается через public_id диалога."""
+    user_a, user_b, _ = users
+
+    dialog = DialogService.create_dialog(
+        [
+            user_a,
+            user_b,
+        ]
+    )
+
+    client.force_login(user_a)
+
+    response = client.get(
+        reverse(
+            "messenger:conversation",
+            kwargs={
+                "user_id": user_b.id,
+            },
+        )
+    )
+
+    assert response.status_code == 302
+    assert response.url == reverse(
+        "messenger:dialog_detail",
+        kwargs={
+            "public_id": dialog.public_id,
+        },
+    )

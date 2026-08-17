@@ -29,7 +29,7 @@ class ConversationView(LoginRequiredMixin, TemplateView):
     открывает пустую страницу создания.
     """
 
-    template_name = "messenger/dialog_detail.html"
+    template_name = "messenger/conversation_new.html"
 
     def dispatch(self, request, *args, **kwargs):
 
