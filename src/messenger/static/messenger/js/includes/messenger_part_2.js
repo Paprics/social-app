@@ -1,3 +1,5 @@
+// src/messenger/static/messenger/js/includes/messenger_part_2.js
+
 /*
  * Messenger frontend.
  *
@@ -6,7 +8,7 @@
  * - message.created;
  * - message.deleted;
  * - messages.read;
- * - future realtime events.
+ * - realtime UI updates.
  */
 
 import {
@@ -37,10 +39,10 @@ function initDialogSocket() {
         );
 
         return;
-
     }
 
-    const dialogPublicId = dialogPage.dataset.dialogId;
+    const dialogPublicId =
+        dialogPage.dataset.dialogId;
 
     if (!dialogPublicId) {
 
@@ -49,12 +51,12 @@ function initDialogSocket() {
         );
 
         return;
-
     }
 
-    const protocol = window.location.protocol === "https:"
-        ? "wss"
-        : "ws";
+    const protocol =
+        window.location.protocol === "https:"
+            ? "wss"
+            : "ws";
 
     socket = new WebSocket(
         `${protocol}://${window.location.host}/ws/messenger/${dialogPublicId}/`,
@@ -87,13 +89,14 @@ function initDialogSocket() {
 
     };
 
-    socket.onmessage = handleSocketMessage;
+    socket.onmessage =
+        handleSocketMessage;
 
 }
 
 
 // =====================================================
-// WebSocket event router
+// WebSocket router
 // =====================================================
 
 async function handleSocketMessage(event) {
@@ -120,7 +123,6 @@ async function handleSocketMessage(event) {
         );
 
         return;
-
     }
 
     switch (data.type) {
@@ -167,41 +169,55 @@ async function handleSocketMessage(event) {
 
 async function handleMessageCreated(data) {
 
-    if (!data.message_id) {
+    const messageId = Number(
+        data.message_id,
+    );
+
+    if (
+        !Number.isInteger(messageId)
+        || messageId <= 0
+    ) {
 
         messengerDebug(
-            "message.created without message_id",
+            "message.created without valid message_id",
             data,
         );
 
         return;
-
     }
 
-    const existingMessage = document.getElementById(
-        `message-${data.message_id}`,
-    );
-
-    if (existingMessage) {
-
-        messengerDebug(
-            "Message already exists",
-            data.message_id,
-        );
+    /*
+     * Свое сообщение уже рендерится ответом формы.
+     * WebSocket нужен здесь только для синхронизации
+     * sidebar.
+     */
+    if (data.is_own === true) {
 
         await reloadSidebar();
 
         return;
+    }
 
+    const existingMessage =
+        document.getElementById(
+            `message-${messageId}`,
+        );
+
+    if (existingMessage) {
+
+        await reloadSidebar();
+
+        return;
     }
 
     try {
 
         const response = await fetch(
-            `${getLangPrefix()}/messenger/messages/${data.message_id}/`,
+            `${getLangPrefix()}/messenger/messages/${messageId}/`,
             {
                 headers: {
-                    "X-Requested-With": "XMLHttpRequest",
+                    "X-Requested-With":
+                        "XMLHttpRequest",
                 },
             },
         );
@@ -214,12 +230,12 @@ async function handleMessageCreated(data) {
             );
 
             return;
-
         }
 
-        const messageList = document.getElementById(
-            "message-list",
-        );
+        const messageList =
+            document.getElementById(
+                "message-list",
+            );
 
         if (!messageList) {
 
@@ -228,10 +244,10 @@ async function handleMessageCreated(data) {
             );
 
             return;
-
         }
 
-        const html = await response.text();
+        const html =
+            await response.text();
 
         messageList.insertAdjacentHTML(
             "beforeend",
@@ -260,20 +276,21 @@ async function handleMessageCreated(data) {
 
 async function handleMessageDeleted(data) {
 
-    if (!data.message_id) {
+    const messageId = Number(
+        data.message_id,
+    );
 
-        messengerDebug(
-            "message.deleted without message_id",
-            data,
-        );
-
+    if (
+        !Number.isInteger(messageId)
+        || messageId <= 0
+    ) {
         return;
-
     }
 
-    const message = document.getElementById(
-        `message-${data.message_id}`,
-    );
+    const message =
+        document.getElementById(
+            `message-${messageId}`,
+        );
 
     if (message) {
         message.remove();
@@ -294,7 +311,11 @@ function handleMessagesRead(data) {
         data.last_read_message_id,
     );
 
-    if (!Number.isInteger(lastReadMessageId)) {
+    if (
+        !Number.isInteger(
+            lastReadMessageId,
+        )
+    ) {
 
         messengerDebug(
             "messages.read has invalid last_read_message_id",
@@ -302,12 +323,12 @@ function handleMessagesRead(data) {
         );
 
         return;
-
     }
 
-    const statuses = document.querySelectorAll(
-        ".message-status[data-message-id]",
-    );
+    const statuses =
+        document.querySelectorAll(
+            ".message-status[data-message-id]",
+        );
 
     statuses.forEach(
         (status) => {

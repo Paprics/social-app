@@ -4,6 +4,10 @@
 
 <div
     id="message-list"
+    data-message-history
+    data-has-older-messages="{% if has_older_messages %}true{% else %}false{% endif %}"
+    data-oldest-message-id="{{ oldest_message_id|default_if_none:'' }}"
+    data-older-messages-url="{% url 'messenger:dialog_messages_older' dialog.public_id %}"
     class="
         flex
         min-h-0

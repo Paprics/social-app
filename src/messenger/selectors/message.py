@@ -1,3 +1,5 @@
+# src/messenger/selectors/message.py
+
 """
 Selectors for messenger messages.
 
@@ -16,14 +18,14 @@ from django.db.models import QuerySet
 
 from messenger.models import Message
 
+MESSAGE_BATCH_SIZE = 30
+
 
 def _message_queryset() -> QuerySet[Message]:
     """
-    Базовый queryset сообщений.
+    Возвращает базовый queryset сообщений.
 
-    Здесь централизованы:
-    - исключение удалённых сообщений;
-    - оптимизация связанных объектов.
+    Здесь централизованы оптимизации связанных объектов.
     """
 
     return Message.objects.select_related(
@@ -36,11 +38,11 @@ def _message_queryset() -> QuerySet[Message]:
 
 def get_dialog_messages(dialog_id: int) -> QuerySet[Message]:
     """
-    Возвращает сообщения конкретного диалога.
+    Возвращает все сообщения конкретного диалога.
 
-    Используется для:
-    - открытия истории сообщений;
-    - первоначальной загрузки чата.
+    Не используется для первоначальной загрузки страницы чата.
+    Предназначен для внутренних сценариев, где действительно
+    требуется полная история.
     """
 
     return (
@@ -55,25 +57,17 @@ def get_dialog_messages(dialog_id: int) -> QuerySet[Message]:
 def get_messages_before(
     dialog_id: int,
     message_id: int,
-    limit: int = 50,
-) -> QuerySet[Message]:
+    limit: int = MESSAGE_BATCH_SIZE,
+) -> list[Message]:
     """
-    Возвращает сообщения старше указанного сообщения.
+    Возвращает порцию сообщений старше указанного сообщения.
 
-    Используется для cursor pagination.
-
-    Пример:
-
-    Загружены сообщения до ID 500.
-    Пользователь листает вверх.
-    Получаем:
-
-    id < 500
-
-    limit = 50
+    Сообщения выбираются от новых к старым для эффективного
+    cursor pagination, после чего разворачиваются в естественный
+    порядок отображения: от старого к новому.
     """
 
-    return (
+    messages = list(
         _message_queryset()
         .filter(
             dialog_id=dialog_id,
@@ -82,24 +76,47 @@ def get_messages_before(
         .order_by("-id")[:limit]
     )
 
+    messages.reverse()
+
+    return messages
+
 
 def get_latest_messages(
     dialog_id: int,
-    limit: int = 50,
-) -> QuerySet[Message]:
+    limit: int = MESSAGE_BATCH_SIZE,
+) -> list[Message]:
     """
     Возвращает последние сообщения диалога.
 
-    Используется при первом открытии чата.
+    В браузер передается только последняя порция сообщений,
+    отсортированная от старого к новому.
     """
 
-    return (
+    messages = list(
         _message_queryset()
         .filter(
             dialog_id=dialog_id,
         )
-        .order_by("id")[:limit]
+        .order_by("-id")[:limit]
     )
+
+    messages.reverse()
+
+    return messages
+
+
+def has_messages_before(
+    dialog_id: int,
+    message_id: int,
+) -> bool:
+    """
+    Проверяет наличие сообщений старше указанного сообщения.
+    """
+
+    return Message.objects.filter(
+        dialog_id=dialog_id,
+        id__lt=message_id,
+    ).exists()
 
 
 def get_unread_messages(
@@ -109,8 +126,7 @@ def get_unread_messages(
     """
     Возвращает непрочитанные сообщения.
 
-    Логика основана на поле:
-    Participant.last_read_message.
+    Логика основана на поле Participant.last_read_message.
 
     Если пользователь ещё ничего не прочитал,
     возвращаются все сообщения диалога.
@@ -132,11 +148,8 @@ def get_message(message_id: int) -> Message:
     """
     Возвращает одно сообщение.
 
-    Используется:
-    - отображение сообщения;
-    - редактирование;
-    - удаление;
-    - HTMX partial.
+    Используется для отображения, редактирования,
+    удаления и HTMX partial.
     """
 
     return (

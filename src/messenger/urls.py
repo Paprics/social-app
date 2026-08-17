@@ -18,6 +18,8 @@ from messenger.views.dialog import (
     DialogDeleteView,
     DialogDetailView,
     DialogListView,
+    DialogMarkReadView,
+    DialogMessagesBeforeView,
     DialogSidebarPageView,
     DialogSidebarView,
 )
@@ -75,6 +77,16 @@ urlpatterns = [
         "<str:public_id>/delete/",
         DialogDeleteView.as_view(),
         name="dialog_delete",
+    ),
+    path(
+        "<str:public_id>/read/",
+        DialogMarkReadView.as_view(),
+        name="dialog_mark_read",
+    ),
+    path(
+        "<str:public_id>/messages/older/",
+        DialogMessagesBeforeView.as_view(),
+        name="dialog_messages_older",
     ),
     path(
         "<str:public_id>/messages/create/",

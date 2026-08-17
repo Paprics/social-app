@@ -3,6 +3,7 @@
  *
  * Part 3:
  * - UI initialization;
+ * - message history lazy loading initialization;
  * - HTMX events;
  * - message deletion;
  * - dialog deletion;
@@ -12,6 +13,7 @@
 import {
     getCookie,
     getLangPrefix,
+    initMessageHistoryLazyLoad,
     messengerDebug,
     reloadSidebar,
     scrollMessagesToBottom,
@@ -27,7 +29,7 @@ document.addEventListener(
     async () => {
 
         focusMessageTextarea();
-
+        initMessageHistoryLazyLoad();
         scrollMessagesToBottom();
 
         const dialogPage = document.getElementById(
@@ -67,6 +69,7 @@ document.body.addEventListener(
             return;
         }
 
+        initMessageHistoryLazyLoad();
         scrollMessagesToBottom();
 
         const textarea = document.querySelector(

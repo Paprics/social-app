@@ -1,3 +1,5 @@
+# src/messenger/services/message.py
+
 """
 Сервис работы с сообщениями.
 
@@ -17,9 +19,7 @@ from messenger.models import Dialog, Message
 
 
 class MessageService:
-    """
-    Бизнес-логика сообщений.
-    """
+    """Бизнес-логика сообщений."""
 
     @staticmethod
     @transaction.atomic
@@ -29,9 +29,7 @@ class MessageService:
         sender,
         text: str,
     ) -> Message:
-        """
-        Создает новое сообщение.
-        """
+        """Создает новое сообщение."""
 
         message = Message.objects.create(
             dialog=dialog,
@@ -61,8 +59,7 @@ class MessageService:
         """
         Полностью удаляет сообщение из базы.
 
-        Возвращает id удаленного сообщения,
-        так как после delete() объект уже нельзя использовать.
+        Возвращает ID удаленного сообщения.
         """
 
         message_id = message.id
@@ -76,9 +73,7 @@ class MessageService:
         *,
         message: Message,
     ) -> None:
-        """
-        Отправляет событие создания сообщения.
-        """
+        """Отправляет событие создания сообщения."""
 
         channel_layer = get_channel_layer()
 
@@ -89,6 +84,7 @@ class MessageService:
             {
                 "type": "chat_message",
                 "message_id": message.id,
+                "sender_id": message.sender_id,
             },
         )
 
@@ -98,9 +94,7 @@ class MessageService:
         dialog_id: int,
         message_id: int,
     ) -> None:
-        """
-        Отправляет событие удаления сообщения.
-        """
+        """Отправляет событие удаления сообщения."""
 
         channel_layer = get_channel_layer()
 

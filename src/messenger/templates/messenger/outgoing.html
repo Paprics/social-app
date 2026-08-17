@@ -42,9 +42,18 @@
             <span
                 class="message-status"
                 data-message-id="{{ message.id }}"
+                data-read="false"
             >
-                {% if dialog.current_participant.last_read_message_id and dialog.current_participant.last_read_message_id >= message.id %}
-                    ✓✓
+                {% if dialog.current_participant %}
+                    {% for participant in dialog.participants.all %}
+                        {% if participant.user_id != dialog.current_participant.user_id %}
+                            {% if participant.last_read_message_id and participant.last_read_message_id >= message.id %}
+                                ✓✓
+                            {% else %}
+                                ✓
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
                 {% else %}
                     ✓
                 {% endif %}
