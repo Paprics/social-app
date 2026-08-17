@@ -27,3 +27,12 @@ class DialogAccessMixin:
             user_id,
         ):
             raise Http404()
+
+
+class MessengerThreadLayoutMixin:
+    """Marks pages that should display the conversation panel on mobile."""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["messenger_thread_active"] = True
+        return context

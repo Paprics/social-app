@@ -158,6 +158,18 @@ class DialogConsumer(AsyncJsonWebsocketConsumer):
             },
         )
 
+    async def dialog_deleted(
+        self,
+        event,
+    ):
+        """Tell the open client that this dialog no longer exists."""
+
+        await self.send_json(
+            {
+                "type": "dialog.deleted",
+            },
+        )
+
     async def messages_read(
         self,
         event,

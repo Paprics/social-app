@@ -5,23 +5,16 @@
 <aside
     id="messenger-sidebar"
     class="
-        {% if hide_sidebar_mobile %}
-            hidden lg:flex
-        {% else %}
-            flex
-        {% endif %}
-
+        flex
         h-full
         min-h-0
         min-w-0
         flex-col
         bg-white
-
         lg:border-r
         lg:border-slate-200
     "
 >
-
     <header
         class="
             flex
@@ -33,11 +26,9 @@
             px-4
         "
     >
-
         <h1 class="text-base font-semibold text-slate-900">
             {% trans "Messages" %}
         </h1>
-
     </header>
 
     <div
@@ -49,9 +40,6 @@
             overscroll-contain
         "
     >
-
         {% include "messenger/partials/sidebar_content.html" %}
-
     </div>
-
 </aside>

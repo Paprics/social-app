@@ -10,6 +10,7 @@ from django.utils import timezone
 from messenger.models import Dialog, Participant
 from messenger.selectors.participant import is_user_participant
 from messenger.services.read import ReadService
+from messenger.services.realtime import MessengerRealtimeService
 
 
 class DialogService:
@@ -216,4 +217,21 @@ class DialogService:
                 "Access denied.",
             )
 
+        dialog_id = dialog.id
+        user_ids = tuple(
+            dialog.participants.filter(
+                is_active=True,
+            ).values_list(
+                "user_id",
+                flat=True,
+            )
+        )
+
         dialog.delete()
+
+        transaction.on_commit(
+            lambda: MessengerRealtimeService.notify_dialog_deleted(
+                dialog_id=dialog_id,
+                user_ids=user_ids,
+            ),
+        )

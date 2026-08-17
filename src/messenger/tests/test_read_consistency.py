@@ -362,3 +362,19 @@ def test_unread_count_follows_read_cursor(
 
     assert loaded_dialog.unread_count == 0
 
+
+def test_dialog_consumer_forwards_deleted_event():
+    consumer = DialogConsumer()
+    consumer.send_json = AsyncMock()
+
+    async_to_sync(consumer.dialog_deleted)(
+        {
+            "type": "dialog_deleted",
+        }
+    )
+
+    consumer.send_json.assert_awaited_once_with(
+        {
+            "type": "dialog.deleted",
+        }
+    )

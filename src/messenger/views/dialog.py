@@ -16,6 +16,7 @@ HTTP views для работы с диалогами.
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Page, Paginator
 from django.http import Http404, HttpResponse
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.views import View
 from django.views.generic import DetailView, ListView
@@ -33,6 +34,7 @@ from messenger.selectors.message import (
 from messenger.services.dialog import DialogService
 from messenger.services.dialog_page import DialogPageService
 from messenger.services.read import ReadService
+from messenger.views.mixins import MessengerThreadLayoutMixin
 
 DIALOGS_PAGE_SIZE = 15
 
@@ -116,6 +118,7 @@ class DialogListView(
 
 
 class DialogDetailView(
+    MessengerThreadLayoutMixin,
     LoginRequiredMixin,
     DetailView,
 ):
@@ -123,6 +126,14 @@ class DialogDetailView(
 
     template_name = "messenger/dialog_detail.html"
     context_object_name = "dialog"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Redirect stale dialog URLs back to the messenger list."""
+
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except Dialog.DoesNotExist:
+            return redirect("messenger:dialog_list")
 
     def get_object(self, queryset=None):
         """

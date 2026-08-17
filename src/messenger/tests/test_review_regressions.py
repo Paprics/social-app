@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 
 from django.urls import reverse
@@ -136,6 +138,7 @@ def test_conversation_without_dialog_renders_new_conversation_page(
 
     assert response.status_code == 200
     assert get_private_dialog(user_a, user_b) is None
+    assert response.context["messenger_thread_active"] is True
     assert b'id="conversation-page"' in response.content
 
 
@@ -172,3 +175,83 @@ def test_conversation_with_existing_dialog_redirects_to_dialog_detail(
             "public_id": dialog.public_id,
         },
     )
+
+
+@pytest.mark.django_db
+def test_deleted_dialog_url_redirects_to_dialog_list(
+    users,
+    client,
+):
+    user_a, user_b, _ = users
+    dialog = DialogService.create_dialog([user_a, user_b])
+    dialog_url = reverse(
+        "messenger:dialog_detail",
+        kwargs={"public_id": dialog.public_id},
+    )
+
+    dialog.delete()
+    client.force_login(user_a)
+
+    response = client.get(dialog_url)
+
+    assert response.status_code == 302
+    assert response.url == reverse("messenger:dialog_list")
+
+
+@pytest.mark.django_db
+def test_first_conversation_message_notifies_realtime(
+    users,
+    client,
+):
+    user_a, user_b, _ = users
+    client.force_login(user_a)
+
+    with patch.object(
+        MessageService,
+        "notify_message_created",
+    ) as notify:
+        response = client.post(
+            reverse(
+                "messenger:conversation_send",
+                kwargs={"user_id": user_b.id},
+            ),
+            {"text": "first realtime message"},
+        )
+
+    assert response.status_code == 204
+    notify.assert_called_once()
+
+    message = notify.call_args.kwargs["message"]
+    assert message.sender_id == user_a.id
+    assert message.dialog.participants.filter(user=user_b).exists()
+
+
+@pytest.mark.django_db
+def test_delete_dialog_schedules_realtime_notification(
+    users,
+):
+    user_a, user_b, _ = users
+    dialog = DialogService.create_dialog([user_a, user_b])
+    dialog_id = dialog.id
+
+    with (
+        patch(
+            "messenger.services.dialog.transaction.on_commit",
+            side_effect=lambda callback: callback(),
+        ),
+        patch(
+            "messenger.services.dialog.MessengerRealtimeService.notify_dialog_deleted",
+        ) as notify,
+    ):
+        DialogService.delete_dialog(
+            dialog=dialog,
+            user=user_a,
+        )
+
+    assert not Dialog.objects.filter(pk=dialog_id).exists()
+    notify.assert_called_once()
+    assert notify.call_args.kwargs["dialog_id"] == dialog_id
+    assert set(notify.call_args.kwargs["user_ids"]) == {
+        user_a.id,
+        user_b.id,
+    }

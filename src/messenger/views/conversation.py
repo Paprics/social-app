@@ -14,11 +14,16 @@ from messenger.forms.message import MessageForm
 from messenger.selectors.dialog import get_private_dialog
 from messenger.services.dialog import DialogService
 from messenger.services.message import MessageService
+from messenger.views.mixins import MessengerThreadLayoutMixin
 
 User = get_user_model()
 
 
-class ConversationView(LoginRequiredMixin, TemplateView):
+class ConversationView(
+    MessengerThreadLayoutMixin,
+    LoginRequiredMixin,
+    TemplateView,
+):
     """
     Точка входа в приватную переписку.
 
@@ -93,10 +98,14 @@ class ConversationSendView(LoginRequiredMixin, View):
             target_user,
         )
 
-        MessageService.create_message(
+        message = MessageService.create_message(
             dialog=dialog,
             sender=request.user,
             text=form.cleaned_data["text"],
+        )
+
+        MessageService.notify_message_created(
+            message=message,
         )
 
         return HttpResponse(
