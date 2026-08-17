@@ -1,0 +1,243 @@
+{% load i18n render_image %}
+
+<div class="relative">
+
+    <button type="button"
+            id="profile-button"
+            data-dropdown-button="profile-menu"
+            class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/70 p-1 transition hover:bg-white sm:px-2">
+
+        <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-slate-200 sm:h-10 sm:w-10">
+
+            {% render_image user.profile.avatar_photo.image variant="avatar_sm" alt=user.username shape="circle" css_class="h-full w-full object-cover" %}
+
+        </div>
+
+        <div class="hidden max-w-32 text-left 2xl:block">
+
+            <p class="truncate text-sm font-medium text-slate-900">
+                {{ user.username|slice:":25" }}
+            </p>
+
+            <p class="text-xs text-slate-500">
+                {% trans "Online" %}
+            </p>
+
+        </div>
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke-width="2"
+             stroke="currentColor"
+             class="hidden h-4 w-4 text-slate-500 sm:block"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+        </svg>
+
+    </button>
+
+
+    <div id="profile-menu"
+         data-dropdown
+         class="absolute right-0 top-full z-50 mt-2 hidden w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+
+        <div class="border-b border-slate-200 px-5 py-4">
+
+            <p class="truncate font-semibold text-slate-900">
+                {{ user.username|slice:":35" }}
+            </p>
+
+            <p class="truncate text-sm text-slate-500">
+                {{ user.email }}
+            </p>
+
+        </div>
+
+
+        <div class="py-2">
+
+            <a href="{% url 'users:profile' user.pk %}"
+               class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
+
+                <svg class="h-5 w-5 shrink-0"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.5"
+                     viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                </svg>
+
+                {% trans "Profile" %}
+
+            </a>
+
+
+            <a href="{% url 'users:account_center' %}"
+               class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
+
+                <svg class="h-5 w-5 shrink-0"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.5"
+                     viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87l.22.127c.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827a1.125 1.125 0 00-.431.992v.255c-.007.378.138.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456a1.125 1.125 0 00-1.076.124l-.22.128a1.125 1.125 0 00-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281a1.125 1.125 0 00-.644-.87l-.22-.127a1.125 1.125 0 00-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827a1.125 1.125 0 00.43-.992v-.255a1.125 1.125 0 00-.43-.991l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456a1.125 1.125 0 001.076-.124l.22-.128a1.125 1.125 0 00.644-.869l.214-1.281z"/>
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+
+                {% trans "Account Center" %}
+
+            </a>
+
+
+            <a href="{% url 'users:settings' %}"
+               class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
+
+                <svg class="h-5 w-5 shrink-0"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.5"
+                     viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/>
+                </svg>
+
+                {% trans "Settings" %}
+
+            </a>
+
+
+            <hr class="my-2 border-slate-200">
+
+
+            {# Safe Media #}
+
+            <div class="flex items-center justify-between gap-4 px-5 py-3"
+                 data-keep-dropdown>
+
+                <div class="min-w-0">
+
+                    <p class="text-sm font-medium text-slate-900">
+                        {% trans "Safe Media Mode" %}
+                    </p>
+
+                    <p class="mt-0.5 text-xs text-slate-500">
+                        {% trans "Blur sensitive images." %}
+                    </p>
+
+                </div>
+
+                <form method="post"
+                      action="{% url 'users:toggle_sensitive_content' %}"
+                      data-safe-media-form
+                      onclick="event.stopPropagation()"
+                      class="shrink-0">
+
+                    {% csrf_token %}
+
+                    <label class="relative inline-flex cursor-pointer items-center">
+
+                        <input type="checkbox"
+                               name="blur_media"
+                               class="peer sr-only"
+                               data-safe-media-toggle
+                               {% if user_settings.blur_media %}checked{% endif %}>
+
+                        <span class="relative h-6 w-11 rounded-full bg-slate-300 transition
+                                     peer-checked:bg-blue-600
+                                     after:absolute after:left-[2px] after:top-[2px]
+                                     after:h-5 after:w-5 after:rounded-full
+                                     after:bg-white after:transition-all
+                                     peer-checked:after:translate-x-5">
+                        </span>
+
+                    </label>
+
+                </form>
+
+            </div>
+
+
+            <hr class="my-2 border-slate-200">
+
+
+            {# Languages #}
+
+            <div class="px-5 py-3">
+
+                <p class="mb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+                    {% trans "Language" %}
+                </p>
+
+                <div class="flex flex-wrap gap-2">
+
+                    {% get_available_languages as LANGUAGES %}
+                    {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
+
+                    {% for lang in LANGUAGE_INFO_LIST %}
+
+                        <button type="button"
+                                data-language-switch="{{ lang.code }}"
+                                class="rounded-lg border px-3 py-1.5 font-mono text-xs uppercase transition
+                                       {% if lang.code == LANGUAGE_CODE %}
+                                           border-blue-600 bg-blue-50 font-medium text-blue-600
+                                       {% else %}
+                                           border-slate-200 text-slate-600 hover:bg-slate-100
+                                       {% endif %}">
+
+                            {{ lang.code }}
+
+                        </button>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <hr class="my-2 border-slate-200">
+
+
+            <form method="post"
+                  action="{% url 'accounts:logout' %}">
+
+                {% csrf_token %}
+
+                <button type="submit"
+                        class="flex w-full items-center gap-2.5 px-5 py-3 text-left text-sm text-red-600 transition hover:bg-red-50">
+
+                    <svg class="h-5 w-5 shrink-0"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="1.5"
+                         viewBox="0 0 24 24"
+                         aria-hidden="true">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"/>
+                    </svg>
+
+                    {% trans "Sign out" %}
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

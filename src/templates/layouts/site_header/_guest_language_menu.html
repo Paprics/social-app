@@ -1,0 +1,63 @@
+{% load i18n %}
+
+<div class="relative hidden sm:block">
+
+    <button type="button"
+            data-dropdown-button="lang-menu"
+            class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white/70 px-3 py-2 text-sm text-slate-600 transition hover:bg-white hover:text-slate-900">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24"
+             stroke-width="1.8"
+             stroke="currentColor"
+             class="h-4 w-4"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M3 12h18M12 3c2.5 2.7 4 6.2 4 9s-1.5 6.3-4 9c-2.5-2.7-4-6.2-4-9s1.5-6.3 4-9z"/>
+            <circle cx="12"
+                    cy="12"
+                    r="9"
+                    stroke-width="1.8"/>
+        </svg>
+
+        <span class="font-medium uppercase">
+            {{ LANGUAGE_CODE }}
+        </span>
+
+    </button>
+
+    <div id="lang-menu"
+         data-dropdown
+         class="absolute right-0 top-full z-50 mt-2 hidden w-40 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+
+        {% get_available_languages as LANGUAGES %}
+        {% get_language_info_list for LANGUAGES as LANGUAGE_INFO_LIST %}
+
+        {% for lang in LANGUAGE_INFO_LIST %}
+
+            <button type="button"
+                    data-language-switch="{{ lang.code }}"
+                    class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition hover:bg-slate-100
+                           {% if lang.code == LANGUAGE_CODE %}
+                               font-medium text-blue-600
+                           {% else %}
+                               text-slate-700
+                           {% endif %}">
+
+                <span class="font-mono text-xs uppercase text-slate-400">
+                    {{ lang.code }}
+                </span>
+
+                <span>
+                    {{ lang.name_local|capfirst }}
+                </span>
+
+            </button>
+
+        {% endfor %}
+
+    </div>
+
+</div>
