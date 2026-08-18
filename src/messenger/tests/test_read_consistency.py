@@ -56,16 +56,14 @@ def read_state(django_user_model):
 
 
 @pytest.mark.django_db
-def test_mark_as_read_does_not_trust_stale_participant_instance(
+def test_mark_read_up_to_uses_current_database_cursor(
     read_state,
 ):
+    reader = read_state["reader"]
+    dialog = read_state["dialog"]
     participant = read_state["participant"]
     first = read_state["first"]
     second = read_state["second"]
-
-    stale_participant = Participant.objects.get(
-        pk=participant.pk,
-    )
 
     Participant.objects.filter(
         pk=participant.pk,
@@ -73,13 +71,15 @@ def test_mark_as_read_does_not_trust_stale_participant_instance(
         last_read_message=second,
     )
 
-    ReadService.mark_as_read(
-        stale_participant,
-        first,
+    changed = ReadService.mark_read_up_to(
+        dialog_id=dialog.id,
+        user_id=reader.id,
+        message_id=first.id,
     )
 
     participant.refresh_from_db()
 
+    assert changed is False
     assert participant.last_read_message_id == second.id
 
 

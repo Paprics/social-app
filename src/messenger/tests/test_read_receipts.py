@@ -83,7 +83,7 @@ def read_receipt_state(django_user_model):
 
 
 @pytest.mark.django_db
-def test_mark_as_read_moves_cursor_forward(
+def test_mark_read_up_to_moves_cursor_forward(
     read_receipt_state,
 ):
     """Прочтение нового сообщения двигает cursor вперёд."""
@@ -96,9 +96,10 @@ def test_mark_as_read_moves_cursor_forward(
         ReadService,
         "notify_messages_read",
     ):
-        ReadService.mark_as_read(
-            participant,
-            message,
+        ReadService.mark_read_up_to(
+            dialog_id=participant.dialog_id,
+            user_id=participant.user_id,
+            message_id=message.id,
         )
 
     participant.refresh_from_db()
@@ -107,7 +108,7 @@ def test_mark_as_read_moves_cursor_forward(
 
 
 @pytest.mark.django_db
-def test_mark_as_read_never_moves_cursor_backward(
+def test_mark_read_up_to_never_moves_cursor_backward(
     read_receipt_state,
 ):
     """Старое сообщение не должно уменьшать last_read_message."""
@@ -131,9 +132,10 @@ def test_mark_as_read_never_moves_cursor_backward(
         "notify_messages_read",
     ) as notify:
 
-        ReadService.mark_as_read(
-            participant,
-            first_message,
+        ReadService.mark_read_up_to(
+            dialog_id=participant.dialog_id,
+            user_id=participant.user_id,
+            message_id=first_message.id,
         )
 
     participant.refresh_from_db()

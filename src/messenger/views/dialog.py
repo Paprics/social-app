@@ -21,7 +21,7 @@ from django.template.response import TemplateResponse
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from messenger.models import Dialog, Message, Participant
+from messenger.models import Dialog, Message
 from messenger.selectors.dialog import (
     get_dialog_by_public_id,
     get_user_dialogs,
@@ -314,18 +314,10 @@ class DialogMarkReadView(
                 status=204,
             )
 
-        try:
-            participant = Participant.objects.get(
-                dialog_id=dialog.id,
-                user_id=request.user.id,
-                is_active=True,
-            )
-        except Participant.DoesNotExist as error:
-            raise Http404() from error
-
-        ReadService.mark_as_read(
-            participant,
-            message,
+        ReadService.mark_read_up_to(
+            dialog_id=dialog.id,
+            user_id=request.user.id,
+            message_id=message.id,
         )
 
         return HttpResponse(

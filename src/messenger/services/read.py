@@ -94,37 +94,6 @@ class ReadService:
         return True
 
     @staticmethod
-    def mark_as_read(
-        participant: Participant,
-        message: Message,
-    ) -> Participant:
-        """
-        Совместимый adapter старого API.
-
-        Business rule находится только в mark_read_up_to().
-        После миграции всех callers этот метод можно удалить.
-        """
-
-        if participant.dialog_id != message.dialog_id:
-            raise ValueError(
-                "Message does not belong to participant dialog.",
-            )
-
-        ReadService.mark_read_up_to(
-            dialog_id=participant.dialog_id,
-            user_id=participant.user_id,
-            message_id=message.id,
-        )
-
-        participant.refresh_from_db(
-            fields=[
-                "last_read_message",
-            ],
-        )
-
-        return participant
-
-    @staticmethod
     def notify_messages_read(
         *,
         dialog_id: int,
