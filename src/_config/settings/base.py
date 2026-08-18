@@ -19,7 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "core.apps.CoreConfig",
-    "chat.apps.ChatConfig",
+    "video_chat.apps.VideoChatConfig",
     "cms.apps.CmsConfig",
     "tinymce",
     "geo.apps.GeoConfig",

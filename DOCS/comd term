@@ -23,6 +23,20 @@ http://127.0.0.1:8000/en/account-center/?friends_tab=incoming#friendsk
 docker compose --env-file .env.dev -f docker/compose.dev.yml exec web \
     pytest --ds=_config.settings.test posts/tests -v
 
-Запуск всех тестов в проекте
+==================== Все тесты в проекте (Отображение)
 docker compose --env-file .env.dev -f docker/compose.dev.yml exec web \
-    pytest --ds=_config.settings.test -q
+    pytest \
+    --ds=_config.settings.test
+
+==================== TEST
+# Запустить/обновить все контейнеры проекта в фоне
+docker compose --env-file .env.dev -f docker/compose.dev.yml up -d
+
+# Посмотреть состояние контейнеров проекта
+docker compose --env-file .env.dev -f docker/compose.dev.yml ps
+
+# Смотреть последние 200 строк логов web-контейнера и продолжать вывод в реальном времени
+docker compose --env-file .env.dev -f docker/compose.dev.yml logs --tail=200 -f web
+
+# Зайти внутрь web-контейнера через Bash
+docker compose --env-file .env.dev -f docker/compose.dev.yml exec web bash

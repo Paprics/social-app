@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block content %}
+
+<div class="flex min-h-screen flex-col bg-gray-950 text-white">
+
+    <div class="flex items-center justify-between border-b border-gray-800 bg-gray-900 px-6 py-3">
+
+        <div class="flex items-center gap-3">
+            <a
+                href="{% url 'chat:moderator_list' %}"
+                class="text-sm text-gray-400 transition-colors hover:text-white"
+            >
+                ← Список комнат
+            </a>
+
+            <span class="text-gray-600">|</span>
+
+            <span class="font-mono text-xs text-gray-400">
+                {{ room_id|slice:":8" }}...
+            </span>
+        </div>
+
+        <div
+            id="modStatus"
+            class="text-xs text-yellow-400"
+        >
+            Подключение...
+        </div>
+
+    </div>
+
+    <div class="flex flex-1 gap-4 p-4">
+
+        <div class="flex flex-1 flex-col gap-4">
+
+            <div class="flex gap-4">
+
+                <div class="relative flex-1">
+                    <video
+                        id="videoUser1"
+                        autoplay
+                        playsinline
+                        class="aspect-video w-full rounded-xl bg-gray-800 object-cover"
+                    ></video>
+
+                    <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 rounded-b-xl bg-black/70 px-3 py-2">
+                        <div class="min-w-0 text-xs text-gray-300">
+                            {% with participant=room.caller_participant %}
+                                {% if participant.is_authenticated %}
+                                    <a href="{{ participant.profile_url }}"
+                                       class="block truncate font-medium text-indigo-300 hover:text-indigo-200">
+                                        {{ participant.username }}
+                                    </a>
+                                    <div class="mt-0.5 text-gray-400">
+                                        {% trans "Profile gender" %}: {{ participant.profile_gender_label|default:"—" }}
+                                    </div>
+                                {% else %}
+                                    <div class="font-medium text-gray-200">{% trans "Anonymous user" %}</div>
+                                {% endif %}
+                                <div class="mt-0.5 text-gray-400">
+                                    {% trans "Chat gender" %}: {{ participant.chat_gender_label|default:"—" }}
+                                </div>
+                            {% endwith %}
+                        </div>
+
+                        <button
+                            type="button"
+                            data-kick-role="caller"
+                            class="rounded-lg bg-red-600 px-3 py-1 text-xs text-white transition-colors hover:bg-red-500"
+                        >
+                            Kick
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative flex-1">
+                    <video
+                        id="videoUser2"
+                        autoplay
+                        playsinline
+                        class="aspect-video w-full rounded-xl bg-gray-800 object-cover"
+                    ></video>
+
+                    <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 rounded-b-xl bg-black/70 px-3 py-2">
+                        <div class="min-w-0 text-xs text-gray-300">
+                            {% with participant=room.callee_participant %}
+                                {% if participant.is_authenticated %}
+                                    <a href="{{ participant.profile_url }}"
+                                       class="block truncate font-medium text-indigo-300 hover:text-indigo-200">
+                                        {{ participant.username }}
+                                    </a>
+                                    <div class="mt-0.5 text-gray-400">
+                                        {% trans "Profile gender" %}: {{ participant.profile_gender_label|default:"—" }}
+                                    </div>
+                                {% else %}
+                                    <div class="font-medium text-gray-200">{% trans "Anonymous user" %}</div>
+                                {% endif %}
+                                <div class="mt-0.5 text-gray-400">
+                                    {% trans "Chat gender" %}: {{ participant.chat_gender_label|default:"—" }}
+                                </div>
+                            {% endwith %}
+                        </div>
+
+                        <button
+                            type="button"
+                            data-kick-role="callee"
+                            class="rounded-lg bg-red-600 px-3 py-1 text-xs text-white transition-colors hover:bg-red-500"
+                        >
+                            Kick
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="rounded-xl bg-gray-900 p-3">
+                <div class="mb-2 text-xs font-medium uppercase tracking-widest text-gray-500">
+                    Лог событий
+                </div>
+
+                <div
+                    id="modLog"
+                    class="flex max-h-32 flex-col gap-1 overflow-y-auto font-mono text-xs text-gray-400"
+                ></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% block extra_js %}
+<script>
+window.videoChatModeratorConfig = {
+    roomId: "{{ room_id|escapejs }}",
+    caller: "{{ caller|escapejs }}",
+    callee: "{{ callee|escapejs }}",
+    rtcConfig: {{ rtc_config|safe }},
+};
+</script>
+<script src="{% static 'video_chat/js/moderator_room.js' %}" defer></script>
+{% endblock %}
+
+{% endblock %}

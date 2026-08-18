@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}
+    {% trans "Anonymous random video chat" %}
+{% endblock %}
+
+{% block meta_description %}
+    {% trans "Anonymous random video chat for instant conversations." %}
+{% endblock %}
+
+{% block content %}
+
+<div class="min-h-screen bg-gray-950 text-white">
+
+    <div class="mx-auto flex w-full max-w-7xl flex-col px-3 py-5 sm:px-4 sm:py-7 lg:px-6">
+
+        <header class="mb-5">
+            <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                {% trans "Anonymous random video chat" %}
+            </h1>
+
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-400 sm:text-base">
+                {% trans "Meet random people by video in Social Network. Your site profile is not shared with the other participant in the current anonymous mode." %}
+            </p>
+        </header>
+
+
+
+        <div
+            id="status"
+            class="mb-4 rounded-xl border border-gray-800 bg-gray-900 px-4 py-3 text-center text-sm tracking-wide text-gray-300"
+        >
+            {% trans "Connecting to chat service..." %}
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+
+            <div class="relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg">
+                <video
+                    id="remoteVideo"
+                    autoplay
+                    playsinline
+                    class="aspect-video w-full bg-gray-900 object-cover"
+                ></video>
+
+                <div
+                    id="remotePlaceholder"
+                    class="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-gray-500"
+                >
+                    {% trans "Your next conversation partner will appear here." %}
+                </div>
+
+                <span class="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-medium text-gray-100 backdrop-blur-sm">
+                    {% trans "Partner" %}
+                </span>
+            </div>
+
+            <div class="relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg">
+                <video
+                    id="localVideo"
+                    autoplay
+                    muted
+                    playsinline
+                    class="aspect-video w-full bg-gray-900 object-cover"
+                ></video>
+
+                <div
+                    id="localPlaceholder"
+                    class="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-gray-500"
+                >
+                    {% trans "Your camera will turn on after you press Start." %}
+                </div>
+
+                <span class="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-medium text-gray-100 backdrop-blur-sm">
+                    {% trans "You" %}
+                </span>
+            </div>
+
+        </div>
+
+        <section
+            id="videoChatSettings"
+            class="mt-3 rounded-xl border border-gray-800 bg-gray-900 p-4 shadow-lg"
+        >
+            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+
+                <fieldset class="max-w-2xl">
+                    <legend class="mb-2 block text-sm font-medium text-gray-200">
+                        {% trans "Your gender in video chat" %}
+                    </legend>
+
+                    <div class="flex flex-wrap gap-2">
+                        {% for value, label in gender_choices %}
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="chatGender"
+                                    value="{{ value }}"
+                                    class="peer sr-only"
+                                >
+                                <span class="inline-flex min-h-10 items-center rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-200 transition hover:border-gray-600 peer-checked:border-indigo-500 peer-checked:bg-indigo-600/20 peer-checked:text-indigo-200 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+                                    {{ label }}
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </div>
+
+                    <p class="mt-2 text-xs leading-5 text-gray-500">
+                        {% trans "This choice applies only to the current video chat session and does not change the gender in your site profile." %}
+                    </p>
+                </fieldset>
+
+                <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+                    <button
+                        id="btnStart"
+                        type="button"
+                        disabled
+                        class="inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400"
+                    >
+                        {% trans "Start" %}
+                    </button>
+
+                    <button
+                        id="btnStop"
+                        type="button"
+                        class="hidden min-h-11 items-center justify-center rounded-xl border border-gray-700 bg-gray-800 px-8 py-3 text-sm font-semibold text-gray-200 transition hover:border-red-500/60 hover:bg-red-950/40 hover:text-red-200"
+                    >
+                        {% trans "Stop" %}
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="flex flex-wrap items-center justify-center gap-3 py-3">
+            <button
+                id="btnNext"
+                type="button"
+                class="hidden min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700"
+            >
+                {% trans "Next" %} →
+            </button>
+
+        </div>
+
+        <div class="mx-auto flex h-72 w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg sm:h-80">
+
+            <div class="flex items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3">
+                <span class="text-xs font-medium uppercase tracking-widest text-gray-400">
+                    {% trans "Chat" %}
+                </span>
+
+                <span id="chatHint" class="text-xs text-gray-600">
+                    {% trans "Available after connection" %}
+                </span>
+            </div>
+
+            <div
+                id="chatMessages"
+                class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3 text-sm sm:p-4"
+            ></div>
+
+            <div class="flex items-center gap-2 border-t border-gray-800 bg-gray-950/40 p-2 sm:p-3">
+
+                <input
+                    id="chatInput"
+                    type="text"
+                    maxlength="500"
+                    autocomplete="off"
+                    disabled
+                    placeholder="{% trans 'Chat is available after connection' %}"
+                    class="min-w-0 flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-100 outline-none transition placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+
+                <button
+                    id="btnSend"
+                    type="button"
+                    disabled
+                    class="inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-500"
+                >
+                    {% trans "Send" %}
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% translate "Choose your gender and press Start." as msg_idle %}
+{% translate "Getting access to camera and microphone..." as msg_media %}
+{% translate "Searching for a conversation partner..." as msg_searching %}
+{% translate "Partner found. Connecting..." as msg_connecting %}
+{% translate "Connected" as msg_connected %}
+{% translate "Next search starts automatically" as msg_cooldown %}
+{% translate "Video chat stopped." as msg_stopped %}
+{% translate "Connection was closed by a moderator." as msg_kicked %}
+{% translate "Chat service connection was closed. Reload the page." as msg_ws_closed %}
+{% translate "Select your gender before starting." as msg_gender_required %}
+{% translate "Could not access camera or microphone." as msg_media_error %}
+{% translate "Chat is available after connection" as msg_chat_disabled %}
+{% translate "Write a message..." as msg_chat_enabled %}
+{% translate "Available after connection" as msg_chat_hint_disabled %}
+{% translate "Connected" as msg_chat_hint_enabled %}
+
+{% block extra_js %}
+<script>
+window.videoChatConfig = {
+    rtcConfig: {{ rtc_config|safe }},
+    i18n: {
+        idle: "{{ msg_idle|escapejs }}",
+        media: "{{ msg_media|escapejs }}",
+        searching: "{{ msg_searching|escapejs }}",
+        connecting: "{{ msg_connecting|escapejs }}",
+        connected: "{{ msg_connected|escapejs }}",
+        cooldown: "{{ msg_cooldown|escapejs }}",
+        stopped: "{{ msg_stopped|escapejs }}",
+        kicked: "{{ msg_kicked|escapejs }}",
+        wsClosed: "{{ msg_ws_closed|escapejs }}",
+        genderRequired: "{{ msg_gender_required|escapejs }}",
+        mediaError: "{{ msg_media_error|escapejs }}",
+        chatDisabled: "{{ msg_chat_disabled|escapejs }}",
+        chatEnabled: "{{ msg_chat_enabled|escapejs }}",
+        chatHintDisabled: "{{ msg_chat_hint_disabled|escapejs }}",
+        chatHintEnabled: "{{ msg_chat_hint_enabled|escapejs }}",
+    },
+};
+</script>
+<script src="{% static 'video_chat/js/room.js' %}" defer></script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% load i18n %}
+
+{% if rooms %}
+    {% for room in rooms %}
+        <div class="rounded-xl border border-gray-800 bg-gray-950/60 p-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-xs text-gray-500">
+                            {{ room.room_id|slice:":8" }}...
+                        </span>
+                        <span class="text-xs text-gray-600">
+                            {{ room.age }}
+                        </span>
+                    </div>
+
+                    <div class="mt-3 grid gap-3 md:grid-cols-2">
+
+                        <div class="rounded-lg border border-gray-800 bg-gray-900 p-3">
+                            <div class="text-xs uppercase tracking-widest text-gray-500">
+                                {% trans "Caller" %}
+                            </div>
+
+                            {% with participant=room.caller_participant %}
+                                {% if participant.is_authenticated %}
+                                    <a
+                                        href="{{ participant.profile_url }}"
+                                        class="mt-1 inline-block font-medium text-indigo-400 hover:text-indigo-300"
+                                    >
+                                        {{ participant.username }}
+                                    </a>
+
+                                    <div class="mt-2 text-xs text-gray-400">
+                                        {% trans "Profile gender" %}:
+                                        <span class="text-gray-200">
+                                            {{ participant.profile_gender_label|default:"—" }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <div class="mt-1 font-medium text-gray-200">
+                                        {% trans "Anonymous user" %}
+                                    </div>
+                                {% endif %}
+
+                                <div class="mt-1 text-xs text-gray-400">
+                                    {% trans "Chat gender" %}:
+                                    <span class="text-gray-200">
+                                        {{ participant.chat_gender_label|default:"—" }}
+                                    </span>
+                                </div>
+                            {% endwith %}
+                        </div>
+
+                        <div class="rounded-lg border border-gray-800 bg-gray-900 p-3">
+                            <div class="text-xs uppercase tracking-widest text-gray-500">
+                                {% trans "Callee" %}
+                            </div>
+
+                            {% with participant=room.callee_participant %}
+                                {% if participant.is_authenticated %}
+                                    <a
+                                        href="{{ participant.profile_url }}"
+                                        class="mt-1 inline-block font-medium text-indigo-400 hover:text-indigo-300"
+                                    >
+                                        {{ participant.username }}
+                                    </a>
+
+                                    <div class="mt-2 text-xs text-gray-400">
+                                        {% trans "Profile gender" %}:
+                                        <span class="text-gray-200">
+                                            {{ participant.profile_gender_label|default:"—" }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <div class="mt-1 font-medium text-gray-200">
+                                        {% trans "Anonymous user" %}
+                                    </div>
+                                {% endif %}
+
+                                <div class="mt-1 text-xs text-gray-400">
+                                    {% trans "Chat gender" %}:
+                                    <span class="text-gray-200">
+                                        {{ participant.chat_gender_label|default:"—" }}
+                                    </span>
+                                </div>
+                            {% endwith %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <a
+                    href="{% url 'chat:moderator_room' room.room_id %}"
+                    class="inline-flex shrink-0 items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500"
+                >
+                    {% trans "Open room" %}
+                </a>
+
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="rounded-xl border border-dashed border-gray-800 px-4 py-8 text-center text-sm text-gray-500">
+        {% trans "No active rooms." %}
+    </div>
+{% endif %}
