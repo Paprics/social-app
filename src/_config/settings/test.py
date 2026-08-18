@@ -42,3 +42,15 @@ PASSWORD_HASHERS = [
 # ---------------------------------------------------------------------------
 
 EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+# ---------------------------------------------------------------------------
+# Channels
+# ---------------------------------------------------------------------------
+
+# WebSocket tests must not depend on an external Redis process.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
