@@ -391,186 +391,54 @@ def test_outgoing_message_stays_single_checked_when_only_sender_read_it(
 
 
 @pytest.mark.django_db
-def test_open_dialog_can_mark_new_message_as_read_without_page_reload(
+def test_lazy_loaded_messages_render_recipient_read_status(
     read_receipt_state,
     client,
 ):
     """
-    Уже открытый диалог должен уметь отметить новое
-    сообщение прочитанным без перезагрузки страницы.
+    Lazy loading старых сообщений сохраняет
+    правильный статус ✓✓.
     """
 
-    reader = read_receipt_state["reader"]
+    sender = read_receipt_state["sender"]
 
     dialog = read_receipt_state["dialog"]
 
-    participant = read_receipt_state["reader_participant"]
+    reader_participant = read_receipt_state["reader_participant"]
 
-    message = read_receipt_state["second_message"]
+    second_message = read_receipt_state["second_message"]
 
-    client.force_login(
-        reader,
+    reader_participant.last_read_message = second_message
+
+    reader_participant.save(
+        update_fields=[
+            "last_read_message",
+        ],
     )
 
-    response = client.post(
+    cursor_message = Message.objects.create(
+        dialog=dialog,
+        sender=sender,
+        text="Cursor message",
+    )
+
+    client.force_login(
+        sender,
+    )
+
+    response = client.get(
         reverse(
-            "messenger:dialog_mark_read",
+            "messenger:dialog_messages_older",
             kwargs={
                 "public_id": dialog.public_id,
             },
         ),
         {
-            "message_id": message.id,
+            "before": cursor_message.id,
         },
     )
 
-    participant.refresh_from_db()
+    html = response.content.decode()
 
-    assert response.status_code == 204
-
-    assert participant.last_read_message_id == message.id
-
-
-@pytest.mark.django_db
-def test_outsider_cannot_mark_dialog_message_as_read(
-    read_receipt_state,
-    client,
-):
-    """Посторонний пользователь не может менять read cursor."""
-
-    outsider = read_receipt_state["outsider"]
-
-    dialog = read_receipt_state["dialog"]
-
-    participant = read_receipt_state["reader_participant"]
-
-    message = read_receipt_state["second_message"]
-
-    client.force_login(
-        outsider,
-    )
-
-    response = client.post(
-        reverse(
-            "messenger:dialog_mark_read",
-            kwargs={
-                "public_id": dialog.public_id,
-            },
-        ),
-        {
-            "message_id": message.id,
-        },
-    )
-
-    participant.refresh_from_db()
-
-    assert response.status_code == 404
-
-    assert participant.last_read_message_id is None
-
-    @pytest.mark.django_db
-    def test_mark_read_rejects_message_from_another_dialog(
-        read_receipt_state,
-        client,
-    ):
-        """Нельзя передать message_id из другого диалога."""
-
-        sender = read_receipt_state["sender"]
-
-        reader = read_receipt_state["reader"]
-
-        dialog = read_receipt_state["dialog"]
-
-        participant = read_receipt_state["reader_participant"]
-
-        another_dialog = Dialog.objects.create()
-
-        Participant.objects.create(
-            dialog=another_dialog,
-            user=sender,
-        )
-
-        Participant.objects.create(
-            dialog=another_dialog,
-            user=reader,
-        )
-
-        foreign_message = Message.objects.create(
-            dialog=another_dialog,
-            sender=sender,
-            text="Foreign dialog message",
-        )
-
-        client.force_login(
-            reader,
-        )
-
-        response = client.post(
-            reverse(
-                "messenger:dialog_mark_read",
-                kwargs={
-                    "public_id": dialog.public_id,
-                },
-            ),
-            {
-                "message_id": foreign_message.id,
-            },
-        )
-
-        participant.refresh_from_db()
-
-        assert response.status_code == 404
-        assert participant.last_read_message_id is None
-
-    @pytest.mark.django_db
-    def test_lazy_loaded_messages_render_recipient_read_status(
-        read_receipt_state,
-        client,
-    ):
-        """
-        Lazy loading старых сообщений сохраняет
-        правильный статус ✓✓.
-        """
-
-        sender = read_receipt_state["sender"]
-
-        dialog = read_receipt_state["dialog"]
-
-        reader_participant = read_receipt_state["reader_participant"]
-
-        second_message = read_receipt_state["second_message"]
-
-        reader_participant.last_read_message = second_message
-
-        reader_participant.save(
-            update_fields=[
-                "last_read_message",
-            ],
-        )
-
-        cursor_message = Message.objects.create(
-            dialog=dialog,
-            sender=sender,
-            text="Cursor message",
-        )
-
-        client.force_login(
-            sender,
-        )
-
-        response = client.get(
-            reverse(
-                "messenger:dialog_messages_older",
-                kwargs={
-                    "public_id": dialog.public_id,
-                },
-            ),
-            {
-                "before": cursor_message.id,
-            },
-        )
-
-        html = response.content.decode()
-
-        assert response.status_code == 200
-        assert "✓✓" in html
+    assert response.status_code == 200
+    assert "✓✓" in html

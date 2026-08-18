@@ -21,7 +21,7 @@ from django.template.response import TemplateResponse
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from messenger.models import Dialog, Message
+from messenger.models import Dialog
 from messenger.selectors.dialog import (
     get_dialog_by_public_id,
     get_user_dialogs,
@@ -256,72 +256,6 @@ class DialogSidebarPageView(
                 "dialogs": page_obj.object_list,
                 "page_obj": page_obj,
             },
-        )
-
-
-class DialogMarkReadView(
-    LoginRequiredMixin,
-    View,
-):
-    """
-    Отмечает входящее сообщение прочитанным.
-
-    Используется, когда сообщение приходит
-    в уже открытый диалог без перезагрузки страницы.
-    """
-
-    http_method_names = ["post"]
-
-    def post(
-        self,
-        request,
-        public_id: str,
-    ) -> HttpResponse:
-        """Продвигает read cursor текущего участника."""
-
-        try:
-            dialog = get_dialog_by_public_id(
-                public_id,
-            )
-        except Dialog.DoesNotExist as error:
-            raise Http404() from error
-
-        if not DialogService.user_has_access(
-            dialog.id,
-            request.user.id,
-        ):
-            raise Http404()
-
-        try:
-            message_id = int(
-                request.POST["message_id"],
-            )
-        except (KeyError, TypeError, ValueError) as error:
-            raise Http404() from error
-
-        try:
-            message = Message.objects.get(
-                pk=message_id,
-                dialog_id=dialog.id,
-            )
-        except Message.DoesNotExist as error:
-            raise Http404() from error
-
-        # Собственные сообщения не являются входящими
-        # и не должны двигать read cursor пользователя.
-        if message.sender_id == request.user.id:
-            return HttpResponse(
-                status=204,
-            )
-
-        ReadService.mark_read_up_to(
-            dialog_id=dialog.id,
-            user_id=request.user.id,
-            message_id=message.id,
-        )
-
-        return HttpResponse(
-            status=204,
         )
 
 
