@@ -3,44 +3,38 @@
 """Временные metadata активных участников видеочата в Redis."""
 
 import json
-import os
+from video_chat.services.redis_client import get_redis_client
 
-import redis as redis_lib
-
-PARTICIPANTS_KEY = "chat:participants"
+PARTICIPANT_KEY_PREFIX = "chat:participant:"
 PARTICIPANT_TTL = 21600
 
 
 class ParticipantStorage:
-    """Связывает channel_name с текущей VideoChatSession и identity metadata."""
+    """Хранит metadata каждого активного участника в отдельном Redis key."""
 
     def __init__(self):
-        self.redis = redis_lib.from_url(
-            os.environ.get(
-                "REDIS_URL",
-                "redis://localhost:6379/0",
-            )
-        )
+        self.redis = get_redis_client()
+
+    @staticmethod
+    def _key(channel_name: str) -> str:
+        """Вернуть Redis key участника."""
+
+        return f"{PARTICIPANT_KEY_PREFIX}{channel_name}"
 
     def save(self, channel_name: str, metadata: dict) -> None:
-        """Сохранить metadata активного участника."""
+        """Сохранить metadata участника с индивидуальным TTL."""
 
-        self.redis.hset(
-            PARTICIPANTS_KEY,
-            channel_name,
+        self.redis.set(
+            self._key(channel_name),
             json.dumps(metadata),
-        )
-        self.redis.expire(
-            PARTICIPANTS_KEY,
-            PARTICIPANT_TTL,
+            ex=PARTICIPANT_TTL,
         )
 
     def get(self, channel_name: str) -> dict | None:
         """Вернуть metadata участника по channel_name."""
 
-        raw = self.redis.hget(
-            PARTICIPANTS_KEY,
-            channel_name,
+        raw = self.redis.get(
+            self._key(channel_name)
         )
 
         if raw is None:
@@ -52,7 +46,6 @@ class ParticipantStorage:
         """Удалить metadata участника."""
 
         if channel_name:
-            self.redis.hdel(
-                PARTICIPANTS_KEY,
-                channel_name,
+            self.redis.delete(
+                self._key(channel_name)
             )

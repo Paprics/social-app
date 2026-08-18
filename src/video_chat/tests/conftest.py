@@ -2,13 +2,16 @@
 
 import pytest
 
-import video_chat.services.matchmaking as matchmaking_module
+import video_chat.services.redis_client as redis_client_module
+from video_chat.services.redis_client import get_redis_client
 
 
 class FakeRedis:
     def __init__(self):
         self.lists = {}
         self.hashes = {}
+        self.strings = {}
+        self.sorted_sets = {}
         self.expirations = {}
         self.eval_calls = []
 
@@ -18,6 +21,64 @@ class FakeRedis:
             return value
 
         return str(value).encode()
+
+    def set(self, key, value, ex=None):
+        self.strings[key] = self._bytes(
+            value
+        )
+
+        if ex is not None:
+            self.expirations[key] = ex
+
+    def get(self, key):
+        return self.strings.get(
+            key
+        )
+
+    def zadd(self, key, mapping):
+        values = self.sorted_sets.setdefault(
+            key,
+            {},
+        )
+
+        for member, score in mapping.items():
+            values[self._bytes(member)] = float(
+                score
+            )
+
+    def zrem(self, key, *members):
+        values = self.sorted_sets.get(
+            key,
+            {},
+        )
+
+        for member in members:
+            values.pop(
+                self._bytes(member),
+                None,
+            )
+
+    def zrevrange(self, key, start, end):
+        values = self.sorted_sets.get(
+            key,
+            {},
+        )
+
+        ordered = [
+            member
+            for member, _score in sorted(
+                values.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )
+        ]
+
+        if end == -1:
+            return ordered[start:]
+
+        return ordered[
+            start : end + 1
+        ]
 
     def lrem(self, key, count, value):
         values = self.lists.setdefault(
@@ -117,6 +178,14 @@ class FakeRedis:
             key,
             None,
         )
+        self.strings.pop(
+            key,
+            None,
+        )
+        self.sorted_sets.pop(
+            key,
+            None,
+        )
         self.expirations.pop(
             key,
             None,
@@ -167,10 +236,14 @@ class FakeRedis:
 def fake_redis(monkeypatch):
     redis = FakeRedis()
 
+    get_redis_client.cache_clear()
+
     monkeypatch.setattr(
-        matchmaking_module.redis_lib,
+        redis_client_module.redis_lib,
         "from_url",
         lambda *args, **kwargs: redis,
     )
 
-    return redis
+    yield redis
+
+    get_redis_client.cache_clear()

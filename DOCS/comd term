@@ -23,6 +23,11 @@ http://127.0.0.1:8000/en/account-center/?friends_tab=incoming#friendsk
 docker compose --env-file .env.dev -f docker/compose.dev.yml exec web \
     pytest --ds=_config.settings.test posts/tests -v
 
+==================== Все тесты в проекте (Отображение)
+docker compose --env-file .env.dev -f docker/compose.dev.yml exec web \
+    pytest \
+    --ds=_config.settings.test
+
 ==================== TEST
 # Запустить/обновить все контейнеры проекта в фоне
 docker compose --env-file .env.dev -f docker/compose.dev.yml up -d

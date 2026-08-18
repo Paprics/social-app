@@ -17,6 +17,11 @@ from video_chat.services.participant import (
 )
 from video_chat.services.participant_storage import ParticipantStorage
 from video_chat.services.room_storage import RoomStorage
+from video_chat.services.websocket_message import (
+    InvalidWebSocketMessage,
+    WebSocketMessageTooLarge,
+    decode_websocket_message,
+)
 
 COOLDOWN_SECONDS = 3
 
@@ -54,11 +59,34 @@ class SignalingConsumer(AsyncWebsocketConsumer):
             notify_partner=True,
         )
 
-    async def receive(self, text_data):
-        """Обработать команду браузера."""
+    async def receive(
+        self,
+        text_data=None,
+        bytes_data=None,
+    ):
+        """Проверить и обработать команду браузера."""
 
-        data = json.loads(text_data)
-        msg_type = data.get("type")
+        try:
+            data = decode_websocket_message(
+                text_data
+            )
+        except WebSocketMessageTooLarge:
+            await self._send_error(
+                "message_too_large"
+            )
+            await self.close(
+                code=4409
+            )
+            return
+        except InvalidWebSocketMessage:
+            await self._send_error(
+                "invalid_payload"
+            )
+            return
+
+        msg_type = data.get(
+            "type"
+        )
 
         if msg_type == "start":
             await self._handle_start(data)
@@ -94,12 +122,19 @@ class SignalingConsumer(AsyncWebsocketConsumer):
 
         if msg_type == "chat_message":
             await self._handle_chat_message(data)
+            return
+
+        await self._send_error(
+            "unsupported_type"
+        )
 
     async def room_matched(self, event):
         """Принять созданную caller-ом комнату как callee."""
 
         if not self.session_active:
-            await sync_to_async(self.room_storage.delete_room)(event["room_id"])
+            await self._delete_room(
+                event["room_id"]
+            )
 
             await self.channel_layer.send(
                 event["caller_channel"],
@@ -445,7 +480,9 @@ class SignalingConsumer(AsyncWebsocketConsumer):
         self.media_connected = False
 
         if old_room:
-            await sync_to_async(self.room_storage.delete_room)(old_room)
+            await self._delete_room(
+                old_room
+            )
 
         if notify_partner and old_partner:
             await self.channel_layer.send(
@@ -454,6 +491,25 @@ class SignalingConsumer(AsyncWebsocketConsumer):
                     "type": "partner.disconnected",
                 },
             )
+
+    async def _delete_room(
+        self,
+        room_id: str,
+    ):
+        """Удалить комнату и закрыть moderator WebSocket этой комнаты."""
+
+        await sync_to_async(
+            self.room_storage.delete_room
+        )(
+            room_id
+        )
+
+        await self.channel_layer.group_send(
+            f"moderate_{room_id}",
+            {
+                "type": "room.closed",
+            },
+        )
 
     async def _enter_cooldown(
         self,

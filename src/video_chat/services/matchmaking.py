@@ -2,9 +2,7 @@
 
 """Управление очередью пользователей для случайного видеочата."""
 
-import os
-
-import redis as redis_lib
+from video_chat.services.redis_client import get_redis_client
 
 QUEUE_KEY = "chat:queue"
 
@@ -26,12 +24,7 @@ class MatchmakingService:
     """Управляет очередью ожидания пользователей в Redis."""
 
     def __init__(self):
-        self.redis = redis_lib.from_url(
-            os.environ.get(
-                "REDIS_URL",
-                "redis://localhost:6379/0",
-            )
-        )
+        self.redis = get_redis_client()
 
     def join_queue(self, channel_name: str) -> str | None:
         """Атомарно добавить пользователя в очередь или вернуть партнёра."""

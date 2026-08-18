@@ -5,8 +5,9 @@
 import json
 
 from video_chat.services.room_storage import (
+    ROOM_INDEX_KEY,
+    ROOM_KEY_PREFIX,
     ROOM_TTL,
-    ROOMS_KEY,
     RoomStorage,
 )
 
@@ -39,9 +40,12 @@ def test_create_room_stores_participant_metadata_and_ttl(
         callee_participant=callee,
     )
 
-    raw = fake_redis.hget(
-        ROOMS_KEY,
-        "room-1",
+    room_key = (
+        f"{ROOM_KEY_PREFIX}"
+        "room-1"
+    )
+    raw = fake_redis.get(
+        room_key
     )
 
     assert json.loads(raw) == {
@@ -54,10 +58,18 @@ def test_create_room_stores_participant_metadata_and_ttl(
 
     assert (
         fake_redis.expirations[
-            ROOMS_KEY
+            room_key
         ]
         == ROOM_TTL
     )
+
+    assert fake_redis.zrevrange(
+        ROOM_INDEX_KEY,
+        0,
+        -1,
+    ) == [
+        b"room-1",
+    ]
 
 
 def test_get_room_returns_metadata(
@@ -65,9 +77,8 @@ def test_get_room_returns_metadata(
 ):
     storage = RoomStorage()
 
-    fake_redis.hset(
-        ROOMS_KEY,
-        "room-1",
+    fake_redis.set(
+        f"{ROOM_KEY_PREFIX}room-1",
         json.dumps(
             {
                 "caller": "caller-channel",
@@ -77,6 +88,7 @@ def test_get_room_returns_metadata(
                 "created_at": 1000.0,
             }
         ),
+        ex=ROOM_TTL,
     )
 
     assert storage.get_room(
@@ -100,15 +112,15 @@ def test_get_room_returns_none_when_missing(
     ) is None
 
 
-def test_delete_room_removes_room(
+def test_delete_room_removes_room_and_index_entry(
     fake_redis,
 ):
     storage = RoomStorage()
 
-    fake_redis.hset(
-        ROOMS_KEY,
+    storage.create_room(
         "room-1",
-        "{}",
+        "caller-channel",
+        "callee-channel",
     )
 
     storage.delete_room(
@@ -119,34 +131,39 @@ def test_delete_room_removes_room(
         "room-1"
     ) is None
 
+    assert fake_redis.zrevrange(
+        ROOM_INDEX_KEY,
+        0,
+        -1,
+    ) == []
+
 
 def test_list_rooms_returns_newest_first(
     fake_redis,
+    monkeypatch,
 ):
-    storage = RoomStorage()
-
-    fake_redis.hset(
-        ROOMS_KEY,
-        "old-room",
-        json.dumps(
-            {
-                "caller": "caller-old",
-                "callee": "callee-old",
-                "created_at": 1000.0,
-            }
-        ),
+    timestamps = iter(
+        [
+            1000.0,
+            2000.0,
+        ]
+    )
+    monkeypatch.setattr(
+        "video_chat.services.room_storage.time.time",
+        lambda: next(timestamps),
     )
 
-    fake_redis.hset(
-        ROOMS_KEY,
+    storage = RoomStorage()
+
+    storage.create_room(
+        "old-room",
+        "caller-old",
+        "callee-old",
+    )
+    storage.create_room(
         "new-room",
-        json.dumps(
-            {
-                "caller": "caller-new",
-                "callee": "callee-new",
-                "created_at": 2000.0,
-            }
-        ),
+        "caller-new",
+        "callee-new",
     )
 
     rooms = storage.list_rooms()
@@ -158,3 +175,24 @@ def test_list_rooms_returns_newest_first(
         "new-room",
         "old-room",
     ]
+
+
+def test_list_rooms_removes_stale_index_entries(
+    fake_redis,
+):
+    storage = RoomStorage()
+
+    fake_redis.zadd(
+        ROOM_INDEX_KEY,
+        {
+            "stale-room": 1000.0,
+        },
+    )
+
+    assert storage.list_rooms() == []
+
+    assert fake_redis.zrevrange(
+        ROOM_INDEX_KEY,
+        0,
+        -1,
+    ) == []

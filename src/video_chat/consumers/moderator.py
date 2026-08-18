@@ -8,6 +8,11 @@ from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from video_chat.services.room_storage import RoomStorage
+from video_chat.services.websocket_message import (
+    InvalidWebSocketMessage,
+    WebSocketMessageTooLarge,
+    decode_websocket_message,
+)
 
 
 class ModeratorConsumer(AsyncWebsocketConsumer):
@@ -19,15 +24,12 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
         self.room_id = None
         self.room_group = None
         self.room_storage = RoomStorage()
-        self.room_meta = None
 
     async def connect(self):
         """Подключить staff-модератора к существующей комнате."""
 
         user = self.scope.get("user")
 
-        # Проверяем права до чтения комнаты, чтобы посторонний пользователь
-        # не мог использовать WebSocket для проверки существования room_id.
         if user is None or not user.is_authenticated or not user.is_staff:
             await self.close(code=4403)
             return
@@ -35,9 +37,9 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
         self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
         self.room_group = f"moderate_{self.room_id}"
 
-        self.room_meta = await sync_to_async(self.room_storage.get_room)(self.room_id)
+        room_meta = await self._get_room()
 
-        if not self.room_meta:
+        if not room_meta:
             await self.close(code=4404)
             return
 
@@ -52,8 +54,8 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
             {
                 "type": "room_info",
                 "room_id": self.room_id,
-                "caller": self.room_meta["caller"],
-                "callee": self.room_meta["callee"],
+                "caller": room_meta["caller"],
+                "callee": room_meta["callee"],
             }
         )
 
@@ -66,25 +68,65 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
                 self.channel_name,
             )
 
-    async def receive(self, text_data):
-        """Обработать signaling или команду модератора."""
+    async def receive(
+        self,
+        text_data=None,
+        bytes_data=None,
+    ):
+        """Проверить и обработать команду модератора."""
 
-        data = json.loads(text_data)
-        msg_type = data.get("type")
+        try:
+            data = decode_websocket_message(
+                text_data
+            )
+        except WebSocketMessageTooLarge:
+            await self._send_error(
+                "message_too_large"
+            )
+            await self.close(
+                code=4409
+            )
+            return
+        except InvalidWebSocketMessage:
+            await self._send_error(
+                "invalid_payload"
+            )
+            return
 
-        if msg_type in ("offer", "answer", "ice_candidate"):
+        msg_type = data.get(
+            "type"
+        )
+
+        if msg_type in (
+            "offer",
+            "answer",
+            "ice_candidate",
+        ):
             await self._handle_signaling(data)
             return
 
         if msg_type == "kick":
             await self._handle_kick(data)
+            return
+
+        await self._send_error(
+            "unsupported_type"
+        )
 
     async def _handle_signaling(self, data):
-        """Передать moderator WebRTC signaling участнику комнаты."""
+        """Передать moderator WebRTC signaling участнику активной комнаты."""
 
         target = data.get("target")
+        room_meta = await self._get_room()
 
-        if not self._is_room_participant(target):
+        if not room_meta:
+            await self._close_stale_room()
+            return
+
+        if not self._is_room_participant(
+            target,
+            room_meta,
+        ):
             return
 
         await self.channel_layer.send(
@@ -99,11 +141,19 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
         )
 
     async def _handle_kick(self, data):
-        """Отправить команду отключения участнику текущей комнаты."""
+        """Отправить команду отключения участнику активной комнаты."""
 
         target = data.get("target")
+        room_meta = await self._get_room()
 
-        if not self._is_room_participant(target):
+        if not room_meta:
+            await self._close_stale_room()
+            return
+
+        if not self._is_room_participant(
+            target,
+            room_meta,
+        ):
             return
 
         await self.channel_layer.send(
@@ -120,16 +170,42 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
             }
         )
 
-    def _is_room_participant(self, target: str | None) -> bool:
-        """Проверить, принадлежит ли channel_name текущей комнате."""
+    async def _get_room(self) -> dict | None:
+        """Перечитать актуальную комнату из Redis."""
 
-        if not target or not self.room_meta:
+        if not self.room_id:
+            return None
+
+        return await sync_to_async(
+            self.room_storage.get_room
+        )(
+            self.room_id
+        )
+
+    @staticmethod
+    def _is_room_participant(
+        target: str | None,
+        room_meta: dict,
+    ) -> bool:
+        """Проверить принадлежность channel_name актуальной комнате."""
+
+        if not target:
             return False
 
         return target in {
-            self.room_meta["caller"],
-            self.room_meta["callee"],
+            room_meta["caller"],
+            room_meta["callee"],
         }
+
+    async def _close_stale_room(self):
+        """Закрыть moderator WebSocket завершённой комнаты."""
+
+        await self.send_json(
+            {
+                "type": "room_closed",
+            }
+        )
+        await self.close()
 
     async def signaling_message(self, event):
         """Передать signaling от участника браузеру модератора."""
@@ -137,6 +213,24 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
         await self.send_json(
             {
                 "payload": event["payload"],
+            }
+        )
+
+    async def room_closed(self, event):
+        """Закрыть moderator WebSocket после завершения комнаты."""
+
+        await self._close_stale_room()
+
+    async def _send_error(
+        self,
+        code: str,
+    ):
+        """Отправить модератору машинный код ошибки."""
+
+        await self.send_json(
+            {
+                "type": "error",
+                "code": code,
             }
         )
 

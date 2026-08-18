@@ -3,7 +3,7 @@
 """Тесты Redis metadata активных участников видеочата."""
 
 from video_chat.services.participant_storage import (
-    PARTICIPANTS_KEY,
+    PARTICIPANT_KEY_PREFIX,
     PARTICIPANT_TTL,
     ParticipantStorage,
 )
@@ -29,13 +29,18 @@ def test_participant_storage_round_trip(
         metadata,
     )
 
+    key = (
+        f"{PARTICIPANT_KEY_PREFIX}"
+        "channel-1"
+    )
+
     assert storage.get(
         "channel-1"
     ) == metadata
 
     assert (
         fake_redis.expirations[
-            PARTICIPANTS_KEY
+            key
         ]
         == PARTICIPANT_TTL
     )

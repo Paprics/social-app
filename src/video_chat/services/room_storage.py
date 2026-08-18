@@ -3,25 +3,26 @@
 """Хранение активных комнат видеочата в Redis."""
 
 import json
-import os
 import time
 
-import redis as redis_lib
+from video_chat.services.redis_client import get_redis_client
 
-ROOMS_KEY = "chat:rooms"
+ROOM_KEY_PREFIX = "chat:room:"
+ROOM_INDEX_KEY = "chat:room:index"
 ROOM_TTL = 7200
 
 
 class RoomStorage:
-    """Управляет метаданными активных видеочат-комнат в Redis."""
+    """Управляет metadata активных комнат с индивидуальным TTL."""
 
     def __init__(self):
-        self.redis = redis_lib.from_url(
-            os.environ.get(
-                "REDIS_URL",
-                "redis://localhost:6379/0",
-            )
-        )
+        self.redis = get_redis_client()
+
+    @staticmethod
+    def _key(room_id: str) -> str:
+        """Вернуть Redis key комнаты."""
+
+        return f"{ROOM_KEY_PREFIX}{room_id}"
 
     def create_room(
         self,
@@ -32,70 +33,90 @@ class RoomStorage:
         caller_participant: dict | None = None,
         callee_participant: dict | None = None,
     ) -> None:
-        """Сохранить комнату вместе со snapshot metadata участников."""
+        """Сохранить комнату и добавить её в индекс активных комнат."""
 
-        meta = json.dumps(
+        created_at = time.time()
+        meta = {
+            "caller": caller_channel,
+            "callee": callee_channel,
+            "caller_participant": caller_participant or {},
+            "callee_participant": callee_participant or {},
+            "created_at": created_at,
+        }
+
+        self.redis.set(
+            self._key(room_id),
+            json.dumps(meta),
+            ex=ROOM_TTL,
+        )
+        self.redis.zadd(
+            ROOM_INDEX_KEY,
             {
-                "caller": caller_channel,
-                "callee": callee_channel,
-                "caller_participant": caller_participant or {},
-                "callee_participant": callee_participant or {},
-                "created_at": time.time(),
-            }
-        )
-
-        self.redis.hset(
-            ROOMS_KEY,
-            room_id,
-            meta,
-        )
-        self.redis.expire(
-            ROOMS_KEY,
-            ROOM_TTL,
+                room_id: created_at,
+            },
         )
 
     def delete_room(self, room_id: str) -> None:
-        """Удалить активную комнату."""
+        """Удалить комнату и её запись из индекса."""
 
-        if room_id:
-            self.redis.hdel(
-                ROOMS_KEY,
-                room_id,
-            )
+        if not room_id:
+            return
 
-    def get_room(self, room_id: str) -> dict | None:
-        """Вернуть метаданные комнаты или None."""
-
-        raw = self.redis.hget(
-            ROOMS_KEY,
+        self.redis.delete(
+            self._key(room_id)
+        )
+        self.redis.zrem(
+            ROOM_INDEX_KEY,
             room_id,
         )
 
-        if raw:
-            return json.loads(raw)
+    def get_room(self, room_id: str) -> dict | None:
+        """Вернуть metadata комнаты или None."""
 
-        return None
+        raw = self.redis.get(
+            self._key(room_id)
+        )
+
+        if raw is None:
+            return None
+
+        return json.loads(raw)
 
     def list_rooms(self) -> list[dict]:
         """Вернуть активные комнаты от новых к старым."""
 
-        all_rooms = self.redis.hgetall(
-            ROOMS_KEY
+        room_ids = self.redis.zrevrange(
+            ROOM_INDEX_KEY,
+            0,
+            -1,
         )
         rooms = []
+        stale_room_ids = []
 
-        for room_id, meta_raw in all_rooms.items():
-            meta = json.loads(meta_raw)
-            meta["room_id"] = (
-                room_id.decode()
-                if isinstance(room_id, bytes)
-                else room_id
+        for raw_room_id in room_ids:
+            room_id = (
+                raw_room_id.decode()
+                if isinstance(raw_room_id, bytes)
+                else str(raw_room_id)
             )
-            rooms.append(meta)
 
-        rooms.sort(
-            key=lambda room: room["created_at"],
-            reverse=True,
-        )
+            room = self.get_room(
+                room_id
+            )
+
+            if room is None:
+                stale_room_ids.append(
+                    room_id
+                )
+                continue
+
+            room["room_id"] = room_id
+            rooms.append(room)
+
+        if stale_room_ids:
+            self.redis.zrem(
+                ROOM_INDEX_KEY,
+                *stale_room_ids,
+            )
 
         return rooms

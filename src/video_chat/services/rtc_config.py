@@ -3,7 +3,9 @@
 """Формирование WebRTC ICE-конфигурации для браузера."""
 
 import json
-import os
+
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 
 def get_rtc_config() -> str:
@@ -15,11 +17,45 @@ def get_rtc_config() -> str:
         }
     ]
 
-    turn_url = os.environ.get("TURN_URL")
-    turn_user = os.environ.get("TURN_USER")
-    turn_password = os.environ.get("TURN_PASSWORD")
+    turn_url = getattr(
+        settings,
+        "TURN_URL",
+        None,
+    )
+    turn_user = getattr(
+        settings,
+        "TURN_USER",
+        None,
+    )
+    turn_password = getattr(
+        settings,
+        "TURN_PASSWORD",
+        None,
+    )
 
-    if turn_url and turn_user and turn_password:
+    turn_credentials = (
+        turn_url,
+        turn_user,
+        turn_password,
+    )
+    turn_is_complete = all(
+        turn_credentials
+    )
+
+    if (
+        getattr(
+            settings,
+            "VIDEO_CHAT_REQUIRE_TURN",
+            False,
+        )
+        and not turn_is_complete
+    ):
+        raise ImproperlyConfigured(
+            "Video chat requires TURN_URL, TURN_USER "
+            "and TURN_PASSWORD in production."
+        )
+
+    if turn_is_complete:
         ice_servers.append(
             {
                 "urls": turn_url,
