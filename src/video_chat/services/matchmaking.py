@@ -8,35 +8,54 @@ import redis as redis_lib
 
 QUEUE_KEY = "chat:queue"
 
+MATCHMAKING_SCRIPT = """
+redis.call("LREM", KEYS[1], 0, ARGV[1])
+
+local partner = redis.call("LPOP", KEYS[1])
+
+if partner then
+    return partner
+end
+
+redis.call("RPUSH", KEYS[1], ARGV[1])
+return false
+"""
+
 
 class MatchmakingService:
     """Управляет очередью ожидания пользователей в Redis."""
 
     def __init__(self):
-        self.redis = redis_lib.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379/0"))
+        self.redis = redis_lib.from_url(
+            os.environ.get(
+                "REDIS_URL",
+                "redis://localhost:6379/0",
+            )
+        )
 
     def join_queue(self, channel_name: str) -> str | None:
-        """Добавить пользователя в очередь или вернуть ожидающего партнёра."""
+        """Атомарно добавить пользователя в очередь или вернуть партнёра."""
 
-        # Удаляем старые записи этого канала после возможного переподключения.
-        self.redis.lrem(QUEUE_KEY, 0, channel_name)
+        partner = self.redis.eval(
+            MATCHMAKING_SCRIPT,
+            1,
+            QUEUE_KEY,
+            channel_name,
+        )
 
-        partner = self.redis.lpop(QUEUE_KEY)
+        if partner is None:
+            return None
 
-        if partner:
-            partner = partner.decode()
+        if isinstance(partner, bytes):
+            return partner.decode()
 
-            # Защита от неконсистентного состояния очереди.
-            if partner == channel_name:
-                self.redis.rpush(QUEUE_KEY, channel_name)
-                return None
-
-            return partner
-
-        self.redis.rpush(QUEUE_KEY, channel_name)
-        return None
+        return str(partner)
 
     def leave_queue(self, channel_name: str) -> None:
         """Удалить все записи канала из очереди ожидания."""
 
-        self.redis.lrem(QUEUE_KEY, 0, channel_name)
+        self.redis.lrem(
+            QUEUE_KEY,
+            0,
+            channel_name,
+        )

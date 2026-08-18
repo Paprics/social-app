@@ -25,49 +25,7 @@
             </p>
         </header>
 
-        <section
-            id="videoChatSettings"
-            class="mb-4 rounded-xl border border-gray-800 bg-gray-900 p-4 shadow-lg"
-        >
-            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
 
-                <fieldset class="max-w-2xl">
-                    <legend class="mb-2 block text-sm font-medium text-gray-200">
-                        {% trans "Your gender in video chat" %}
-                    </legend>
-
-                    <div class="flex flex-wrap gap-2">
-                        {% for value, label in gender_choices %}
-                            <label class="cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="chatGender"
-                                    value="{{ value }}"
-                                    class="peer sr-only"
-                                >
-                                <span class="inline-flex min-h-10 items-center rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-200 transition hover:border-gray-600 peer-checked:border-indigo-500 peer-checked:bg-indigo-600/20 peer-checked:text-indigo-200 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
-                                    {{ label }}
-                                </span>
-                            </label>
-                        {% endfor %}
-                    </div>
-
-                    <p class="mt-2 text-xs leading-5 text-gray-500">
-                        {% trans "This choice applies only to the current video chat session and does not change the gender in your site profile." %}
-                    </p>
-                </fieldset>
-
-                <button
-                    id="btnStart"
-                    type="button"
-                    disabled
-                    class="inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400"
-                >
-                    {% trans "Start" %}
-                </button>
-
-            </div>
-        </section>
 
         <div
             id="status"
@@ -121,7 +79,61 @@
 
         </div>
 
-        <div class="flex min-h-20 flex-wrap items-center justify-center gap-3 py-4 sm:py-5">
+        <section
+            id="videoChatSettings"
+            class="mt-3 rounded-xl border border-gray-800 bg-gray-900 p-4 shadow-lg"
+        >
+            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+
+                <fieldset class="max-w-2xl">
+                    <legend class="mb-2 block text-sm font-medium text-gray-200">
+                        {% trans "Your gender in video chat" %}
+                    </legend>
+
+                    <div class="flex flex-wrap gap-2">
+                        {% for value, label in gender_choices %}
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="chatGender"
+                                    value="{{ value }}"
+                                    class="peer sr-only"
+                                >
+                                <span class="inline-flex min-h-10 items-center rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-200 transition hover:border-gray-600 peer-checked:border-indigo-500 peer-checked:bg-indigo-600/20 peer-checked:text-indigo-200 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+                                    {{ label }}
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </div>
+
+                    <p class="mt-2 text-xs leading-5 text-gray-500">
+                        {% trans "This choice applies only to the current video chat session and does not change the gender in your site profile." %}
+                    </p>
+                </fieldset>
+
+                <div class="flex flex-wrap items-center gap-2 sm:justify-end">
+                    <button
+                        id="btnStart"
+                        type="button"
+                        disabled
+                        class="inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400"
+                    >
+                        {% trans "Start" %}
+                    </button>
+
+                    <button
+                        id="btnStop"
+                        type="button"
+                        class="hidden min-h-11 items-center justify-center rounded-xl border border-gray-700 bg-gray-800 px-8 py-3 text-sm font-semibold text-gray-200 transition hover:border-red-500/60 hover:bg-red-950/40 hover:text-red-200"
+                    >
+                        {% trans "Stop" %}
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="flex flex-wrap items-center justify-center gap-3 py-3">
             <button
                 id="btnNext"
                 type="button"
@@ -130,13 +142,6 @@
                 {% trans "Next" %} →
             </button>
 
-            <button
-                id="btnStop"
-                type="button"
-                class="hidden min-h-11 items-center justify-center rounded-xl border border-gray-700 bg-gray-800 px-8 py-3 text-sm font-semibold text-gray-200 transition hover:border-red-500/60 hover:bg-red-950/40 hover:text-red-200"
-            >
-                {% trans "Stop" %}
-            </button>
         </div>
 
         <div class="mx-auto flex h-72 w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg sm:h-80">
@@ -256,40 +261,50 @@ const chatHint = document.getElementById("chatHint");
 function setState(nextState) {
     chatState = nextState;
 
-    const activeSession = [
+    const isIdle = (
+        nextState === "idle"
+    );
+
+    const isActive = [
         "starting",
         "searching",
         "connecting",
         "connected",
         "cooldown",
-    ].includes(nextState);
+    ].includes(
+        nextState
+    );
 
     chatGenderInputs.forEach(
         (input) => {
-            input.disabled = (
-                nextState !== "idle"
-            );
+            input.disabled = !isIdle;
         }
     );
 
+    // В IDLE показываем только Start.
     btnStart.classList.toggle(
         "hidden",
-        nextState !== "idle"
+        !isIdle
+    );
+    btnStart.classList.toggle(
+        "inline-flex",
+        isIdle
     );
 
     btnStart.disabled = (
-        nextState !== "idle"
+        !isIdle
         || !ws
         || ws.readyState !== WebSocket.OPEN
     );
 
+    // Во время активной сессии показываем Stop вместо Start.
     btnStop.classList.toggle(
         "hidden",
-        !activeSession
+        !isActive
     );
     btnStop.classList.toggle(
         "inline-flex",
-        activeSession
+        isActive
     );
 
     const canSkip = (
@@ -329,6 +344,44 @@ function setChatEnabled(enabled) {
 
 function setStatus(text) {
     statusEl.textContent = text;
+}
+
+function wsSend(payload) {
+    if (
+        !ws
+        || ws.readyState !== WebSocket.OPEN
+    ) {
+        return false;
+    }
+
+    ws.send(
+        JSON.stringify(payload)
+    );
+
+    return true;
+}
+
+function resetToIdle(statusText = I18N.idle) {
+    startAttempt += 1;
+    startSent = false;
+
+    cancelCooldown();
+    closePeerConnections();
+    stopLocalMedia();
+    clearChat();
+
+    role = null;
+    currentRoomId = null;
+
+    setState("idle");
+    setStatus(statusText);
+
+    if (
+        ws
+        && ws.readyState === WebSocket.OPEN
+    ) {
+        btnStart.disabled = false;
+    }
 }
 
 function connectWS() {
@@ -414,24 +467,16 @@ function connectWS() {
                 return;
 
             case "stopped":
-                startSent = false;
-                cancelCooldown();
-                closePeerConnections();
-                stopLocalMedia();
-                clearChat();
-                setState("idle");
-                setStatus(I18N.stopped);
+                resetToIdle(
+                    I18N.stopped
+                );
                 return;
 
             case "kicked":
                 wasKicked = true;
-                startSent = false;
-                cancelCooldown();
-                closePeerConnections();
-                stopLocalMedia();
-                clearChat();
-                setState("idle");
-                setStatus(I18N.kicked);
+                resetToIdle(
+                    I18N.kicked
+                );
                 return;
 
             case "error":
@@ -453,11 +498,15 @@ function connectWS() {
         cancelCooldown();
         closePeerConnections();
         stopLocalMedia();
+        clearChat();
+
+        setState("idle");
         btnStart.disabled = true;
 
         if (!wasKicked) {
-            setState("idle");
-            setStatus(I18N.wsClosed);
+            setStatus(
+                I18N.wsClosed
+            );
         }
     };
 
@@ -618,7 +667,12 @@ async function handleIceCandidate(payload) {
 }
 
 async function setupPeerConnection() {
-    closePeerConnections();
+    // Закрываем только старые RTC peer connections.
+    // Нельзя вызывать closePeerConnections() здесь:
+    // она сбрасывает role/currentRoomId текущего match.
+    closeMainPeer();
+    closeModeratorPeer();
+    setChatEnabled(false);
 
     pc = new RTCPeerConnection(
         RTC_CONFIG
@@ -818,10 +872,9 @@ function cancelCooldown() {
 
 function handleServerError(code) {
     if (code === "invalid_gender") {
-        startSent = false;
-        stopLocalMedia();
-        setState("idle");
-        setStatus(I18N.genderRequired);
+        resetToIdle(
+            I18N.genderRequired
+        );
         return;
     }
 
@@ -922,16 +975,22 @@ btnStart.addEventListener(
         }
 
         if (!mediaReady) {
-            setState("idle");
+            resetToIdle(
+                I18N.mediaError
+            );
             return;
         }
 
-        startSent = true;
-
-        wsSend({
+        startSent = wsSend({
             type: "start",
             gender,
         });
+
+        if (!startSent) {
+            resetToIdle(
+                I18N.wsClosed
+            );
+        }
     }
 );
 
@@ -954,27 +1013,23 @@ btnNext.addEventListener(
 btnStop.addEventListener(
     "click",
     () => {
-        startAttempt += 1;
-
-        cancelCooldown();
-        closePeerConnections();
-        stopLocalMedia();
-        clearChat();
-
-        if (
+        const shouldNotifyServer = (
             startSent
             && ws
             && ws.readyState === WebSocket.OPEN
-        ) {
+        );
+
+        // UI сбрасываем немедленно и полностью.
+        resetToIdle(
+            I18N.stopped
+        );
+
+        // Backend дочищает queue/room/participant отдельно.
+        if (shouldNotifyServer) {
             wsSend({
                 type: "stop",
             });
-            return;
         }
-
-        startSent = false;
-        setState("idle");
-        setStatus(I18N.stopped);
     }
 );
 
