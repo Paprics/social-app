@@ -12,27 +12,61 @@ from messenger.models import Message, Participant
 
 
 class ReadService:
-    """
-    Сервис отметки сообщений как прочитанных.
-    """
+    """Сервис управления read cursor участника диалога."""
 
     @staticmethod
     @transaction.atomic
-    def mark_as_read(
-        participant: Participant,
-        message: Message,
-    ) -> Participant:
+    def mark_read_up_to(
+        *,
+        dialog_id: int,
+        user_id: int,
+        message_id: int,
+    ) -> bool:
         """
-        Обновляет последнее прочитанное сообщение участника.
+        Атомарно продвигает read cursor только вперёд.
 
-        Значение обновляется только вперёд. После успешной
-        транзакции отправляется WebSocket-событие в группу диалога.
+        Participant перечитывается под SELECT ... FOR UPDATE, поэтому
+        решение принимается по актуальному состоянию БД, а не по
+        потенциально устаревшему объекту из caller'а.
+
+        Возвращает True только если cursor действительно изменился.
         """
 
-        if participant.dialog_id != message.dialog_id:
-            raise ValueError(
-                "Message does not belong to participant dialog.",
+        message = (
+            Message.objects
+            .only(
+                "id",
+                "dialog_id",
             )
+            .filter(
+                pk=message_id,
+                dialog_id=dialog_id,
+            )
+            .first()
+        )
+
+        if message is None:
+            return False
+
+        participant = (
+            Participant.objects
+            .select_for_update()
+            .only(
+                "id",
+                "dialog_id",
+                "user_id",
+                "last_read_message_id",
+            )
+            .filter(
+                dialog_id=dialog_id,
+                user_id=user_id,
+                is_active=True,
+            )
+            .first()
+        )
+
+        if participant is None:
+            return False
 
         current_message_id = participant.last_read_message_id
 
@@ -40,9 +74,9 @@ class ReadService:
             current_message_id is not None
             and current_message_id >= message.id
         ):
-            return participant
+            return False
 
-        participant.last_read_message = message
+        participant.last_read_message_id = message.id
         participant.save(
             update_fields=[
                 "last_read_message",
@@ -51,13 +85,13 @@ class ReadService:
 
         transaction.on_commit(
             lambda: ReadService.notify_messages_read(
-                dialog_id=participant.dialog_id,
-                reader_id=participant.user_id,
+                dialog_id=dialog_id,
+                reader_id=user_id,
                 last_read_message_id=message.id,
             ),
         )
 
-        return participant
+        return True
 
     @staticmethod
     def notify_messages_read(
@@ -66,9 +100,7 @@ class ReadService:
         reader_id: int,
         last_read_message_id: int,
     ) -> None:
-        """
-        Уведомляет участников диалога об изменении статуса прочтения.
-        """
+        """Уведомляет участников диалога об изменении read cursor."""
 
         channel_layer = get_channel_layer()
 
@@ -83,14 +115,31 @@ class ReadService:
             },
         )
 
+
+        async_to_sync(
+            channel_layer.group_send,
+        )(
+            f"messenger_user_{reader_id}",
+            {
+                "type": "inbox_changed",
+                "reason": "messages.read",
+            },
+        )
+
     @staticmethod
     @transaction.atomic
     def reset_read_state(
         participant: Participant,
     ) -> Participant:
-        """
-        Сбрасывает статус прочтения участника.
-        """
+        """Сбрасывает статус прочтения участника."""
+
+        participant = (
+            Participant.objects
+            .select_for_update()
+            .get(
+                pk=participant.pk,
+            )
+        )
 
         if participant.last_read_message_id is None:
             return participant

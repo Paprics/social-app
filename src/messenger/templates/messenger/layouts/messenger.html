@@ -6,13 +6,23 @@
 
 {% block content %}
 
-<div class="mx-auto h-[calc(100dvh-4rem)] w-full max-w-7xl sm:px-4 sm:py-4 lg:px-6">
-
+<div
+    class="
+        mx-auto
+        h-[calc(100dvh-4rem)]
+        w-full
+        max-w-7xl
+        sm:px-4
+        sm:py-4
+        lg:px-6
+    "
+>
     <div
         class="
             grid
             h-full
             min-h-0
+            min-w-0
             overflow-hidden
             bg-white
 
@@ -25,12 +35,25 @@
             xl:grid-cols-[22rem_minmax(0,1fr)]
         "
     >
+        <div
+            class="
+                {% if messenger_thread_active %}
+                    hidden lg:block
+                {% else %}
+                    block
+                {% endif %}
 
-        {% include "messenger/partials/sidebar.html" with hide_sidebar_mobile=dialog %}
+                min-h-0
+                min-w-0
+                overflow-hidden
+            "
+        >
+            {% include "messenger/partials/sidebar.html" %}
+        </div>
 
         <main
             class="
-                {% if dialog %}
+                {% if messenger_thread_active %}
                     flex
                 {% else %}
                     hidden lg:flex
@@ -39,17 +62,14 @@
                 min-h-0
                 min-w-0
                 flex-col
+                overflow-hidden
                 bg-white
             "
         >
-
             {% block messenger_content %}
             {% endblock %}
-
         </main>
-
     </div>
-
 </div>
 
 {% endblock %}

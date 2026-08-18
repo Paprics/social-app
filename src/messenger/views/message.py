@@ -22,21 +22,15 @@ from messenger.selectors.message import get_message
 from messenger.services.dialog import DialogService
 from messenger.services.message import MessageService
 from messenger.views.mixins import DialogAccessMixin
-from messenger.models import Participant
-from messenger.services.read import ReadService
 
 
 class MessageCreateView(LoginRequiredMixin, View):
-    """
-    Создает новое сообщение.
-    """
+    """Создает новое сообщение."""
 
     http_method_names = ["post"]
 
     def post(self, request, public_id: str) -> HttpResponse:
-        """
-        Создает сообщение в диалоге.
-        """
+        """Создает сообщение в диалоге."""
 
         dialog = get_dialog_by_public_id(public_id)
 
@@ -49,7 +43,6 @@ class MessageCreateView(LoginRequiredMixin, View):
         form = MessageForm(request.POST)
 
         if not form.is_valid():
-
             return render(
                 request,
                 "messenger/partials/dialog/message_form.html",
@@ -66,8 +59,6 @@ class MessageCreateView(LoginRequiredMixin, View):
             text=form.cleaned_data["text"],
         )
 
-        MessageService.notify_message_created(message=message)
-
         return HttpResponse(status=204)
 
 
@@ -76,11 +67,7 @@ class MessageItemView(
     DialogAccessMixin,
     View,
 ):
-    """
-    Возвращает HTML одного сообщения.
-
-    Если сообщение входящее, отмечает его прочитанным.
-    """
+    """Возвращает read-only HTML одного сообщения."""
 
     http_method_names = ["get"]
 
@@ -89,9 +76,7 @@ class MessageItemView(
         request,
         message_id: int,
     ) -> HttpResponse:
-        """
-        Получает сообщение и возвращает partial.
-        """
+        """Получает сообщение и возвращает partial без DB side effects."""
 
         message = get_message(message_id)
 
@@ -100,21 +85,16 @@ class MessageItemView(
             request.user.id,
         )
 
-        if message.sender_id != request.user.id:
-            participant = Participant.objects.get(
-                dialog_id=message.dialog_id,
-                user_id=request.user.id,
-            )
-
-            ReadService.mark_as_read(
-                participant,
-                message,
-            )
+        # Временная compatibility-привязка для outgoing.html.
+        # Удаляется вместе с Dialog._current_user при переходе на DTO.
+        dialog = message.dialog
+        dialog._current_user = request.user
 
         return render(
             request,
             "messenger/partials/dialog/message_item.html",
             {
+                "dialog": dialog,
                 "message": message,
                 "current_user": request.user,
             },
@@ -143,11 +123,6 @@ class MessageDeleteView(LoginRequiredMixin, DialogAccessMixin, View):
 
         deleted_message_id = MessageService.delete_message(
             message=message,
-        )
-
-        MessageService.notify_message_deleted(
-            dialog_id=dialog_id,
-            message_id=deleted_message_id,
         )
 
         return HttpResponse(status=204)

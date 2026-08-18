@@ -1,7 +1,3 @@
-/*
- * Messenger frontend entry point.
- */
-
-import "./includes/messenger_part_1.js";
-import "./includes/messenger_part_2.js";
-import "./includes/messenger_part_3.js";
+import "./includes/ui.js";
+import "./includes/dialog_realtime.js";
+import "./includes/inbox_realtime.js";

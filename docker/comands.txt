@@ -23,3 +23,6 @@ FROM public.auth_user_id_seq;
 ------------+-----------
    10000000 | f
 (1 row)
+
+созлать архив
+tar -czf messenger_current.tar.gz src/messenger

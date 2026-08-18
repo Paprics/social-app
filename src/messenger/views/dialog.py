@@ -16,11 +16,12 @@ HTTP views для работы с диалогами.
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Page, Paginator
 from django.http import Http404, HttpResponse
+from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from messenger.models import Dialog, Message, Participant
+from messenger.models import Dialog
 from messenger.selectors.dialog import (
     get_dialog_by_public_id,
     get_user_dialogs,
@@ -33,6 +34,7 @@ from messenger.selectors.message import (
 from messenger.services.dialog import DialogService
 from messenger.services.dialog_page import DialogPageService
 from messenger.services.read import ReadService
+from messenger.views.mixins import MessengerThreadLayoutMixin
 
 DIALOGS_PAGE_SIZE = 15
 
@@ -116,6 +118,7 @@ class DialogListView(
 
 
 class DialogDetailView(
+    MessengerThreadLayoutMixin,
     LoginRequiredMixin,
     DetailView,
 ):
@@ -123,6 +126,14 @@ class DialogDetailView(
 
     template_name = "messenger/dialog_detail.html"
     context_object_name = "dialog"
+
+    def dispatch(self, request, *args, **kwargs):
+        """Redirect stale dialog URLs back to the messenger list."""
+
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except Dialog.DoesNotExist:
+            return redirect("messenger:dialog_list")
 
     def get_object(self, queryset=None):
         """
@@ -145,14 +156,10 @@ class DialogDetailView(
         last_message = dialog.messages.order_by("-id").first()
 
         if last_message:
-            participant = Participant.objects.get(
-                dialog=dialog,
-                user=self.request.user,
-            )
-
-            ReadService.mark_as_read(
-                participant,
-                last_message,
+            ReadService.mark_read_up_to(
+                dialog_id=dialog.id,
+                user_id=self.request.user.id,
+                message_id=last_message.id,
             )
 
         return dialog
@@ -210,11 +217,10 @@ class DialogSidebarView(
 
         return TemplateResponse(
             request,
-            "messenger/partials/sidebar.html",
+            "messenger/partials/sidebar_content.html",
             {
                 "dialogs": page_obj.object_list,
                 "page_obj": page_obj,
-                "hide_sidebar_mobile": True,
             },
         )
 
@@ -250,80 +256,6 @@ class DialogSidebarPageView(
                 "dialogs": page_obj.object_list,
                 "page_obj": page_obj,
             },
-        )
-
-
-class DialogMarkReadView(
-    LoginRequiredMixin,
-    View,
-):
-    """
-    Отмечает входящее сообщение прочитанным.
-
-    Используется, когда сообщение приходит
-    в уже открытый диалог без перезагрузки страницы.
-    """
-
-    http_method_names = ["post"]
-
-    def post(
-        self,
-        request,
-        public_id: str,
-    ) -> HttpResponse:
-        """Продвигает read cursor текущего участника."""
-
-        try:
-            dialog = get_dialog_by_public_id(
-                public_id,
-            )
-        except Dialog.DoesNotExist as error:
-            raise Http404() from error
-
-        if not DialogService.user_has_access(
-            dialog.id,
-            request.user.id,
-        ):
-            raise Http404()
-
-        try:
-            message_id = int(
-                request.POST["message_id"],
-            )
-        except (KeyError, TypeError, ValueError) as error:
-            raise Http404() from error
-
-        try:
-            message = Message.objects.get(
-                pk=message_id,
-                dialog_id=dialog.id,
-            )
-        except Message.DoesNotExist as error:
-            raise Http404() from error
-
-        # Собственные сообщения не являются входящими
-        # и не должны двигать read cursor пользователя.
-        if message.sender_id == request.user.id:
-            return HttpResponse(
-                status=204,
-            )
-
-        try:
-            participant = Participant.objects.get(
-                dialog_id=dialog.id,
-                user_id=request.user.id,
-                is_active=True,
-            )
-        except Participant.DoesNotExist as error:
-            raise Http404() from error
-
-        ReadService.mark_as_read(
-            participant,
-            message,
-        )
-
-        return HttpResponse(
-            status=204,
         )
 
 

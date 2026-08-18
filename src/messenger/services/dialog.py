@@ -4,11 +4,15 @@
 Business logic for dialogs.
 """
 
+from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.utils import timezone
 
 from messenger.models import Dialog, Participant
+from messenger.selectors.dialog import get_private_dialog
 from messenger.selectors.participant import is_user_participant
+from messenger.services.realtime import MessengerRealtimeService
+
+User = get_user_model()
 
 
 class DialogService:
@@ -47,21 +51,35 @@ class DialogService:
     @transaction.atomic
     def get_or_create_private_dialog(user1, user2):
         """
-        Возвращает существующий личный диалог.
+        Возвращает единственный приватный диалог пары пользователей.
 
-        Если диалог отсутствует —
-        создает новый.
+        Блокирует обе строки User в стабильном порядке, чтобы два
+        конкурентных запроса для одной пары не создали два Dialog.
         """
 
-        dialog = (
-            Dialog.objects.filter(
-                dialog_type="private",
-                participants__user=user1,
+        user_ids = sorted(
+            (
+                user1.pk,
+                user2.pk,
             )
+        )
+
+        list(
+            User.objects
+            .select_for_update()
             .filter(
-                participants__user=user2,
+                pk__in=user_ids,
             )
-            .first()
+            .order_by("pk")
+            .values_list(
+                "pk",
+                flat=True,
+            )
+        )
+
+        dialog = get_private_dialog(
+            user1,
+            user2,
         )
 
         if dialog:
@@ -119,58 +137,12 @@ class DialogService:
 
     @staticmethod
     def user_has_access(dialog_id, user_id):
-        """
-        Проверяет доступ пользователя к диалогу.
-        """
+        """Проверяет доступ пользователя к диалогу."""
 
         return is_user_participant(
             dialog_id=dialog_id,
             user_id=user_id,
         )
-
-    @staticmethod
-    @transaction.atomic
-    def mark_as_read(
-        dialog,
-        user,
-    ):
-        """
-        Помечает сообщения диалога как прочитанные.
-
-        Используется при открытии страницы диалога.
-        """
-
-        participant = (
-            Participant.objects
-            .filter(
-                dialog=dialog,
-                user=user,
-            )
-            .select_for_update()
-            .first()
-        )
-
-        if not participant:
-            return None
-
-        last_message = (
-            dialog.messages
-            .order_by("-id")
-            .only("id")
-            .first()
-        )
-
-        if not last_message:
-            return participant
-
-        participant.last_read_message = last_message
-        participant.save(
-            update_fields=[
-                "last_read_message",
-            ]
-        )
-
-        return participant
 
     @staticmethod
     def get_other_user(dialog, current_user):
@@ -209,4 +181,21 @@ class DialogService:
                 "Access denied.",
             )
 
+        dialog_id = dialog.id
+        user_ids = tuple(
+            dialog.participants.filter(
+                is_active=True,
+            ).values_list(
+                "user_id",
+                flat=True,
+            )
+        )
+
         dialog.delete()
+
+        transaction.on_commit(
+            lambda: MessengerRealtimeService.notify_dialog_deleted(
+                dialog_id=dialog_id,
+                user_ids=user_ids,
+            ),
+        )
