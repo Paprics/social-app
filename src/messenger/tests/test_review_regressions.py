@@ -1,7 +1,10 @@
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
 from unittest.mock import patch
 
 import pytest
 
+from django.db import close_old_connections
 from django.urls import reverse
 
 from messenger.models import Message, Participant
@@ -443,4 +446,61 @@ def test_delete_message_schedules_realtime_on_commit(users):
         dialog_id=dialog_id,
         message_id=message_id,
     )
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_private_dialog_creation_returns_single_dialog(users):
+    user_a, user_b, _ = users
+    user_model = type(user_a)
+    start = Barrier(2)
+
+    def create_dialog(user1_id, user2_id):
+        close_old_connections()
+
+        try:
+            local_user1 = user_model.objects.get(pk=user1_id)
+            local_user2 = user_model.objects.get(pk=user2_id)
+
+            start.wait(timeout=5)
+
+            dialog = DialogService.get_or_create_private_dialog(
+                local_user1,
+                local_user2,
+            )
+
+            return dialog.id
+        finally:
+            close_old_connections()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        first = executor.submit(
+            create_dialog,
+            user_a.id,
+            user_b.id,
+        )
+        second = executor.submit(
+            create_dialog,
+            user_b.id,
+            user_a.id,
+        )
+
+        dialog_ids = {
+            first.result(timeout=10),
+            second.result(timeout=10),
+        }
+
+    dialogs = (
+        Dialog.objects
+        .filter(
+            dialog_type=DialogType.PRIVATE,
+            participants__user=user_a,
+        )
+        .filter(
+            participants__user=user_b,
+        )
+        .distinct()
+    )
+
+    assert len(dialog_ids) == 1
+    assert dialogs.count() == 1
+    assert dialogs.first().id in dialog_ids
 

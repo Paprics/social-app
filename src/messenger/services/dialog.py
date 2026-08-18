@@ -4,12 +4,15 @@
 Business logic for dialogs.
 """
 
+from django.contrib.auth import get_user_model
 from django.db import transaction
-from django.utils import timezone
 
 from messenger.models import Dialog, Participant
+from messenger.selectors.dialog import get_private_dialog
 from messenger.selectors.participant import is_user_participant
 from messenger.services.realtime import MessengerRealtimeService
+
+User = get_user_model()
 
 
 class DialogService:
@@ -48,21 +51,35 @@ class DialogService:
     @transaction.atomic
     def get_or_create_private_dialog(user1, user2):
         """
-        Возвращает существующий личный диалог.
+        Возвращает единственный приватный диалог пары пользователей.
 
-        Если диалог отсутствует —
-        создает новый.
+        Блокирует обе строки User в стабильном порядке, чтобы два
+        конкурентных запроса для одной пары не создали два Dialog.
         """
 
-        dialog = (
-            Dialog.objects.filter(
-                dialog_type="private",
-                participants__user=user1,
+        user_ids = sorted(
+            (
+                user1.pk,
+                user2.pk,
             )
+        )
+
+        list(
+            User.objects
+            .select_for_update()
             .filter(
-                participants__user=user2,
+                pk__in=user_ids,
             )
-            .first()
+            .order_by("pk")
+            .values_list(
+                "pk",
+                flat=True,
+            )
+        )
+
+        dialog = get_private_dialog(
+            user1,
+            user2,
         )
 
         if dialog:
