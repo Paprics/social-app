@@ -1,263 +1,417 @@
 # src/video_chat/consumers/signaling.py
 
-"""
-signaling.py — Главный WebSocket consumer для видеочата.
-
-Что делает этот файл:
-    Обрабатывает все WebSocket соединения от обычных пользователей чата.
-    Отвечает за три вещи:
-        1. Матчмейкинг — найти собеседника через очередь в Redis
-        2. Сигналинг — проксировать WebRTC сообщения (offer/answer/ICE) между партнёрами
-        3. Текстовый чат — пересылать сообщения между партнёрами
-
-Как работает WebRTC соединение (упрощённо):
-    1. Оба пользователя подключаются к WebSocket
-    2. Сервер находит им пару (матчмейкинг)
-    3. Один получает роль "caller", другой — "callee"
-    4. Callee поднимает RTCPeerConnection и сообщает "ready"
-    5. Caller получает "ready_to_connect" и создаёт offer
-    6. Идёт обмен offer/answer/ICE через сервер (сигналинг)
-    7. После этого видео/аудио идут напрямую P2P, минуя сервер
-"""
+"""WebSocket consumer для пользователей случайного видеочата."""
 
 import json
-import logging
+import math
+import time
 import uuid
 
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from video_chat.services.matchmaking import MatchmakingService
+from video_chat.services.participant import (
+    InvalidChatGender,
+    build_participant_metadata,
+)
+from video_chat.services.participant_storage import ParticipantStorage
 from video_chat.services.room_storage import RoomStorage
 
-logger = logging.getLogger(__name__)
+COOLDOWN_SECONDS = 3
 
 
 class SignalingConsumer(AsyncWebsocketConsumer):
-    """WebSocket consumer для обычных пользователей видеочата.
-
-    Жизненный цикл одного соединения:
-        connect() → _find_partner() → [ожидание] → _create_room() или room_matched()
-        → receive() [множество раз] → disconnect()
-
-    Атрибуты:
-        room_id: UUID текущей комнаты. None если пользователь в очереди.
-        partner_channel: channel_name партнёра. Используется для прямой отправки
-                         сообщений через channel layer.
-        matchmaking: сервис для работы с очередью в Redis.
-        room_storage: сервис для хранения списка комнат (нужен модератору).
-        in_room: True если пользователь находится в активной комнате.
-    """
+    """Управляет matchmaking-сессией, signaling и текстовым чатом."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.room_id = None
         self.partner_channel = None
+
         self.matchmaking = MatchmakingService()
         self.room_storage = RoomStorage()
-        self.in_room = False
+        self.participant_storage = ParticipantStorage()
 
-    # ── Жизненный цикл соединения ───────────────────────────────────────────
+        self.in_room = False
+        self.media_connected = False
+
+        self.session_id = None
+        self.session_active = False
+
+        self.search_available_at = 0.0
 
     async def connect(self):
-        """Пользователь открыл WebSocket.
+        """Принять WebSocket без автоматического входа в matchmaking."""
 
-        Принимаем соединение и сразу ищем партнёра.
-        Если партнёра нет — пользователь встаёт в очередь и ждёт.
-        """
         await self.accept()
-        await self._find_partner()
 
     async def disconnect(self, close_code):
-        """Пользователь закрыл вкладку или потерял соединение.
+        """Очистить Redis-состояние после закрытия WebSocket."""
 
-        Порядок важен:
-            1. Убираем себя из очереди (если ещё там)
-            2. Удаляем комнату из Redis (чтобы модератор не видел мёртвые комнаты)
-            3. Уведомляем партнёра о разрыве
-        """
-        # Убираем себя из очереди матчмейкинга на случай если ещё там
-        await sync_to_async(self.matchmaking.leave_queue)(self.channel_name)
-
-        # Удаляем комнату из Redis если она была
-        if self.room_id:
-            await sync_to_async(self.room_storage.delete_room)(self.room_id)
-
-        # Уведомляем партнёра — он увидит "Партнёр отключился"
-        if self.partner_channel:
-            await self.channel_layer.send(
-                self.partner_channel,
-                {"type": "partner.disconnected"},
-            )
-            self.partner_channel = None
+        await self._finish_session(
+            notify_partner=True,
+        )
 
     async def receive(self, text_data):
-        """Получено сообщение от клиента (браузера).
+        """Обработать команду браузера."""
 
-        Роутим по полю type:
-            offer/answer/ice_candidate → WebRTC сигналинг, проксируем партнёру
-            next → пользователь нажал "Следующий", ищем нового партнёра
-            ready → callee сообщает что RTCPeerConnection готов
-            chat_message → текстовое сообщение, пересылаем партнёру
-        """
         data = json.loads(text_data)
         msg_type = data.get("type")
 
-        if msg_type in ("offer", "answer", "ice_candidate"):
-            # WebRTC сигналинг — просто передаём партнёру как есть.
-            # Сервер не понимает содержимое, просто проксирует.
-            if self.partner_channel:
-                await self.channel_layer.send(
-                    self.partner_channel,
-                    {
-                        "type": "signaling.message",
-                        "payload": data,  # Фронт читает msg.payload.type
-                    },
-                )
+        if msg_type == "start":
+            await self._handle_start(data)
+            return
 
-            # Также пересылаем модератору если он подключён к этой комнате.
-            # Модератору нужен сигналинг чтобы установить своё P2P соединение.
-            if self.room_id:
-                await self.channel_layer.group_send(
-                    f"moderate_{self.room_id}",  # Группа модераторов этой комнаты
-                    {"type": "signaling.message", "payload": data},
-                )
+        if msg_type == "search":
+            await self._handle_search()
+            return
 
-        elif msg_type == "next":
-            # Пользователь нажал "Следующий" — разрываем текущую связь и ищем нового
+        if msg_type == "next":
             await self._handle_next()
+            return
 
-        elif msg_type == "ready":
-            # Callee поднял RTCPeerConnection и сообщает что готов принять offer.
-            # Пересылаем это caller-у — он только тогда создаст и пошлёт offer.
-            # Это handshake который решает гонку состояний:
-            # без него caller мог отправить offer до того как callee создал pc.
-            if self.partner_channel:
-                await self.channel_layer.send(
-                    self.partner_channel,
-                    {
-                        "type": "signaling.message",
-                        "payload": {"type": "ready_to_connect"},
-                    },
-                )
+        if msg_type == "stop":
+            await self._handle_stop()
+            return
 
-        elif msg_type == "chat_message":
-            # Текстовое сообщение — пересылаем партнёру.
-            # Меняем sender на "partner" чтобы у партнёра отобразилось правильно.
-            if self.partner_channel and self.room_id:
-                payload = {
-                    "type": "chat_message",
-                    "text": data.get("text", ""),
-                    "sender": "partner",
-                }
-                await self.channel_layer.send(
-                    self.partner_channel,
-                    {"type": "signaling.message", "payload": payload},
-                )
+        if msg_type == "connected":
+            await self._handle_connected()
+            return
 
-    # ── Обработчики сообщений из channel layer ──────────────────────────────
-    # Эти методы вызываются когда ДРУГОЙ consumer шлёт сообщение этому
-    # через self.channel_layer.send(). Django Channels автоматически
-    # маппит type "room.matched" → метод room_matched() (точка → подчёркивание).
+        if msg_type in (
+            "offer",
+            "answer",
+            "ice_candidate",
+        ):
+            await self._handle_signaling(data)
+            return
+
+        if msg_type == "ready":
+            await self._handle_ready()
+            return
+
+        if msg_type == "chat_message":
+            await self._handle_chat_message(data)
 
     async def room_matched(self, event):
-        """Callee получает это сообщение когда caller нашёл его в очереди.
+        """Принять созданную caller-ом комнату как callee."""
 
-        Вызывается через channel_layer.send() из _create_room() caller-а.
+        if not self.session_active:
+            await sync_to_async(self.room_storage.delete_room)(event["room_id"])
 
-        event содержит:
-            room_id: UUID новой комнаты
-            caller_channel: channel_name caller-а (нужен для отправки сигналинга)
-        """
-        try:
-            self.room_id = event["room_id"]
-            self.partner_channel = event["caller_channel"]
-            self.in_room = True
-
-            # Отправляем клиенту — он узнаёт что нашёлся партнёр и его роль
-            await self.send_json(
+            await self.channel_layer.send(
+                event["caller_channel"],
                 {
-                    "type": "matched",
-                    "room_id": self.room_id,
-                    "role": "callee",  # Этот пользователь — callee
-                }
+                    "type": "partner.disconnected",
+                },
             )
-        except Exception as e:
-            logger.error(f"[room_matched] EXCEPTION: {e}", exc_info=True)
-            raise
+            return
+
+        self.room_id = event["room_id"]
+        self.partner_channel = event["caller_channel"]
+        self.in_room = True
+        self.media_connected = False
+
+        await self.send_json(
+            {
+                "type": "matched",
+                "room_id": self.room_id,
+                "role": "callee",
+            }
+        )
 
     async def signaling_message(self, event):
-        """Получен WebRTC payload от партнёра или модератора — пересылаем клиенту.
+        """Передать WebRTC payload из channel layer браузеру."""
 
-        ВАЖНО: фронт ожидает структуру { payload: { type: "...", ... } }.
-        Не менять формат без изменения room.html!
-
-        ВАЖНО: этот метод должен быть только один в классе.
-        Если объявить дважды — Python молча возьмёт последний, первый исчезнет.
-        """
-        await self.send_json({"payload": event["payload"]})
+        await self.send_json(
+            {
+                "payload": event["payload"],
+            }
+        )
 
     async def partner_disconnected(self, event):
-        """Партнёр отключился или нажал "Следующий".
+        """После разрыва пары автоматически перейти в cooldown."""
 
-        ВАЖНО: мы НЕ вызываем _find_partner() автоматически.
-        Пользователь сам решает — нажать "Следующий" или подождать.
-        Это предотвращает бесконечный цикл матчинга.
-        """
         self.partner_channel = None
         self.room_id = None
         self.in_room = False
-        # Клиент покажет "Партнёр отключился. Нажмите Следующий."
-        await self.send_json({"type": "partner_disconnected"})
+        self.media_connected = False
+
+        if not self.session_active:
+            await self.send_json(
+                {
+                    "type": "partner_disconnected",
+                }
+            )
+            return
+
+        await self._enter_cooldown(
+            event_type="partner_disconnected",
+        )
 
     async def moderator_kick(self, event):
-        """Модератор кикнул этого пользователя.
+        """Закрыть соединение пользователя по команде модератора."""
 
-        Отправляем клиенту уведомление и принудительно закрываем WebSocket.
-        Клиент перенаправится или покажет сообщение о бане.
-        """
-        await self.send_json({"type": "kicked"})
+        await self.send_json(
+            {
+                "type": "kicked",
+            }
+        )
         await self.close()
 
-    # ── Внутренние методы ───────────────────────────────────────────────────
+    async def _handle_start(self, data):
+        """Создать Redis-only сессию и запустить первый поиск."""
+
+        if self.session_active:
+            await self._send_error("already_started")
+            return
+
+        session_id = str(uuid.uuid4())
+        chat_gender = data.get("gender", "")
+
+        try:
+            participant = await sync_to_async(build_participant_metadata)(
+                user=self.scope.get("user"),
+                chat_gender=chat_gender,
+                session_id=session_id,
+            )
+        except InvalidChatGender:
+            await self._send_error("invalid_gender")
+            return
+
+        self.session_id = session_id
+        self.session_active = True
+        self.search_available_at = 0.0
+
+        await sync_to_async(self.participant_storage.save)(
+            self.channel_name,
+            participant,
+        )
+
+        await self.send_json(
+            {
+                "type": "started",
+                "session_id": self.session_id,
+                "chat_gender": participant["chat_gender"],
+            }
+        )
+
+        await self._find_partner()
+
+    async def _handle_search(self):
+        """Продолжить поиск после cooldown."""
+
+        if not self.session_active:
+            await self._send_error("no_active_session")
+            return
+
+        if self.in_room:
+            return
+
+        remaining = self._cooldown_remaining()
+
+        if remaining > 0:
+            await self.send_json(
+                {
+                    "type": "cooldown",
+                    "seconds": remaining,
+                }
+            )
+            return
+
+        await self._find_partner()
+
+    async def _handle_next(self):
+        """Разорвать пару и начать трёхсекундный cooldown."""
+
+        if not self.session_active:
+            return
+
+        await sync_to_async(self.matchmaking.leave_queue)(self.channel_name)
+
+        await self._end_current_room(
+            notify_partner=True,
+        )
+
+        await self._enter_cooldown(
+            event_type="cooldown",
+        )
+
+    async def _handle_stop(self):
+        """Остановить matchmaking-сессию и очистить Redis."""
+
+        if not self.session_active:
+            await self.send_json(
+                {
+                    "type": "stopped",
+                }
+            )
+            return
+
+        await self._finish_session(
+            notify_partner=True,
+        )
+
+        await self.send_json(
+            {
+                "type": "stopped",
+            }
+        )
+
+    async def _handle_connected(self):
+        """Разрешить текстовый чат для текущей пары."""
+
+        if not self.session_active or not self.in_room or not self.room_id:
+            return
+
+        self.media_connected = True
+
+    async def _handle_signaling(self, data):
+        """Маршрутизировать WebRTC signaling партнёру или модератору."""
+
+        if data.get("from_moderator_reply"):
+            await self._send_signaling_to_moderator(data)
+            return
+
+        if not self.session_active or not self.in_room or not self.partner_channel:
+            return
+
+        await self.channel_layer.send(
+            self.partner_channel,
+            {
+                "type": "signaling.message",
+                "payload": data,
+            },
+        )
+
+    async def _send_signaling_to_moderator(self, data):
+        """Передать ответ отдельного moderator WebRTC-соединения."""
+
+        if not self.room_id:
+            return
+
+        payload = {
+            **data,
+            # Channel identity определяет сервер, а не браузер.
+            "answering_channel": self.channel_name,
+        }
+
+        await self.channel_layer.group_send(
+            f"moderate_{self.room_id}",
+            {
+                "type": "signaling.message",
+                "payload": payload,
+            },
+        )
+
+    async def _handle_ready(self):
+        """Сообщить caller-у, что callee готов принять WebRTC offer."""
+
+        if not self.in_room or not self.partner_channel:
+            return
+
+        await self.channel_layer.send(
+            self.partner_channel,
+            {
+                "type": "signaling.message",
+                "payload": {
+                    "type": "ready_to_connect",
+                },
+            },
+        )
+
+    async def _handle_chat_message(self, data):
+        """Передать сообщение только после подтверждённого WebRTC connect."""
+
+        if not self.session_active or not self.media_connected or not self.partner_channel or not self.room_id:
+            return
+
+        text = str(data.get("text", "")).strip()[:500]
+
+        if not text:
+            return
+
+        await self.channel_layer.send(
+            self.partner_channel,
+            {
+                "type": "signaling.message",
+                "payload": {
+                    "type": "chat_message",
+                    "text": text,
+                    "sender": "partner",
+                },
+            },
+        )
 
     async def _find_partner(self):
-        """Поиск партнёра через очередь Redis.
+        """Встать в очередь или создать комнату с валидным участником."""
 
-        Алгоритм:
-            1. Сбрасываем in_room
-            2. Убираем себя из очереди (дубли от переподключений)
-            3. Сообщаем клиенту "ожидание"
-            4. Пробуем взять партнёра из очереди
-            5. Если нашли — создаём комнату, если нет — ждём (стоим в очереди)
-        """
+        if not self.session_active:
+            return
+
         self.in_room = False
-        # Убираем дубли — на случай если этот channel уже есть в очереди
+        self.media_connected = False
+        self.search_available_at = 0.0
+
         await sync_to_async(self.matchmaking.leave_queue)(self.channel_name)
-        await self.send_json({"type": "status", "message": "waiting"})
-        partner = await sync_to_async(self.matchmaking.join_queue)(self.channel_name)
-        if partner:
-            await self._create_room(partner)
 
-    async def _create_room(self, partner_channel: str):
-        """Создать комнату когда нашли партнёра.
+        while self.session_active:
+            partner = await sync_to_async(self.matchmaking.join_queue)(self.channel_name)
 
-        Этот пользователь становится caller-ом — он первым узнаёт о матче
-        и будет отправлять WebRTC offer (но только после ready_to_connect от callee).
+            # Отправляем waiting только после завершения операции с очередью.
+            # Так клиент, получив status=waiting, видит уже актуальное
+            # состояние matchmaking, а не промежуточное.
+            await self.send_json(
+                {
+                    "type": "status",
+                    "message": "waiting",
+                }
+            )
 
-        Args:
-            partner_channel: channel_name пользователя из очереди (станет callee)
-        """
+            if not partner:
+                return
+
+            partner_participant = await sync_to_async(self.participant_storage.get)(partner)
+
+            if not partner_participant:
+                continue
+
+            await self._create_room(
+                partner,
+                partner_participant,
+            )
+            return
+
+    async def _create_room(
+        self,
+        partner_channel: str,
+        partner_participant: dict,
+    ):
+        """Создать комнату со snapshot metadata обоих участников."""
+
+        caller_participant = await sync_to_async(self.participant_storage.get)(self.channel_name)
+
+        if not caller_participant:
+            await self._finish_session(
+                notify_partner=False,
+            )
+            return
+
         self.room_id = str(uuid.uuid4())
         self.partner_channel = partner_channel
         self.in_room = True
+        self.media_connected = False
 
-        # Сохраняем комнату в Redis — модератор увидит её в своём списке
         await sync_to_async(self.room_storage.create_room)(
-            self.room_id, self.channel_name, partner_channel
+            self.room_id,
+            self.channel_name,
+            partner_channel,
+            caller_participant=caller_participant,
+            callee_participant=partner_participant,
         )
 
-        # Сообщаем этому пользователю (caller) о матче
         await self.send_json(
             {
                 "type": "matched",
@@ -266,53 +420,98 @@ class SignalingConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        # Уведомляем callee через channel layer.
-        # channel_layer.send() — прямая отправка конкретному каналу (не broadcast).
-        # Тип "room.matched" → вызовет метод room_matched() у callee.
         await self.channel_layer.send(
             partner_channel,
             {
                 "type": "room.matched",
                 "room_id": self.room_id,
-                "caller_channel": self.channel_name,  # Callee запомнит кто его caller
+                "caller_channel": self.channel_name,
             },
         )
 
-    async def _handle_next(self):
-        """Пользователь нажал кнопку "Следующий".
+    async def _end_current_room(
+        self,
+        *,
+        notify_partner: bool,
+    ):
+        """Удалить текущую комнату и сбросить локальное состояние."""
 
-        Порядок операций критически важен:
-            1. Сначала сохраняем ссылки на старого партнёра и комнату
-            2. Сбрасываем своё состояние (partner_channel = None и т.д.)
-            3. Удаляем комнату из Redis
-            4. Уведомляем старого партнёра о разрыве
-            5. Ищем нового партнёра
-
-        ВАЖНО: шаг 2 до шага 4 — если сначала уведомить партнёра,
-        а потом сбрасывать состояние, можно получить гонку состояний.
-        """
         old_partner = self.partner_channel
         old_room = self.room_id
 
-        # Сбрасываем состояние ДО уведомления партнёра
         self.partner_channel = None
         self.room_id = None
         self.in_room = False
+        self.media_connected = False
 
-        # Удаляем комнату из Redis
         if old_room:
             await sync_to_async(self.room_storage.delete_room)(old_room)
 
-        # Партнёр получит partner_disconnected и будет ждать нажатия кнопки
-        if old_partner:
+        if notify_partner and old_partner:
             await self.channel_layer.send(
                 old_partner,
-                {"type": "partner.disconnected"},
+                {
+                    "type": "partner.disconnected",
+                },
             )
 
-        # Идём искать нового партнёра
-        await self._find_partner()
+    async def _enter_cooldown(
+        self,
+        *,
+        event_type: str,
+    ):
+        """Запретить повторный поиск на COOLDOWN_SECONDS."""
+
+        self.search_available_at = time.monotonic() + COOLDOWN_SECONDS
+
+        await self.send_json(
+            {
+                "type": event_type,
+                "seconds": COOLDOWN_SECONDS,
+            }
+        )
+
+    def _cooldown_remaining(self) -> int:
+        """Вернуть оставшееся время cooldown, округлённое вверх."""
+
+        return max(
+            0,
+            math.ceil(self.search_available_at - time.monotonic()),
+        )
+
+    async def _finish_session(
+        self,
+        *,
+        notify_partner: bool,
+    ):
+        """Очистить очередь, room и participant metadata."""
+
+        await sync_to_async(self.matchmaking.leave_queue)(self.channel_name)
+
+        await self._end_current_room(
+            notify_partner=notify_partner,
+        )
+
+        await sync_to_async(self.participant_storage.delete)(self.channel_name)
+
+        self.session_id = None
+        self.session_active = False
+        self.search_available_at = 0.0
+
+    async def _send_error(
+        self,
+        code: str,
+    ):
+        """Отправить клиенту машинный код ошибки."""
+
+        await self.send_json(
+            {
+                "type": "error",
+                "code": code,
+            }
+        )
 
     async def send_json(self, data: dict):
-        """Отправить JSON клиенту через WebSocket."""
+        """Отправить JSON-сообщение браузеру."""
+
         await self.send(text_data=json.dumps(data))

@@ -1,361 +1,1010 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Anonymous random video chat" %}
+{% endblock %}
+
+{% block meta_description %}
+    {% trans "Anonymous random video chat for instant conversations." %}
+{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-950 text-white flex flex-col">
 
-  <!-- Статус -->
-  <div id="status" class="text-center py-3 bg-gray-900 text-sm text-gray-300 tracking-wide">
-    Подключение...
-  </div>
+<div class="min-h-screen bg-gray-950 text-white">
 
-  <!-- Видео + чат -->
-  <div class="flex flex-1 gap-4 p-4">
+    <div class="mx-auto flex w-full max-w-7xl flex-col px-3 py-5 sm:px-4 sm:py-7 lg:px-6">
 
-    <!-- Видео блок -->
-    <div class="flex flex-col gap-4 flex-1">
-      <div class="flex gap-4">
-        <!-- Локальное видео -->
-        <div class="relative flex-1">
-          <video id="localVideo" autoplay muted playsinline
-                 class="w-full rounded-xl bg-gray-800 aspect-video object-cover"></video>
-          <span class="absolute bottom-2 left-2 text-xs bg-black/60 px-2 py-1 rounded">Ты</span>
+        <header class="mb-5">
+            <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                {% trans "Anonymous random video chat" %}
+            </h1>
+
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-400 sm:text-base">
+                {% trans "Meet random people by video in Social Network. Your site profile is not shared with the other participant in the current anonymous mode." %}
+            </p>
+        </header>
+
+        <section
+            id="videoChatSettings"
+            class="mb-4 rounded-xl border border-gray-800 bg-gray-900 p-4 shadow-lg"
+        >
+            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+
+                <fieldset class="max-w-2xl">
+                    <legend class="mb-2 block text-sm font-medium text-gray-200">
+                        {% trans "Your gender in video chat" %}
+                    </legend>
+
+                    <div class="flex flex-wrap gap-2">
+                        {% for value, label in gender_choices %}
+                            <label class="cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="chatGender"
+                                    value="{{ value }}"
+                                    class="peer sr-only"
+                                >
+                                <span class="inline-flex min-h-10 items-center rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-200 transition hover:border-gray-600 peer-checked:border-indigo-500 peer-checked:bg-indigo-600/20 peer-checked:text-indigo-200 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
+                                    {{ label }}
+                                </span>
+                            </label>
+                        {% endfor %}
+                    </div>
+
+                    <p class="mt-2 text-xs leading-5 text-gray-500">
+                        {% trans "This choice applies only to the current video chat session and does not change the gender in your site profile." %}
+                    </p>
+                </fieldset>
+
+                <button
+                    id="btnStart"
+                    type="button"
+                    disabled
+                    class="inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400"
+                >
+                    {% trans "Start" %}
+                </button>
+
+            </div>
+        </section>
+
+        <div
+            id="status"
+            class="mb-4 rounded-xl border border-gray-800 bg-gray-900 px-4 py-3 text-center text-sm tracking-wide text-gray-300"
+        >
+            {% trans "Connecting to chat service..." %}
         </div>
-        <!-- Удалённое видео -->
-        <div class="relative flex-1">
-          <video id="remoteVideo" autoplay playsinline
-                 class="w-full rounded-xl bg-gray-800 aspect-video object-cover"></video>
-          <span class="absolute bottom-2 left-2 text-xs bg-black/60 px-2 py-1 rounded">Партнёр</span>
+
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+
+            <div class="relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg">
+                <video
+                    id="remoteVideo"
+                    autoplay
+                    playsinline
+                    class="aspect-video w-full bg-gray-900 object-cover"
+                ></video>
+
+                <div
+                    id="remotePlaceholder"
+                    class="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-gray-500"
+                >
+                    {% trans "Your next conversation partner will appear here." %}
+                </div>
+
+                <span class="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-medium text-gray-100 backdrop-blur-sm">
+                    {% trans "Partner" %}
+                </span>
+            </div>
+
+            <div class="relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg">
+                <video
+                    id="localVideo"
+                    autoplay
+                    muted
+                    playsinline
+                    class="aspect-video w-full bg-gray-900 object-cover"
+                ></video>
+
+                <div
+                    id="localPlaceholder"
+                    class="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-gray-500"
+                >
+                    {% trans "Your camera will turn on after you press Start." %}
+                </div>
+
+                <span class="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-medium text-gray-100 backdrop-blur-sm">
+                    {% trans "You" %}
+                </span>
+            </div>
+
         </div>
-      </div>
 
-      <!-- Кнопка Следующий -->
-      <button id="btnNext"
-              class="self-center px-8 py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700
-                     rounded-xl font-semibold transition-colors text-sm">
-        Следующий →
-      </button>
+        <div class="flex min-h-20 flex-wrap items-center justify-center gap-3 py-4 sm:py-5">
+            <button
+                id="btnNext"
+                type="button"
+                class="hidden min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700"
+            >
+                {% trans "Next" %} →
+            </button>
+
+            <button
+                id="btnStop"
+                type="button"
+                class="hidden min-h-11 items-center justify-center rounded-xl border border-gray-700 bg-gray-800 px-8 py-3 text-sm font-semibold text-gray-200 transition hover:border-red-500/60 hover:bg-red-950/40 hover:text-red-200"
+            >
+                {% trans "Stop" %}
+            </button>
+        </div>
+
+        <div class="mx-auto flex h-72 w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg sm:h-80">
+
+            <div class="flex items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3">
+                <span class="text-xs font-medium uppercase tracking-widest text-gray-400">
+                    {% trans "Chat" %}
+                </span>
+
+                <span id="chatHint" class="text-xs text-gray-600">
+                    {% trans "Available after connection" %}
+                </span>
+            </div>
+
+            <div
+                id="chatMessages"
+                class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3 text-sm sm:p-4"
+            ></div>
+
+            <div class="flex items-center gap-2 border-t border-gray-800 bg-gray-950/40 p-2 sm:p-3">
+
+                <input
+                    id="chatInput"
+                    type="text"
+                    maxlength="500"
+                    autocomplete="off"
+                    disabled
+                    placeholder="{% trans 'Chat is available after connection' %}"
+                    class="min-w-0 flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-100 outline-none transition placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+
+                <button
+                    id="btnSend"
+                    type="button"
+                    disabled
+                    class="inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-500"
+                >
+                    {% trans "Send" %}
+                </button>
+
+            </div>
+        </div>
     </div>
-
-    <!-- Текстовый чат -->
-    <div class="w-72 flex flex-col bg-gray-900 rounded-xl overflow-hidden">
-      <div class="px-4 py-2 bg-gray-800 text-xs text-gray-400 font-medium uppercase tracking-widest">
-        Чат
-      </div>
-      <div id="chatMessages"
-           class="flex-1 overflow-y-auto p-3 flex flex-col gap-2 text-sm">
-        <!-- сообщения добавляются сюда -->
-      </div>
-      <div class="flex border-t border-gray-800">
-        <input id="chatInput" type="text" placeholder="Сообщение..."
-               class="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder-gray-600"
-               maxlength="500" />
-        <button id="btnSend"
-                class="px-3 py-2 text-indigo-400 hover:text-indigo-300 transition-colors text-sm">
-          ↵
-        </button>
-      </div>
-    </div>
-
-  </div>
 </div>
 
+{% translate "Choose your gender and press Start." as msg_idle %}
+{% translate "Getting access to camera and microphone..." as msg_media %}
+{% translate "Searching for a conversation partner..." as msg_searching %}
+{% translate "Partner found. Connecting..." as msg_connecting %}
+{% translate "Connected" as msg_connected %}
+{% translate "Next search starts automatically" as msg_cooldown %}
+{% translate "Video chat stopped." as msg_stopped %}
+{% translate "Connection was closed by a moderator." as msg_kicked %}
+{% translate "Chat service connection was closed. Reload the page." as msg_ws_closed %}
+{% translate "Select your gender before starting." as msg_gender_required %}
+{% translate "Could not access camera or microphone." as msg_media_error %}
+{% translate "Chat is available after connection" as msg_chat_disabled %}
+{% translate "Write a message..." as msg_chat_enabled %}
+{% translate "Available after connection" as msg_chat_hint_disabled %}
+{% translate "Connected" as msg_chat_hint_enabled %}
+
 <script>
-// ── Состояние ────────────────────────────────────────────────────────────────
-let ws, pc, localStream;
-let role = null;           // 'caller' | 'callee'
-let currentRoomId = null;
-let pcModerator = null;
+const RTC_CONFIG = {{ rtc_config|safe }};
 
-// ── DOM ──────────────────────────────────────────────────────────────────────
-const localVideo   = document.getElementById('localVideo');
-const remoteVideo  = document.getElementById('remoteVideo');
-const statusEl     = document.getElementById('status');
-const btnNext      = document.getElementById('btnNext');
-const chatMessages = document.getElementById('chatMessages');
-const chatInput    = document.getElementById('chatInput');
-const btnSend      = document.getElementById('btnSend');
-
-// RTC_CONFIG
-// const RTC_CONFIG = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] }; #Для dev
-const RTC_CONFIG = {
-    iceServers: [
-        { urls: "stun:stun.l.google.com:19302" }
-    ]
+const I18N = {
+    idle: "{{ msg_idle|escapejs }}",
+    media: "{{ msg_media|escapejs }}",
+    searching: "{{ msg_searching|escapejs }}",
+    connecting: "{{ msg_connecting|escapejs }}",
+    connected: "{{ msg_connected|escapejs }}",
+    cooldown: "{{ msg_cooldown|escapejs }}",
+    stopped: "{{ msg_stopped|escapejs }}",
+    kicked: "{{ msg_kicked|escapejs }}",
+    wsClosed: "{{ msg_ws_closed|escapejs }}",
+    genderRequired: "{{ msg_gender_required|escapejs }}",
+    mediaError: "{{ msg_media_error|escapejs }}",
+    chatDisabled: "{{ msg_chat_disabled|escapejs }}",
+    chatEnabled: "{{ msg_chat_enabled|escapejs }}",
+    chatHintDisabled: "{{ msg_chat_hint_disabled|escapejs }}",
+    chatHintEnabled: "{{ msg_chat_hint_enabled|escapejs }}",
 };
 
-// ── Старт ────────────────────────────────────────────────────────────────────
-async function start() {
-    setStatus('Получение камеры...');
-    try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        localVideo.srcObject = localStream;
-    } catch (err) {
-        setStatus('Ошибка доступа к камере: ' + err.message);
-        return;
-    }
-    connectWS();
+let ws = null;
+let pc = null;
+let pcModerator = null;
+let localStream = null;
+
+let role = null;
+let currentRoomId = null;
+let chatState = "idle";
+let cooldownTimer = null;
+let wasKicked = false;
+let startAttempt = 0;
+let startSent = false;
+
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+const localPlaceholder = document.getElementById("localPlaceholder");
+const remotePlaceholder = document.getElementById("remotePlaceholder");
+
+const statusEl = document.getElementById("status");
+const chatGenderInputs = Array.from(
+    document.querySelectorAll(
+        'input[name="chatGender"]'
+    )
+);
+
+const btnStart = document.getElementById("btnStart");
+const btnNext = document.getElementById("btnNext");
+const btnStop = document.getElementById("btnStop");
+
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const btnSend = document.getElementById("btnSend");
+const chatHint = document.getElementById("chatHint");
+
+function setState(nextState) {
+    chatState = nextState;
+
+    const activeSession = [
+        "starting",
+        "searching",
+        "connecting",
+        "connected",
+        "cooldown",
+    ].includes(nextState);
+
+    chatGenderInputs.forEach(
+        (input) => {
+            input.disabled = (
+                nextState !== "idle"
+            );
+        }
+    );
+
+    btnStart.classList.toggle(
+        "hidden",
+        nextState !== "idle"
+    );
+
+    btnStart.disabled = (
+        nextState !== "idle"
+        || !ws
+        || ws.readyState !== WebSocket.OPEN
+    );
+
+    btnStop.classList.toggle(
+        "hidden",
+        !activeSession
+    );
+    btnStop.classList.toggle(
+        "inline-flex",
+        activeSession
+    );
+
+    const canSkip = (
+        nextState === "connected"
+    );
+
+    btnNext.classList.toggle(
+        "hidden",
+        !canSkip
+    );
+    btnNext.classList.toggle(
+        "inline-flex",
+        canSkip
+    );
+
+    setChatEnabled(
+        nextState === "connected"
+    );
 }
 
-// ── WebSocket ─────────────────────────────────────────────────────────────────
+function setChatEnabled(enabled) {
+    chatInput.disabled = !enabled;
+    btnSend.disabled = !enabled;
+
+    chatInput.placeholder = (
+        enabled
+            ? I18N.chatEnabled
+            : I18N.chatDisabled
+    );
+
+    chatHint.textContent = (
+        enabled
+            ? I18N.chatHintEnabled
+            : I18N.chatHintDisabled
+    );
+}
+
+function setStatus(text) {
+    statusEl.textContent = text;
+}
+
 function connectWS() {
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    ws = new WebSocket(`${proto}://${location.host}/ws/chat/`);
+    const protocol = (
+        location.protocol === "https:"
+            ? "wss"
+            : "ws"
+    );
 
-    ws.onopen = () => console.log('[WS] открыт');
+    ws = new WebSocket(
+        `${protocol}://${location.host}/ws/chat/`
+    );
 
-    ws.onmessage = async (e) => {
-        const msg = JSON.parse(e.data);
-        console.log('[WS] RAW:', JSON.stringify(msg));
+    ws.onopen = () => {
+        if (chatState === "idle") {
+            setStatus(I18N.idle);
+            btnStart.disabled = false;
+        }
+    };
 
-        // ── Верхнеуровневые сообщения (type на верхнем уровне) ───────────────
-        switch (msg.type) {
+    ws.onmessage = async (event) => {
+        const message = JSON.parse(
+            event.data
+        );
 
-            case 'status':
-                setStatus('Ожидание собеседника...');
-                clearChat();
+        switch (message.type) {
+            case "started":
+                startSent = true;
+                setState("searching");
                 return;
 
-            case 'matched':
-              role = msg.role;
-              currentRoomId = msg.room_id;
-              const myRole = msg.role;  // ← сохраняем до await
-              console.log('[DEBUG] matched, role:', myRole);
-              clearChat();
-              setStatus('Собеседник найден, соединяемся...');
-              try {
-                await setupPeerConnection();
-                console.log('[DEBUG] setupPeerConnection done, myRole:', myRole);
-                if (myRole === 'callee') {
-                  console.log('[DEBUG] callee отправляет ready');
-                  wsSend({type: 'ready'});
+            case "status":
+                if (message.message === "waiting") {
+                    cancelCooldown();
+                    clearChat();
+                    setState("searching");
+                    setStatus(I18N.searching);
                 }
-              } catch (e) {
-                console.error('[DEBUG] EXCEPTION in matched handler:', e);
-              }
-              return;
+                return;
 
-            case 'partner_disconnected':
-                setStatus('Партнёр отключился. Нажмите "Следующий" для поиска нового.');
-                closePeer();
+            case "matched": {
+                cancelCooldown();
+
+                role = message.role;
+                currentRoomId = message.room_id;
+                const myRole = message.role;
+
+                clearChat();
+                setState("connecting");
+                setStatus(I18N.connecting);
+
+                try {
+                    await setupPeerConnection();
+
+                    if (myRole === "callee") {
+                        wsSend({
+                            type: "ready",
+                        });
+                    }
+                } catch (error) {
+                    console.error(
+                        "[RTC] setup error:",
+                        error
+                    );
+                }
+
+                return;
+            }
+
+            case "cooldown":
+                startCooldown(
+                    message.seconds
+                );
+                return;
+
+            case "partner_disconnected":
+                closePeerConnections();
+                clearChat();
+
+                startCooldown(
+                    message.seconds || 3
+                );
+                return;
+
+            case "stopped":
+                startSent = false;
+                cancelCooldown();
+                closePeerConnections();
+                stopLocalMedia();
+                clearChat();
+                setState("idle");
+                setStatus(I18N.stopped);
+                return;
+
+            case "kicked":
+                wasKicked = true;
+                startSent = false;
+                cancelCooldown();
+                closePeerConnections();
+                stopLocalMedia();
+                clearChat();
+                setState("idle");
+                setStatus(I18N.kicked);
+                return;
+
+            case "error":
+                handleServerError(
+                    message.code
+                );
                 return;
         }
 
-        // ── Сигналинг и чат приходят как { payload: { type, ... } } ──────────
-        // Бэкенд оборачивает все signaling.message события именно так.
-        if (msg.payload) {
-            await handlePayload(msg.payload);
+        if (message.payload) {
+            await handlePayload(
+                message.payload
+            );
         }
     };
 
     ws.onclose = () => {
-        setStatus('WebSocket закрыт. Обновите страницу.');
-        closePeer();
+        startSent = false;
+        cancelCooldown();
+        closePeerConnections();
+        stopLocalMedia();
+        btnStart.disabled = true;
+
+        if (!wasKicked) {
+            setState("idle");
+            setStatus(I18N.wsClosed);
+        }
     };
-    ws.onerror = (err) => console.error('[WS] ошибка:', err);
+
+    ws.onerror = (error) => {
+        console.error(
+            "[WS] error:",
+            error
+        );
+    };
 }
 
-// ── Обработка payload (WebRTC сигналинг + чат) ───────────────────────────────
 async function handlePayload(payload) {
-    console.log('[WS] payload:', payload.type, payload);
-
     switch (payload.type) {
-
-        // ── Handshake ─────────────────────────────────────────────────────────
-        case 'ready_to_connect':
-            // Callee готов — теперь caller создаёт offer
-            if (role === 'caller') {
-                console.log('[RTC] callee готов, отправляем offer');
+        case "ready_to_connect":
+            if (role === "caller") {
                 await sendOffer();
             }
-            break;
+            return;
 
-        // ── WebRTC SDP ────────────────────────────────────────────────────────
-        case 'offer':
-          if (payload.from_moderator) {
-            // Offer от модератора — отдельный pc, не трогаем основной
-            console.log('[RTC] offer от модератора');
-            if (!pcModerator) {
-              pcModerator = new RTCPeerConnection(RTC_CONFIG);
-              // Добавляем свои треки — модератор нас увидит
-              if (localStream) {
-                localStream.getTracks().forEach(t => pcModerator.addTrack(t, localStream));
-              }
-              pcModerator.onicecandidate = (e) => {
-                if (e.candidate) {
-                  wsSend({
-                    type: 'ice_candidate',
-                    candidate: e.candidate,
-                    from_moderator_reply: true,
-                    answering_channel: payload.target, // наш channel_name
-                  });
-                }
-              };
+        case "offer":
+            if (payload.from_moderator) {
+                await handleModeratorOffer(
+                    payload
+                );
+                return;
             }
-            await pcModerator.setRemoteDescription(new RTCSessionDescription(payload.sdp));
-            const modAnswer = await pcModerator.createAnswer();
-            await pcModerator.setLocalDescription(modAnswer);
-            wsSend({
-              type: 'answer',
-              sdp: pcModerator.localDescription,
-              from_moderator_reply: true,
-              answering_channel: payload.target,
-            });
-            break;
-          }
-          // Обычный offer от партнёра — старый код
-          if (!pc) return;
-          console.log('[RTC] получен offer, создаём answer');
-          await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          wsSend({type: 'answer', sdp: pc.localDescription});
-          break;
 
-        case 'answer':
-            if (!pc) return;
-            console.log('[RTC] получен answer');
-            await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
-            break;
+            await handlePartnerOffer(
+                payload
+            );
+            return;
 
-        case 'ice_candidate':
-            if (!pc) return;
-            try {
-                await pc.addIceCandidate(new RTCIceCandidate(payload.candidate));
-            } catch (err) {
-                console.warn('[RTC] ошибка добавления ICE candidate:', err);
+        case "answer":
+            if (!pc) {
+                return;
             }
-            break;
 
-        // ── Текстовый чат ─────────────────────────────────────────────────────
-        case 'chat_message':
-            appendMessage(payload.text, 'partner');
-            break;
+            await pc.setRemoteDescription(
+                new RTCSessionDescription(
+                    payload.sdp
+                )
+            );
+            return;
+
+        case "ice_candidate":
+            await handleIceCandidate(
+                payload
+            );
+            return;
+
+        case "chat_message":
+            if (chatState === "connected") {
+                appendMessage(
+                    payload.text,
+                    "partner"
+                );
+            }
+            return;
     }
 }
 
-// ── WebRTC ───────────────────────────────────────────────────────────────────
-async function setupPeerConnection() {
-    console.log('[DEBUG] setupPeerConnection, localStream:', localStream);
-    closePeer();  // закрываем старое соединение если есть
-
-    pc = new RTCPeerConnection(RTC_CONFIG);
-
-    if (localStream) {  // ← оберни в проверку
-        localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-    } else {
-        console.warn('[DEBUG] localStream null — подключаемся без медиа');
+async function handlePartnerOffer(payload) {
+    if (!pc) {
+        return;
     }
 
-    // Удалённый стрим
-    pc.ontrack = (e) => {
-        console.log('[RTC] получен remote track');
-        remoteVideo.srcObject = e.streams[0];
-        setStatus('Подключено ✓');
-    };
+    await pc.setRemoteDescription(
+        new RTCSessionDescription(
+            payload.sdp
+        )
+    );
 
-    // ICE кандидаты
-    pc.onicecandidate = (e) => {
-        if (e.candidate) {
-            console.log('[RTC] ICE candidate:', e.candidate.type);
-            wsSend({ type: 'ice_candidate', candidate: e.candidate });
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+
+    wsSend({
+        type: "answer",
+        sdp: pc.localDescription,
+    });
+}
+
+async function handleModeratorOffer(payload) {
+    closeModeratorPeer();
+
+    pcModerator = new RTCPeerConnection(
+        RTC_CONFIG
+    );
+
+    if (localStream) {
+        localStream.getTracks().forEach(
+            (track) => {
+                pcModerator.addTrack(
+                    track,
+                    localStream
+                );
+            }
+        );
+    }
+
+    pcModerator.onicecandidate = (event) => {
+        if (!event.candidate) {
+            return;
         }
+
+        wsSend({
+            type: "ice_candidate",
+            candidate: event.candidate,
+            from_moderator_reply: true,
+        });
     };
 
-    // Состояние соединения
+    await pcModerator.setRemoteDescription(
+        new RTCSessionDescription(
+            payload.sdp
+        )
+    );
+
+    const answer = await pcModerator.createAnswer();
+    await pcModerator.setLocalDescription(answer);
+
+    wsSend({
+        type: "answer",
+        sdp: pcModerator.localDescription,
+        from_moderator_reply: true,
+    });
+}
+
+async function handleIceCandidate(payload) {
+    try {
+        if (payload.from_moderator) {
+            if (!pcModerator) {
+                return;
+            }
+
+            await pcModerator.addIceCandidate(
+                new RTCIceCandidate(
+                    payload.candidate
+                )
+            );
+            return;
+        }
+
+        if (!pc) {
+            return;
+        }
+
+        await pc.addIceCandidate(
+            new RTCIceCandidate(
+                payload.candidate
+            )
+        );
+    } catch (error) {
+        console.warn(
+            "[RTC] ICE error:",
+            error
+        );
+    }
+}
+
+async function setupPeerConnection() {
+    closePeerConnections();
+
+    pc = new RTCPeerConnection(
+        RTC_CONFIG
+    );
+
+    if (localStream) {
+        localStream.getTracks().forEach(
+            (track) => {
+                pc.addTrack(
+                    track,
+                    localStream
+                );
+            }
+        );
+    }
+
+    pc.ontrack = (event) => {
+        remoteVideo.srcObject = (
+            event.streams[0]
+        );
+        remotePlaceholder.classList.add(
+            "hidden"
+        );
+    };
+
+    pc.onicecandidate = (event) => {
+        if (!event.candidate) {
+            return;
+        }
+
+        wsSend({
+            type: "ice_candidate",
+            candidate: event.candidate,
+        });
+    };
+
     pc.onconnectionstatechange = () => {
-        console.log('[RTC] connectionState:', pc.connectionState);
-        if (pc.connectionState === 'connected') {
-            setStatus('Подключено ✓');
-        } else if (pc.connectionState === 'failed') {
-            setStatus('Соединение прервано');
-            closePeer();
-        } else if (pc.connectionState === 'disconnected') {
-            setStatus('Переподключение...');
+        if (!pc) {
+            return;
         }
-    };
 
-    pc.onicegatheringstatechange = () => {
-        console.log('[RTC] iceGatheringState:', pc.iceGatheringState);
+        if (pc.connectionState === "connected") {
+            setState("connected");
+            setStatus(I18N.connected);
+
+            wsSend({
+                type: "connected",
+            });
+            return;
+        }
+
+        if (pc.connectionState === "failed") {
+            closePeerConnections();
+        }
     };
 }
 
 async function sendOffer() {
     if (!pc) {
-        console.error('[RTC] sendOffer: pc не инициализирован');
         return;
     }
-    try {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        console.log('[RTC] offer отправлен');
-        wsSend({ type: 'offer', sdp: pc.localDescription });
-    } catch (err) {
-        console.error('[RTC] ошибка создания offer:', err);
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    wsSend({
+        type: "offer",
+        sdp: pc.localDescription,
+    });
+}
+
+function closeMainPeer() {
+    if (pc) {
+        pc.close();
+        pc = null;
+    }
+
+    remoteVideo.srcObject = null;
+    remotePlaceholder.classList.remove(
+        "hidden"
+    );
+}
+
+function closeModeratorPeer() {
+    if (pcModerator) {
+        pcModerator.close();
+        pcModerator = null;
     }
 }
 
-function closePeer() {
-    if (pc) { pc.close(); pc = null; }
-    if (pcModerator) { pcModerator.close(); pcModerator = null; }
-    remoteVideo.srcObject = null;
+function closePeerConnections() {
+    closeMainPeer();
+    closeModeratorPeer();
+
     currentRoomId = null;
+    role = null;
+
+    setChatEnabled(false);
 }
 
-// ── Текстовый чат ─────────────────────────────────────────────────────────────
 function appendMessage(text, sender) {
-    const div = document.createElement('div');
-    div.className = sender === 'me'
-        ? 'self-end bg-indigo-600 text-white px-3 py-1.5 rounded-2xl rounded-br-sm max-w-[90%] break-words'
-        : 'self-start bg-gray-700 text-gray-100 px-3 py-1.5 rounded-2xl rounded-bl-sm max-w-[90%] break-words';
-    div.textContent = text;
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    const message = document.createElement(
+        "div"
+    );
+
+    message.className = (
+        sender === "me"
+            ? "self-end max-w-[85%] break-words rounded-2xl rounded-br-sm bg-indigo-600 px-3 py-2 text-white"
+            : "self-start max-w-[85%] break-words rounded-2xl rounded-bl-sm bg-gray-700 px-3 py-2 text-gray-100"
+    );
+
+    message.textContent = text;
+
+    chatMessages.appendChild(
+        message
+    );
+    chatMessages.scrollTop = (
+        chatMessages.scrollHeight
+    );
 }
 
 function clearChat() {
-    chatMessages.innerHTML = '';
+    chatMessages.innerHTML = "";
 }
 
 function sendChatMessage() {
+    if (chatState !== "connected") {
+        return;
+    }
+
     const text = chatInput.value.trim();
-    if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
-    wsSend({ type: 'chat_message', text });
-    appendMessage(text, 'me');
-    chatInput.value = '';
-}
 
-btnSend.addEventListener('click', sendChatMessage);
-chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendChatMessage();
+    if (
+        !text
+        || !ws
+        || ws.readyState !== WebSocket.OPEN
+    ) {
+        return;
     }
-});
 
-// ── Кнопка Следующий ─────────────────────────────────────────────────────────
-// WS НЕ закрываем — только пересоздаём RTCPeerConnection
-btnNext.addEventListener('click', () => {
-    closePeer();
-    clearChat();
-    setStatus('Ищем следующего...');
-    wsSend({ type: 'next' });
-});
+    wsSend({
+        type: "chat_message",
+        text,
+    });
 
-// ── Утилиты ───────────────────────────────────────────────────────────────────
-function wsSend(data) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(data));
-    } else {
-        console.warn('[WS] не открыт, сообщение не отправлено:', data.type);
+    appendMessage(
+        text,
+        "me"
+    );
+
+    chatInput.value = "";
+    chatInput.focus();
+}
+
+function startCooldown(seconds) {
+    cancelCooldown();
+    closePeerConnections();
+    setState("cooldown");
+
+    let remaining = Number(seconds) || 3;
+
+    const render = () => {
+        setStatus(
+            `${I18N.cooldown}: ${remaining}`
+        );
+    };
+
+    render();
+
+    cooldownTimer = setInterval(
+        () => {
+            remaining -= 1;
+
+            if (remaining <= 0) {
+                cancelCooldown();
+                setState("searching");
+                setStatus(I18N.searching);
+
+                wsSend({
+                    type: "search",
+                });
+                return;
+            }
+
+            render();
+        },
+        1000
+    );
+}
+
+function cancelCooldown() {
+    if (cooldownTimer) {
+        clearInterval(cooldownTimer);
+        cooldownTimer = null;
     }
 }
 
-function setStatus(text) {
-    statusEl.textContent = text;
-    console.log('[STATUS]', text);
+function handleServerError(code) {
+    if (code === "invalid_gender") {
+        startSent = false;
+        stopLocalMedia();
+        setState("idle");
+        setStatus(I18N.genderRequired);
+        return;
+    }
+
+    console.warn(
+        "[WS] server error:",
+        code
+    );
 }
 
-// ── Запуск ────────────────────────────────────────────────────────────────────
-start();
+function getSelectedChatGender() {
+    const selected = chatGenderInputs.find(
+        (input) => input.checked
+    );
+
+    return selected ? selected.value : "";
+}
+
+function stopLocalMedia() {
+    if (!localStream) {
+        return;
+    }
+
+    localStream.getTracks().forEach(
+        (track) => track.stop()
+    );
+
+    localStream = null;
+    localVideo.srcObject = null;
+
+    localPlaceholder.classList.remove(
+        "hidden"
+    );
+}
+
+async function ensureLocalMedia() {
+    if (localStream) {
+        return true;
+    }
+
+    setStatus(I18N.media);
+
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia(
+            {
+                video: true,
+                audio: true,
+            }
+        );
+
+        localVideo.srcObject = localStream;
+        localPlaceholder.classList.add(
+            "hidden"
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            "[MEDIA] error:",
+            error
+        );
+
+        setStatus(I18N.mediaError);
+        return false;
+    }
+}
+
+btnStart.addEventListener(
+    "click",
+    async () => {
+        const gender = getSelectedChatGender();
+
+        if (!gender) {
+            setStatus(
+                I18N.genderRequired
+            );
+            return;
+        }
+
+        if (
+            !ws
+            || ws.readyState !== WebSocket.OPEN
+        ) {
+            return;
+        }
+
+        const attempt = ++startAttempt;
+        startSent = false;
+
+        setState("starting");
+
+        const mediaReady = await ensureLocalMedia();
+
+        if (attempt !== startAttempt) {
+            if (mediaReady) {
+                stopLocalMedia();
+            }
+            return;
+        }
+
+        if (!mediaReady) {
+            setState("idle");
+            return;
+        }
+
+        startSent = true;
+
+        wsSend({
+            type: "start",
+            gender,
+        });
+    }
+);
+
+btnNext.addEventListener(
+    "click",
+    () => {
+        if (chatState !== "connected") {
+            return;
+        }
+
+        closePeerConnections();
+        clearChat();
+
+        wsSend({
+            type: "next",
+        });
+    }
+);
+
+btnStop.addEventListener(
+    "click",
+    () => {
+        startAttempt += 1;
+
+        cancelCooldown();
+        closePeerConnections();
+        stopLocalMedia();
+        clearChat();
+
+        if (
+            startSent
+            && ws
+            && ws.readyState === WebSocket.OPEN
+        ) {
+            wsSend({
+                type: "stop",
+            });
+            return;
+        }
+
+        startSent = false;
+        setState("idle");
+        setStatus(I18N.stopped);
+    }
+);
+
+btnSend.addEventListener(
+    "click",
+    sendChatMessage
+);
+
+chatInput.addEventListener(
+    "keydown",
+    (event) => {
+        if (
+            event.key === "Enter"
+            && !event.shiftKey
+        ) {
+            event.preventDefault();
+            sendChatMessage();
+        }
+    }
+);
+
+window.addEventListener(
+    "beforeunload",
+    () => {
+        stopLocalMedia();
+    }
+);
+
+setState("idle");
+connectWS();
 </script>
+
 {% endblock %}

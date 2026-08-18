@@ -1,5 +1,8 @@
 # src/video_chat/tests/test_moderator_consumer.py
 
+"""Регрессионные тесты WebSocket consumer модератора видеочата."""
+
+import asyncio
 from types import SimpleNamespace
 
 import pytest
@@ -21,6 +24,8 @@ ROOM_META = {
 
 
 def websocket_application(user):
+    """Создать ASGI-приложение с заданным пользователем в scope."""
+
     router = URLRouter(video_chat.routing.websocket_urlpatterns)
 
     async def application(
@@ -41,6 +46,8 @@ def websocket_application(user):
 
 
 def anonymous_user():
+    """Вернуть неавторизованного пользователя."""
+
     return SimpleNamespace(
         is_authenticated=False,
         is_staff=False,
@@ -48,6 +55,8 @@ def anonymous_user():
 
 
 def regular_user():
+    """Вернуть обычного авторизованного пользователя."""
+
     return SimpleNamespace(
         is_authenticated=True,
         is_staff=False,
@@ -55,6 +64,8 @@ def regular_user():
 
 
 def staff_user():
+    """Вернуть staff-пользователя."""
+
     return SimpleNamespace(
         is_authenticated=True,
         is_staff=True,
@@ -72,6 +83,8 @@ def test_moderator_websocket_rejects_non_staff(
     user,
     monkeypatch,
 ):
+    """Модераторский WebSocket недоступен пользователям без staff-прав."""
+
     monkeypatch.setattr(
         "video_chat.consumers.moderator.RoomStorage.get_room",
         lambda self, room_id: ROOM_META,
@@ -97,6 +110,8 @@ def test_moderator_websocket_rejects_non_staff(
 def test_moderator_websocket_rejects_missing_room(
     monkeypatch,
 ):
+    """Staff-пользователь не может подключиться к отсутствующей комнате."""
+
     monkeypatch.setattr(
         "video_chat.consumers.moderator.RoomStorage.get_room",
         lambda self, room_id: None,
@@ -119,6 +134,8 @@ def test_moderator_websocket_rejects_missing_room(
 def test_staff_moderator_receives_room_info(
     monkeypatch,
 ):
+    """Staff-модератор получает метаданные существующей комнаты."""
+
     monkeypatch.setattr(
         "video_chat.consumers.moderator.RoomStorage.get_room",
         lambda self, room_id: ROOM_META,
@@ -146,18 +163,27 @@ def test_staff_moderator_receives_room_info(
     async_to_sync(scenario)()
 
 
-def test_moderator_signaling_is_sent_to_target(
+def test_moderator_signaling_is_sent_to_room_participant(
     monkeypatch,
 ):
-    monkeypatch.setattr(
-        "video_chat.consumers.moderator.RoomStorage.get_room",
-        lambda self, room_id: ROOM_META,
-    )
+    """WebRTC signaling модератора передаётся участнику текущей комнаты."""
 
     async def scenario():
         layer = get_channel_layer()
 
-        target = await layer.new_channel("moderator-test.")
+        caller_channel = await layer.new_channel("moderator-caller.")
+        callee_channel = await layer.new_channel("moderator-callee.")
+
+        room_meta = {
+            "caller": caller_channel,
+            "callee": callee_channel,
+            "created_at": 1000.0,
+        }
+
+        monkeypatch.setattr(
+            "video_chat.consumers.moderator.RoomStorage.get_room",
+            lambda self, room_id: room_meta,
+        )
 
         communicator = WebsocketCommunicator(
             websocket_application(staff_user()),
@@ -171,7 +197,7 @@ def test_moderator_signaling_is_sent_to_target(
         await communicator.send_json_to(
             {
                 "type": "offer",
-                "target": target,
+                "target": caller_channel,
                 "sdp": {
                     "type": "offer",
                     "sdp": "test-offer",
@@ -179,13 +205,16 @@ def test_moderator_signaling_is_sent_to_target(
             }
         )
 
-        event = await layer.receive(target)
+        event = await asyncio.wait_for(
+            layer.receive(caller_channel),
+            timeout=1,
+        )
 
         assert event == {
             "type": "signaling.message",
             "payload": {
                 "type": "offer",
-                "target": target,
+                "target": caller_channel,
                 "sdp": {
                     "type": "offer",
                     "sdp": "test-offer",
@@ -199,9 +228,65 @@ def test_moderator_signaling_is_sent_to_target(
     async_to_sync(scenario)()
 
 
+def test_moderator_cannot_signal_foreign_channel(
+    monkeypatch,
+):
+    """Модератор не может отправить signaling пользователю другой комнаты."""
+
+    async def scenario():
+        layer = get_channel_layer()
+
+        caller_channel = await layer.new_channel("moderator-caller.")
+        callee_channel = await layer.new_channel("moderator-callee.")
+        foreign_channel = await layer.new_channel("moderator-foreign.")
+
+        room_meta = {
+            "caller": caller_channel,
+            "callee": callee_channel,
+            "created_at": 1000.0,
+        }
+
+        monkeypatch.setattr(
+            "video_chat.consumers.moderator.RoomStorage.get_room",
+            lambda self, room_id: room_meta,
+        )
+
+        communicator = WebsocketCommunicator(
+            websocket_application(staff_user()),
+            "/ws/chat/moderate/room-1/",
+        )
+
+        assert (await communicator.connect())[0] is True
+
+        await communicator.receive_json_from(timeout=1)
+
+        await communicator.send_json_to(
+            {
+                "type": "offer",
+                "target": foreign_channel,
+                "sdp": {
+                    "type": "offer",
+                    "sdp": "foreign-offer",
+                },
+            }
+        )
+
+        with pytest.raises(asyncio.TimeoutError):
+            await asyncio.wait_for(
+                layer.receive(foreign_channel),
+                timeout=0.1,
+            )
+
+        await communicator.disconnect()
+
+    async_to_sync(scenario)()
+
+
 def test_moderator_receives_participant_signaling(
     monkeypatch,
 ):
+    """Модератор получает signaling участника через группу комнаты."""
+
     monkeypatch.setattr(
         "video_chat.consumers.moderator.RoomStorage.get_room",
         lambda self, room_id: ROOM_META,
@@ -242,18 +327,27 @@ def test_moderator_receives_participant_signaling(
     async_to_sync(scenario)()
 
 
-def test_moderator_kick_is_sent_to_target(
+def test_moderator_kick_is_sent_to_room_participant(
     monkeypatch,
 ):
-    monkeypatch.setattr(
-        "video_chat.consumers.moderator.RoomStorage.get_room",
-        lambda self, room_id: ROOM_META,
-    )
+    """Команда kick передаётся участнику текущей комнаты."""
 
     async def scenario():
         layer = get_channel_layer()
 
-        target = await layer.new_channel("moderator-kick-test.")
+        caller_channel = await layer.new_channel("moderator-kick-caller.")
+        callee_channel = await layer.new_channel("moderator-kick-callee.")
+
+        room_meta = {
+            "caller": caller_channel,
+            "callee": callee_channel,
+            "created_at": 1000.0,
+        }
+
+        monkeypatch.setattr(
+            "video_chat.consumers.moderator.RoomStorage.get_room",
+            lambda self, room_id: room_meta,
+        )
 
         communicator = WebsocketCommunicator(
             websocket_application(staff_user()),
@@ -267,11 +361,14 @@ def test_moderator_kick_is_sent_to_target(
         await communicator.send_json_to(
             {
                 "type": "kick",
-                "target": target,
+                "target": callee_channel,
             }
         )
 
-        event = await layer.receive(target)
+        event = await asyncio.wait_for(
+            layer.receive(callee_channel),
+            timeout=1,
+        )
 
         assert event == {
             "type": "moderator.kick",
@@ -279,8 +376,61 @@ def test_moderator_kick_is_sent_to_target(
 
         assert await communicator.receive_json_from(timeout=1) == {
             "type": "kick_sent",
-            "target": target,
+            "target": callee_channel,
         }
+
+        await communicator.disconnect()
+
+    async_to_sync(scenario)()
+
+
+def test_moderator_cannot_kick_foreign_channel(
+    monkeypatch,
+):
+    """Модератор не может кикнуть пользователя другой комнаты."""
+
+    async def scenario():
+        layer = get_channel_layer()
+
+        caller_channel = await layer.new_channel("moderator-kick-caller.")
+        callee_channel = await layer.new_channel("moderator-kick-callee.")
+        foreign_channel = await layer.new_channel("moderator-kick-foreign.")
+
+        room_meta = {
+            "caller": caller_channel,
+            "callee": callee_channel,
+            "created_at": 1000.0,
+        }
+
+        monkeypatch.setattr(
+            "video_chat.consumers.moderator.RoomStorage.get_room",
+            lambda self, room_id: room_meta,
+        )
+
+        communicator = WebsocketCommunicator(
+            websocket_application(staff_user()),
+            "/ws/chat/moderate/room-1/",
+        )
+
+        assert (await communicator.connect())[0] is True
+
+        await communicator.receive_json_from(timeout=1)
+
+        await communicator.send_json_to(
+            {
+                "type": "kick",
+                "target": foreign_channel,
+            }
+        )
+
+        with pytest.raises(asyncio.TimeoutError):
+            await asyncio.wait_for(
+                layer.receive(foreign_channel),
+                timeout=0.1,
+            )
+
+        # Для отклонённого target модератор не должен получить kick_sent.
+        assert await communicator.receive_nothing(timeout=0.1)
 
         await communicator.disconnect()
 

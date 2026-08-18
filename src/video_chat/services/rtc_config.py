@@ -1,27 +1,18 @@
 # src/video_chat/services/rtc_config.py
 
-# chat/services/rtc_config.py
-# Утилита для получения RTC_CONFIG из переменных окружения.
-# Используется во views чтобы передать TURN настройки в шаблон.
+"""Формирование WebRTC ICE-конфигурации для браузера."""
 
 import json
 import os
 
 
 def get_rtc_config() -> str:
-    """Вернуть RTC_CONFIG как JSON строку для вставки в шаблон.
+    """Вернуть JSON-конфигурацию STUN/TURN серверов."""
 
-    В dev (localhost): только STUN Google.
-    На проде: STUN + TURN из переменных окружения.
-
-    Использование в view:
-        context["rtc_config"] = get_rtc_config()
-
-    Использование в шаблоне:
-        const RTC_CONFIG = {{ rtc_config|safe }};
-    """
     ice_servers = [
-        {"urls": "stun:stun.l.google.com:19302"},
+        {
+            "urls": "stun:stun.l.google.com:19302",
+        }
     ]
 
     turn_url = os.environ.get("TURN_URL")
@@ -37,4 +28,8 @@ def get_rtc_config() -> str:
             }
         )
 
-    return json.dumps({"iceServers": ice_servers})
+    return json.dumps(
+        {
+            "iceServers": ice_servers,
+        }
+    )

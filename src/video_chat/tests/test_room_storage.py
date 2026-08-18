@@ -1,5 +1,7 @@
 # src/video_chat/tests/test_room_storage.py
 
+"""Тесты Redis-хранилища активных комнат."""
+
 import json
 
 from video_chat.services.room_storage import (
@@ -9,7 +11,7 @@ from video_chat.services.room_storage import (
 )
 
 
-def test_create_room_stores_metadata_and_ttl(
+def test_create_room_stores_participant_metadata_and_ttl(
     fake_redis,
     monkeypatch,
 ):
@@ -20,10 +22,21 @@ def test_create_room_stores_metadata_and_ttl(
 
     storage = RoomStorage()
 
+    caller = {
+        "user_id": 1,
+        "chat_gender": "male",
+    }
+    callee = {
+        "user_id": None,
+        "chat_gender": "female",
+    }
+
     storage.create_room(
         "room-1",
         "caller-channel",
         "callee-channel",
+        caller_participant=caller,
+        callee_participant=callee,
     )
 
     raw = fake_redis.hget(
@@ -34,13 +47,22 @@ def test_create_room_stores_metadata_and_ttl(
     assert json.loads(raw) == {
         "caller": "caller-channel",
         "callee": "callee-channel",
+        "caller_participant": caller,
+        "callee_participant": callee,
         "created_at": 1234.5,
     }
 
-    assert fake_redis.expirations[ROOMS_KEY] == ROOM_TTL
+    assert (
+        fake_redis.expirations[
+            ROOMS_KEY
+        ]
+        == ROOM_TTL
+    )
 
 
-def test_get_room_returns_metadata(fake_redis):
+def test_get_room_returns_metadata(
+    fake_redis,
+):
     storage = RoomStorage()
 
     fake_redis.hset(
@@ -50,14 +72,20 @@ def test_get_room_returns_metadata(fake_redis):
             {
                 "caller": "caller-channel",
                 "callee": "callee-channel",
+                "caller_participant": {},
+                "callee_participant": {},
                 "created_at": 1000.0,
             }
         ),
     )
 
-    assert storage.get_room("room-1") == {
+    assert storage.get_room(
+        "room-1"
+    ) == {
         "caller": "caller-channel",
         "callee": "callee-channel",
+        "caller_participant": {},
+        "callee_participant": {},
         "created_at": 1000.0,
     }
 
@@ -67,10 +95,14 @@ def test_get_room_returns_none_when_missing(
 ):
     storage = RoomStorage()
 
-    assert storage.get_room("missing") is None
+    assert storage.get_room(
+        "missing"
+    ) is None
 
 
-def test_delete_room_removes_room(fake_redis):
+def test_delete_room_removes_room(
+    fake_redis,
+):
     storage = RoomStorage()
 
     fake_redis.hset(
@@ -79,9 +111,13 @@ def test_delete_room_removes_room(fake_redis):
         "{}",
     )
 
-    storage.delete_room("room-1")
+    storage.delete_room(
+        "room-1"
+    )
 
-    assert storage.get_room("room-1") is None
+    assert storage.get_room(
+        "room-1"
+    ) is None
 
 
 def test_list_rooms_returns_newest_first(
@@ -115,7 +151,10 @@ def test_list_rooms_returns_newest_first(
 
     rooms = storage.list_rooms()
 
-    assert [room["room_id"] for room in rooms] == [
+    assert [
+        room["room_id"]
+        for room in rooms
+    ] == [
         "new-room",
         "old-room",
     ]

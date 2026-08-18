@@ -1,300 +1,418 @@
-{% extends 'base.html' %}
-{% comment %}
-moderator_room.html — Страница модератора для просмотра конкретной комнаты.
+{% extends "base.html" %}
+{% load i18n %}
 
-Что происходит на этой странице:
-    1. Открывается WebSocket на /ws/chat/moderate/{room_id}/
-    2. Сервер присылает room_info с channel_name обоих участников
-    3. Фронт устанавливает ДВА отдельных RTCPeerConnection:
-       - pcCaller → соединение с первым участником
-       - pcCallee → соединение со вторым участником
-    4. Для каждого соединения модератор отправляет offer (recvonly — без камеры)
-    5. Участники отвечают answer через SignalingConsumer
-    6. Видео появляется в двух video элементах
-
-Кнопка Kick:
-    kickUser('caller') → wsSend({type:'kick', target: CALLER_CHANNEL})
-    → ModeratorConsumer.receive() → channel_layer.send(target, {type:'moderator.kick'})
-    → SignalingConsumer.moderator_kick() → ws.close() у пользователя
-
-Переменные из Django context (server-side):
-    {{ room_id }}  — UUID комнаты
-    {{ caller }}   — channel_name первого участника
-    {{ callee }}   — channel_name второго участника
-{% endcomment %}
 {% block content %}
-<div class="min-h-screen bg-gray-950 text-white flex flex-col">
 
-  <!-- Шапка с навигацией и статусом -->
-  <div class="flex items-center justify-between px-6 py-3 bg-gray-900 border-b border-gray-800">
-    <div class="flex items-center gap-3">
-      <a href="{% url 'chat:moderator_list' %}"
-         class="text-gray-400 hover:text-white text-sm transition-colors">
-        ← Список комнат
-      </a>
-      <span class="text-gray-600">|</span>
-      <!-- Показываем первые 8 символов room_id для идентификации -->
-      <span class="text-xs font-mono text-gray-400">{{ room_id|slice:":8" }}...</span>
-    </div>
-    <div id="modStatus" class="text-xs text-yellow-400">Подключение...</div>
-  </div>
+<div class="flex min-h-screen flex-col bg-gray-950 text-white">
 
-  <div class="flex flex-1 gap-4 p-4">
+    <div class="flex items-center justify-between border-b border-gray-800 bg-gray-900 px-6 py-3">
 
-    <!-- Блок с двумя видео участников -->
-    <div class="flex flex-col gap-4 flex-1">
-      <div class="flex gap-4">
+        <div class="flex items-center gap-3">
+            <a
+                href="{% url 'chat:moderator_list' %}"
+                class="text-sm text-gray-400 transition-colors hover:text-white"
+            >
+                ← Список комнат
+            </a>
 
-        <!-- Видео первого участника (caller) -->
-        <div class="relative flex-1">
-          <video id="videoUser1" autoplay playsinline
-                 class="w-full rounded-xl bg-gray-800 aspect-video object-cover"></video>
-          <!-- Оверлей с именем и кнопкой kick -->
-          <div class="absolute bottom-0 left-0 right-0 flex items-center justify-between
-                      px-3 py-2 bg-black/60 rounded-b-xl">
-            <span class="text-xs text-gray-300">Пользователь 1</span>
-            <button onclick="kickUser('caller')"
-                    class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs
-                           rounded-lg transition-colors">
-              Kick
-            </button>
-          </div>
+            <span class="text-gray-600">|</span>
+
+            <span class="font-mono text-xs text-gray-400">
+                {{ room_id|slice:":8" }}...
+            </span>
         </div>
 
-        <!-- Видео второго участника (callee) -->
-        <div class="relative flex-1">
-          <video id="videoUser2" autoplay playsinline
-                 class="w-full rounded-xl bg-gray-800 aspect-video object-cover"></video>
-          <div class="absolute bottom-0 left-0 right-0 flex items-center justify-between
-                      px-3 py-2 bg-black/60 rounded-b-xl">
-            <span class="text-xs text-gray-300">Пользователь 2</span>
-            <button onclick="kickUser('callee')"
-                    class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white text-xs
-                           rounded-lg transition-colors">
-              Kick
-            </button>
-          </div>
+        <div
+            id="modStatus"
+            class="text-xs text-yellow-400"
+        >
+            Подключение...
         </div>
 
-      </div>
-
-      <!-- Лог событий — для отладки и наблюдения -->
-      <div class="bg-gray-900 rounded-xl p-3">
-        <div class="text-xs text-gray-500 mb-2 font-medium uppercase tracking-widest">
-          Лог событий
-        </div>
-        <div id="modLog"
-             class="text-xs text-gray-400 font-mono flex flex-col gap-1 max-h-32 overflow-y-auto">
-        </div>
-      </div>
     </div>
 
-  </div>
+    <div class="flex flex-1 gap-4 p-4">
+
+        <div class="flex flex-1 flex-col gap-4">
+
+            <div class="flex gap-4">
+
+                <div class="relative flex-1">
+                    <video
+                        id="videoUser1"
+                        autoplay
+                        playsinline
+                        class="aspect-video w-full rounded-xl bg-gray-800 object-cover"
+                    ></video>
+
+                    <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 rounded-b-xl bg-black/70 px-3 py-2">
+                        <div class="min-w-0 text-xs text-gray-300">
+                            {% with participant=room.caller_participant %}
+                                {% if participant.is_authenticated %}
+                                    <a href="{{ participant.profile_url }}"
+                                       class="block truncate font-medium text-indigo-300 hover:text-indigo-200">
+                                        {{ participant.username }}
+                                    </a>
+                                    <div class="mt-0.5 text-gray-400">
+                                        {% trans "Profile gender" %}: {{ participant.profile_gender_label|default:"—" }}
+                                    </div>
+                                {% else %}
+                                    <div class="font-medium text-gray-200">{% trans "Anonymous user" %}</div>
+                                {% endif %}
+                                <div class="mt-0.5 text-gray-400">
+                                    {% trans "Chat gender" %}: {{ participant.chat_gender_label|default:"—" }}
+                                </div>
+                            {% endwith %}
+                        </div>
+
+                        <button
+                            type="button"
+                            onclick="kickUser('caller')"
+                            class="rounded-lg bg-red-600 px-3 py-1 text-xs text-white transition-colors hover:bg-red-500"
+                        >
+                            Kick
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative flex-1">
+                    <video
+                        id="videoUser2"
+                        autoplay
+                        playsinline
+                        class="aspect-video w-full rounded-xl bg-gray-800 object-cover"
+                    ></video>
+
+                    <div class="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 rounded-b-xl bg-black/70 px-3 py-2">
+                        <div class="min-w-0 text-xs text-gray-300">
+                            {% with participant=room.callee_participant %}
+                                {% if participant.is_authenticated %}
+                                    <a href="{{ participant.profile_url }}"
+                                       class="block truncate font-medium text-indigo-300 hover:text-indigo-200">
+                                        {{ participant.username }}
+                                    </a>
+                                    <div class="mt-0.5 text-gray-400">
+                                        {% trans "Profile gender" %}: {{ participant.profile_gender_label|default:"—" }}
+                                    </div>
+                                {% else %}
+                                    <div class="font-medium text-gray-200">{% trans "Anonymous user" %}</div>
+                                {% endif %}
+                                <div class="mt-0.5 text-gray-400">
+                                    {% trans "Chat gender" %}: {{ participant.chat_gender_label|default:"—" }}
+                                </div>
+                            {% endwith %}
+                        </div>
+
+                        <button
+                            type="button"
+                            onclick="kickUser('callee')"
+                            class="rounded-lg bg-red-600 px-3 py-1 text-xs text-white transition-colors hover:bg-red-500"
+                        >
+                            Kick
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="rounded-xl bg-gray-900 p-3">
+                <div class="mb-2 text-xs font-medium uppercase tracking-widest text-gray-500">
+                    Лог событий
+                </div>
+
+                <div
+                    id="modLog"
+                    class="flex max-h-32 flex-col gap-1 overflow-y-auto font-mono text-xs text-gray-400"
+                ></div>
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 <script>
-// ── Данные комнаты из Django context ─────────────────────────────────────────
-// Django вставляет эти значения при рендере шаблона на сервере.
-// CALLER и CALLEE — это channel_name участников (длинные строки вида specific.xxx!yyy)
 const ROOM_ID = "{{ room_id }}";
-const CALLER  = "{{ caller }}";  // channel_name первого участника
-const CALLEE  = "{{ callee }}";  // channel_name второго участника
+const CALLER = "{{ caller }}";
+const CALLEE = "{{ callee }}";
+const RTC_CONFIG = {{ rtc_config|safe }};
 
-// STUN сервер для WebRTC — помогает найти публичный IP за NAT.
-// На проде добавить TURN сервер (coturn) для пользователей за симметричным NAT.
-const RTC_CONFIG = {
-    iceServers: [
-        { urls: "stun:stun.l.google.com:19302" }
-    ]
-};
+let ws = null;
+let pcCaller = null;
+let pcCallee = null;
 
-// ── Состояние ─────────────────────────────────────────────────────────────────
-let ws;
-let pcCaller = null;  // RTCPeerConnection с первым участником (caller)
-let pcCallee  = null;  // RTCPeerConnection со вторым участником (callee)
+const videoUser1 = document.getElementById("videoUser1");
+const videoUser2 = document.getElementById("videoUser2");
+const modStatus = document.getElementById("modStatus");
+const modLog = document.getElementById("modLog");
 
-// ── DOM элементы ──────────────────────────────────────────────────────────────
-const videoUser1 = document.getElementById('videoUser1');
-const videoUser2 = document.getElementById('videoUser2');
-const modStatus  = document.getElementById('modStatus');
-const modLog     = document.getElementById('modLog');
+function log(message) {
+    const element = document.createElement("div");
 
-// ── Утилиты ───────────────────────────────────────────────────────────────────
+    element.textContent = (
+        `[${new Date().toLocaleTimeString()}] ${message}`
+    );
 
-/** Добавить строку в лог событий с текущим временем. */
-function log(msg) {
-    const el = document.createElement('div');
-    el.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-    modLog.appendChild(el);
+    modLog.appendChild(element);
     modLog.scrollTop = modLog.scrollHeight;
 }
 
-/** Обновить статус в шапке и добавить в лог. */
 function setStatus(text) {
     modStatus.textContent = text;
     log(text);
 }
 
-/** Отправить JSON через WebSocket. Проверяет что соединение открыто. */
 function wsSend(data) {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(data));
-    } else {
-        log('WS не открыт — сообщение не отправлено');
+    if (
+        ws
+        && ws.readyState === WebSocket.OPEN
+    ) {
+        ws.send(
+            JSON.stringify(data)
+        );
+        return;
     }
-}
 
-// ── WebSocket ─────────────────────────────────────────────────────────────────
+    log("WS не открыт — сообщение не отправлено");
+}
 
 function connectWS() {
-    // Автоопределение протокола: ws:// для http, wss:// для https
-    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-    ws = new WebSocket(`${proto}://${location.host}/ws/chat/moderate/${ROOM_ID}/`);
+    const protocol = location.protocol === "https:" ? "wss" : "ws";
 
-    ws.onopen = () => setStatus('Подключён к комнате');
+    ws = new WebSocket(
+        `${protocol}://${location.host}/ws/chat/moderate/${ROOM_ID}/`
+    );
 
-    ws.onmessage = async (e) => {
-        const msg = JSON.parse(e.data);
+    ws.onopen = () => {
+        setStatus("Подключён к комнате");
+    };
 
-        if (msg.type === 'room_info') {
-            // Сервер прислал данные комнаты — начинаем устанавливать P2P соединения
-            log(`Комната: caller=...${msg.caller.slice(-8)}, callee=...${msg.callee.slice(-8)}`);
+    ws.onmessage = async (event) => {
+        const message = JSON.parse(event.data);
 
-            // Устанавливаем соединение с каждым участником отдельно
-            await setupPeerWith(CALLER, 'caller');
-            await setupPeerWith(CALLEE, 'callee');
+        if (message.type === "room_info") {
+            log(
+                `Комната: caller=...${message.caller.slice(-8)}, `
+                + `callee=...${message.callee.slice(-8)}`
+            );
+
+            await setupPeerWith(
+                CALLER,
+                "caller"
+            );
+
+            await setupPeerWith(
+                CALLEE,
+                "callee"
+            );
+
             return;
         }
 
-        if (msg.type === 'kick_sent') {
-            log(`Kick отправлен пользователю ...${msg.target.slice(-8)}`);
+        if (message.type === "kick_sent") {
+            log(
+                `Kick отправлен пользователю ...${message.target.slice(-8)}`
+            );
             return;
         }
 
-        // WebRTC сигналинг от участников (answer, ice_candidate)
-        // Участники отвечают на наши offer-ы через SignalingConsumer → ModeratorConsumer
-        if (msg.payload) {
-            await handleSignaling(msg.payload);
+        if (message.payload) {
+            await handleSignaling(
+                message.payload
+            );
         }
     };
 
-    ws.onclose = () => setStatus('WebSocket закрыт — комната завершена');
-    ws.onerror = (err) => log('WS ошибка: ' + err);
+    ws.onclose = () => {
+        setStatus(
+            "WebSocket закрыт — комната завершена"
+        );
+
+        closePeers();
+    };
+
+    ws.onerror = (error) => {
+        log(
+            `WS ошибка: ${error}`
+        );
+    };
 }
 
-// ── WebRTC — установка соединения с одним участником ──────────────────────────
+async function setupPeerWith(
+    targetChannel,
+    role
+) {
+    const peer = new RTCPeerConnection(
+        RTC_CONFIG
+    );
 
-/**
- * Создать RTCPeerConnection с участником и отправить ему offer.
- *
- * @param {string} targetChannel - channel_name участника (CALLER или CALLEE)
- * @param {string} role - 'caller' или 'callee' (для логов и выбора видео элемента)
- */
-async function setupPeerWith(targetChannel, role) {
-    const pc = new RTCPeerConnection(RTC_CONFIG);
+    peer.ontrack = (event) => {
+        log(
+            `Получен видеопоток от ${role}`
+        );
 
-    // Получаем видеопоток от участника
-    pc.ontrack = (e) => {
-        log(`Получен видеопоток от ${role}`);
-        // Показываем в нужном video элементе
-        if (role === 'caller') {
-            videoUser1.srcObject = e.streams[0];
-        } else {
-            videoUser2.srcObject = e.streams[0];
+        if (role === "caller") {
+            videoUser1.srcObject = event.streams[0];
+            return;
         }
+
+        videoUser2.srcObject = event.streams[0];
     };
 
-    // ICE кандидаты — отправляем участнику с указанием target
-    pc.onicecandidate = (e) => {
-        if (e.candidate) {
-            wsSend({
-                type: 'ice_candidate',
-                candidate: e.candidate,
-                target: targetChannel,  // ModeratorConsumer перешлёт нужному участнику
-                from_role: role,
-            });
+    peer.onicecandidate = (event) => {
+        if (!event.candidate) {
+            return;
         }
+
+        wsSend({
+            type: "ice_candidate",
+            candidate: event.candidate,
+            target: targetChannel,
+            from_role: role,
+        });
     };
 
-    pc.onconnectionstatechange = () => {
-        log(`${role}: ${pc.connectionState}`);
+    peer.onconnectionstatechange = () => {
+        log(
+            `${role}: ${peer.connectionState}`
+        );
     };
 
-    // Сохраняем ссылку на pc для последующей обработки answer
-    if (role === 'caller') pcCaller = pc;
-    else pcCallee = pc;
+    if (role === "caller") {
+        pcCaller = peer;
+    } else {
+        pcCallee = peer;
+    }
 
-    // ВАЖНО: модератор только смотрит, не передаёт видео/аудио.
-    // direction: 'recvonly' — принимаем треки, не отправляем.
-    // Это означает что камера/микрофон модератора не нужны.
-    pc.addTransceiver('video', { direction: 'recvonly' });
-    pc.addTransceiver('audio', { direction: 'recvonly' });
+    // Модератор только принимает медиа.
+    peer.addTransceiver(
+        "video",
+        {
+            direction: "recvonly",
+        }
+    );
 
-    // Создаём и отправляем offer участнику
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
+    peer.addTransceiver(
+        "audio",
+        {
+            direction: "recvonly",
+        }
+    );
+
+    const offer = await peer.createOffer();
+
+    await peer.setLocalDescription(
+        offer
+    );
 
     wsSend({
-        type: 'offer',
-        sdp: pc.localDescription,
-        target: targetChannel,  // ModeratorConsumer перешлёт нужному участнику
-        from_role: role,        // Чтобы участник знал что это от модератора
+        type: "offer",
+        sdp: peer.localDescription,
+        target: targetChannel,
+        from_role: role,
     });
 
-    log(`Offer отправлен → ${role}`);
+    log(
+        `Offer отправлен → ${role}`
+    );
 }
 
-// ── Обработка входящего сигналинга от участников ──────────────────────────────
-
-/**
- * Обработать WebRTC сообщение от участника (answer или ice_candidate).
- *
- * @param {Object} payload - объект с type и данными (sdp или candidate)
- */
 async function handleSignaling(payload) {
-    let pc, role;
-
-    if (payload.answering_channel) {
-        // Участник ответил на наш offer — определяем по channel_name
-        const isCaller = payload.answering_channel === CALLER;
-        pc   = isCaller ? pcCaller : pcCallee;
-        role = isCaller ? 'caller' : 'callee';
-    } else {
-        // ICE кандидат — определяем по from_role
-        const isCaller = payload.from_role === 'caller';
-        pc   = isCaller ? pcCaller : pcCallee;
-        role = isCaller ? 'caller' : 'callee';
+    // После backend-изоляции сюда должны попадать только ответы
+    // participant → moderator.
+    if (!payload.from_moderator_reply) {
+        return;
     }
 
-    if (!pc) return;
+    const channel = payload.answering_channel;
+
+    let peer = null;
+    let role = null;
+
+    if (channel === CALLER) {
+        peer = pcCaller;
+        role = "caller";
+    } else if (channel === CALLEE) {
+        peer = pcCallee;
+        role = "callee";
+    } else {
+        log(
+            "Игнорирован signaling от неизвестного канала"
+        );
+        return;
+    }
+
+    if (!peer) {
+        return;
+    }
 
     try {
-        if (payload.type === 'answer') {
-            log(`Answer от ${role}`);
-            await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
-        } else if (payload.type === 'ice_candidate' && !payload.from_moderator) {
-            await pc.addIceCandidate(new RTCIceCandidate(payload.candidate));
+        if (payload.type === "answer") {
+            log(
+                `Answer от ${role}`
+            );
+
+            await peer.setRemoteDescription(
+                new RTCSessionDescription(
+                    payload.sdp
+                )
+            );
+
+            return;
         }
-    } catch (err) {
-        log(`Ошибка: ${err.message}`);
+
+        if (payload.type === "ice_candidate") {
+            await peer.addIceCandidate(
+                new RTCIceCandidate(
+                    payload.candidate
+                )
+            );
+        }
+    } catch (error) {
+        log(
+            `Ошибка ${role}: ${error.message}`
+        );
     }
 }
 
-// ── Kick ──────────────────────────────────────────────────────────────────────
-
-/**
- * Кикнуть участника комнаты.
- *
- * @param {string} role - 'caller' или 'callee'
- */
 function kickUser(role) {
-    const target = role === 'caller' ? CALLER : CALLEE;
-    if (!confirm(`Кикнуть пользователя (${role})?`)) return;
-    // Отправляем kick → ModeratorConsumer → SignalingConsumer.moderator_kick() → ws.close()
-    wsSend({ type: 'kick', target });
+    const target = (
+        role === "caller"
+            ? CALLER
+            : CALLEE
+    );
+
+    if (
+        !confirm(
+            `Кикнуть пользователя (${role})?`
+        )
+    ) {
+        return;
+    }
+
+    wsSend({
+        type: "kick",
+        target,
+    });
 }
 
-// ── Запуск ────────────────────────────────────────────────────────────────────
+function closePeers() {
+    if (pcCaller) {
+        pcCaller.close();
+        pcCaller = null;
+    }
+
+    if (pcCallee) {
+        pcCallee.close();
+        pcCallee = null;
+    }
+
+    videoUser1.srcObject = null;
+    videoUser2.srcObject = null;
+}
+
 connectWS();
 </script>
+
 {% endblock %}
