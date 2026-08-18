@@ -1,3 +1,5 @@
+# src/video_chat/services/room_storage.py
+
 """
 room_storage.py — Хранение активных комнат в Redis.
 

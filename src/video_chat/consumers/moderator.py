@@ -1,3 +1,5 @@
+# src/video_chat/consumers/moderator.py
+
 """
 moderator.py — WebSocket consumer для модератора.
 
@@ -24,14 +26,11 @@ moderator.py — WebSocket consumer для модератора.
 """
 
 import json
-import logging
 
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from chat.services.room_storage import RoomStorage
-
-logger = logging.getLogger(__name__)
+from video_chat.services.room_storage import RoomStorage
 
 
 class ModeratorConsumer(AsyncWebsocketConsumer):
@@ -61,29 +60,33 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
     # ── Жизненный цикл соединения ───────────────────────────────────────────
 
     async def connect(self):
-        """Модератор подключается к комнате.
+        """Модератор подключается к комнате."""
 
-        Проверяет что комната существует в Redis.
-        Вступает в channel group чтобы получать сигналинг от участников.
-        Отправляет модератору данные комнаты (caller и callee channel_name).
-        """
+        user = self.scope.get("user")
+
+        # Модераторский WebSocket доступен только staff-пользователям.
+        # Проверяем доступ ДО чтения комнаты, чтобы посторонний пользователь
+        # не мог даже проверять существование room_id.
+        if user is None or not user.is_authenticated or not user.is_staff:
+            await self.close(code=4403)
+            return
+
         self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
         self.room_group = f"moderate_{self.room_id}"
 
-        # Проверяем что комната ещё активна
         self.room_meta = await sync_to_async(self.room_storage.get_room)(self.room_id)
-        logger.error(f"[MOD] room_meta: {self.room_meta}")
 
         if not self.room_meta:
-            logger.error(f"[MOD] комната не найдена: {self.room_id}")
             await self.close(code=4404)
             return
 
-        # Вступаем в group — будем получать сигналинг от участников
-        await self.channel_layer.group_add(self.room_group, self.channel_name)
+        await self.channel_layer.group_add(
+            self.room_group,
+            self.channel_name,
+        )
+
         await self.accept()
 
-        # Отправляем модератору данные комнаты
         await self.send_json(
             {
                 "type": "room_info",
@@ -92,7 +95,6 @@ class ModeratorConsumer(AsyncWebsocketConsumer):
                 "callee": self.room_meta["callee"],
             }
         )
-        logger.error("[MOD] room_info отправлен")
 
     async def disconnect(self, close_code):
         """Модератор закрыл вкладку.

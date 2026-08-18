@@ -1,6 +1,8 @@
+# src/video_chat/urls.py
+
 from django.urls import path
 
-from chat.views import ChatView, ModeratorListView, ModeratorRoomView
+from video_chat.views import ChatView, ModeratorListView, ModeratorRoomView
 
 app_name = "chat"
 

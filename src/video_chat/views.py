@@ -1,3 +1,5 @@
+# src/video_chat/views.py
+
 """
 views.py — Django views для чата и панели модератора.
 
@@ -13,8 +15,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect, render
 from django.views.generic import View
 
-from chat.services.room_storage import RoomStorage
-from chat.services.rtc_config import get_rtc_config
+from video_chat.services.room_storage import RoomStorage
+from video_chat.services.rtc_config import get_rtc_config
 
 
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):

@@ -11,7 +11,7 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path("admin/", admin.site.urls),
     path("", include("core.urls")),
-    path("", include("chat.urls")),
+    path("", include("video_chat.urls")),
     path("", include("users.urls")),
     path("", include("accounts.urls")),
     path("", include("cms.urls")),

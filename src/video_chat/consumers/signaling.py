@@ -1,3 +1,5 @@
+# src/video_chat/consumers/signaling.py
+
 """
 signaling.py — Главный WebSocket consumer для видеочата.
 
@@ -25,8 +27,8 @@ import uuid
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from chat.services.matchmaking import MatchmakingService
-from chat.services.room_storage import RoomStorage
+from video_chat.services.matchmaking import MatchmakingService
+from video_chat.services.room_storage import RoomStorage
 
 logger = logging.getLogger(__name__)
 

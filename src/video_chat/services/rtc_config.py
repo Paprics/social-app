@@ -1,3 +1,5 @@
+# src/video_chat/services/rtc_config.py
+
 # chat/services/rtc_config.py
 # Утилита для получения RTC_CONFIG из переменных окружения.
 # Используется во views чтобы передать TURN настройки в шаблон.
