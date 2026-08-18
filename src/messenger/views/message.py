@@ -59,10 +59,6 @@ class MessageCreateView(LoginRequiredMixin, View):
             text=form.cleaned_data["text"],
         )
 
-        MessageService.notify_message_created(
-            message=message,
-        )
-
         return HttpResponse(status=204)
 
 
@@ -127,11 +123,6 @@ class MessageDeleteView(LoginRequiredMixin, DialogAccessMixin, View):
 
         deleted_message_id = MessageService.delete_message(
             message=message,
-        )
-
-        MessageService.notify_message_deleted(
-            dialog_id=dialog_id,
-            message_id=deleted_message_id,
         )
 
         return HttpResponse(status=204)

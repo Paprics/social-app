@@ -104,10 +104,6 @@ class ConversationSendView(LoginRequiredMixin, View):
             text=form.cleaned_data["text"],
         )
 
-        MessageService.notify_message_created(
-            message=message,
-        )
-
         return HttpResponse(
             status=204,
             headers={

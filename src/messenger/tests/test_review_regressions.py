@@ -206,10 +206,16 @@ def test_first_conversation_message_notifies_realtime(
     user_a, user_b, _ = users
     client.force_login(user_a)
 
-    with patch.object(
-        MessageService,
-        "notify_message_created",
-    ) as notify:
+    with (
+        patch(
+            "messenger.services.message.transaction.on_commit",
+            side_effect=lambda callback: callback(),
+        ),
+        patch.object(
+            MessageService,
+            "notify_message_created",
+        ) as notify,
+    ):
         response = client.post(
             reverse(
                 "messenger:conversation_send",
@@ -372,4 +378,69 @@ def test_delete_only_message_clears_dialog_metadata(users):
 
     assert dialog.last_message_id is None
     assert dialog.last_activity_at == dialog.created_at
+
+@pytest.mark.django_db
+def test_create_message_schedules_realtime_on_commit(users):
+    user_a, user_b, _ = users
+    dialog = DialogService.create_dialog([user_a, user_b])
+
+    with patch(
+        "messenger.services.message.transaction.on_commit",
+    ) as on_commit:
+        message = MessageService.create_message(
+            dialog=dialog,
+            sender=user_a,
+            text="scheduled create",
+        )
+
+    on_commit.assert_called_once()
+
+    callback = on_commit.call_args.args[0]
+
+    with patch.object(
+        MessageService,
+        "notify_message_created",
+    ) as notify:
+        callback()
+
+    notify.assert_called_once_with(
+        message=message,
+    )
+
+
+@pytest.mark.django_db
+def test_delete_message_schedules_realtime_on_commit(users):
+    user_a, user_b, _ = users
+    dialog = DialogService.create_dialog([user_a, user_b])
+
+    message = MessageService.create_message(
+        dialog=dialog,
+        sender=user_a,
+        text="scheduled delete",
+    )
+    dialog_id = dialog.id
+    message_id = message.id
+
+    with patch(
+        "messenger.services.message.transaction.on_commit",
+    ) as on_commit:
+        deleted_message_id = MessageService.delete_message(
+            message=message,
+        )
+
+    assert deleted_message_id == message_id
+    on_commit.assert_called_once()
+
+    callback = on_commit.call_args.args[0]
+
+    with patch.object(
+        MessageService,
+        "notify_message_deleted",
+    ) as notify:
+        callback()
+
+    notify.assert_called_once_with(
+        dialog_id=dialog_id,
+        message_id=message_id,
+    )
 

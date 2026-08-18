@@ -48,6 +48,12 @@ class MessageService:
             ],
         )
 
+        transaction.on_commit(
+            lambda: MessageService.notify_message_created(
+                message=message,
+            ),
+        )
+
         return message
 
     @staticmethod
@@ -124,6 +130,13 @@ class MessageService:
                 last_message_id=previous_message_id,
                 last_activity_at=last_activity_at,
             )
+
+        transaction.on_commit(
+            lambda: MessageService.notify_message_deleted(
+                dialog_id=dialog.id,
+                message_id=message_id,
+            ),
+        )
 
         return message_id
 
