@@ -255,3 +255,121 @@ def test_delete_dialog_schedules_realtime_notification(
         user_a.id,
         user_b.id,
     }
+
+@pytest.mark.django_db
+def test_delete_non_last_message_keeps_dialog_metadata(users):
+    user_a, user_b, _ = users
+    dialog = DialogService.create_dialog([user_a, user_b])
+
+    first = MessageService.create_message(
+        dialog=dialog,
+        sender=user_a,
+        text="first",
+    )
+    second = MessageService.create_message(
+        dialog=dialog,
+        sender=user_b,
+        text="second",
+    )
+
+    dialog.refresh_from_db()
+    previous_activity_at = dialog.last_activity_at
+
+    MessageService.delete_message(
+        message=first,
+    )
+
+    dialog.refresh_from_db()
+
+    assert dialog.last_message_id == second.id
+    assert dialog.last_activity_at == previous_activity_at
+
+
+@pytest.mark.django_db
+def test_delete_last_message_repoints_dialog_metadata(users):
+    user_a, user_b, _ = users
+    dialog = DialogService.create_dialog([user_a, user_b])
+
+    first = MessageService.create_message(
+        dialog=dialog,
+        sender=user_a,
+        text="first",
+    )
+    second = MessageService.create_message(
+        dialog=dialog,
+        sender=user_b,
+        text="second",
+    )
+
+    MessageService.delete_message(
+        message=second,
+    )
+
+    dialog.refresh_from_db()
+
+    assert dialog.last_message_id == first.id
+    assert dialog.last_activity_at == first.created_at
+
+
+@pytest.mark.django_db
+def test_delete_read_cursor_message_preserves_unread_count(users):
+    reader, sender, _ = users
+    dialog = DialogService.create_dialog([reader, sender])
+
+    first = MessageService.create_message(
+        dialog=dialog,
+        sender=sender,
+        text="first",
+    )
+    second = MessageService.create_message(
+        dialog=dialog,
+        sender=sender,
+        text="second",
+    )
+    MessageService.create_message(
+        dialog=dialog,
+        sender=sender,
+        text="third",
+    )
+
+    participant = Participant.objects.get(
+        dialog=dialog,
+        user=reader,
+    )
+    participant.last_read_message = second
+    participant.save(
+        update_fields=["last_read_message"],
+    )
+
+    assert participant.unread_count == 1
+
+    MessageService.delete_message(
+        message=second,
+    )
+
+    participant.refresh_from_db()
+
+    assert participant.last_read_message_id == first.id
+    assert participant.unread_count == 1
+
+
+@pytest.mark.django_db
+def test_delete_only_message_clears_dialog_metadata(users):
+    user_a, user_b, _ = users
+    dialog = DialogService.create_dialog([user_a, user_b])
+
+    message = MessageService.create_message(
+        dialog=dialog,
+        sender=user_a,
+        text="only",
+    )
+
+    MessageService.delete_message(
+        message=message,
+    )
+
+    dialog.refresh_from_db()
+
+    assert dialog.last_message_id is None
+    assert dialog.last_activity_at == dialog.created_at
+

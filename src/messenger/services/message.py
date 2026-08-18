@@ -57,14 +57,73 @@ class MessageService:
         message: Message,
     ) -> int:
         """
-        Полностью удаляет сообщение из базы.
+        Полностью удаляет сообщение и сохраняет согласованность
+        dialog metadata и read cursors.
 
         Возвращает ID удаленного сообщения.
         """
 
-        message_id = message.id
+        locked_message = (
+            Message.objects
+            .select_for_update()
+            .get(
+                pk=message.pk,
+            )
+        )
 
-        message.delete()
+        dialog = (
+            Dialog.objects
+            .select_for_update()
+            .get(
+                pk=locked_message.dialog_id,
+            )
+        )
+
+        previous_message = (
+            Message.objects
+            .filter(
+                dialog_id=dialog.id,
+                id__lt=locked_message.id,
+            )
+            .order_by("-id")
+            .only(
+                "id",
+                "created_at",
+            )
+            .first()
+        )
+
+        previous_message_id = (
+            previous_message.id
+            if previous_message is not None
+            else None
+        )
+
+        Participant.objects.filter(
+            dialog_id=dialog.id,
+            last_read_message_id=locked_message.id,
+        ).update(
+            last_read_message_id=previous_message_id,
+        )
+
+        message_id = locked_message.id
+        was_last_message = dialog.last_message_id == message_id
+
+        locked_message.delete()
+
+        if was_last_message:
+            last_activity_at = (
+                previous_message.created_at
+                if previous_message is not None
+                else dialog.created_at
+            )
+
+            Dialog.objects.filter(
+                pk=dialog.id,
+            ).update(
+                last_message_id=previous_message_id,
+                last_activity_at=last_activity_at,
+            )
 
         return message_id
 
