@@ -33,7 +33,8 @@
 <body class="min-h-screen bg-[#f9faf9]"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-    {% include "layouts/header.html" %}
+<!--    {% include "layouts/header.html" %}-->
+    {% include "layouts/site_header_alt/header.html" %}
 
     <main>
         {% block content %}

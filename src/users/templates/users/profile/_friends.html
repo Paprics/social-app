@@ -25,18 +25,8 @@
                     <a href="{% url 'users:profile' friend.pk %}"
                        class="flex flex-col items-center gap-1 transition hover:opacity-90">
 
-                        <div class="aspect-square w-full overflow-hidden rounded-lg bg-slate-100 transition hover:ring-2 hover:ring-blue-500">
-
-                            {% if friend.profile.avatar_photo %}
-                                <img src="{{ friend.profile.avatar_photo.image.url }}"
-                                     alt="{{ friend.username }}"
-                                     class="h-full w-full object-cover {% if request.user.is_authenticated and request.user.settings.blur_media %}is-blurred{% endif %}">
-                            {% else %}
-                                <img src="{% static 'images/default-avatar.svg' %}"
-                                     alt="{% trans 'Default avatar' %}"
-                                     class="h-full w-full object-cover">
-                            {% endif %}
-
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center">
+                            {% render_image friend.profile.avatar_photo.image variant="avatar_sm" alt=friend.username reveal=True shape="circle" css_class="media-image--compact h-12 w-12 object-cover" %}
                         </div>
 
                         <span class="w-full truncate text-center text-xs text-slate-600">

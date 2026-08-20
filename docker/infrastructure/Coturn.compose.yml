@@ -1,0 +1,27 @@
+# docker/infrastructure/coturn.compose.yml
+#
+# Standalone TURN infrastructure for WebRTC.
+# Run from project root:
+# docker compose --env-file .env -f docker/infrastructure/coturn.compose.yml up -d
+
+services:
+  coturn:
+    image: coturn/coturn:4.6.3
+    container_name: infra-coturn
+    restart: unless-stopped
+    network_mode: host
+
+    env_file:
+      - ../../.env
+
+    volumes:
+      - ./turnserver.conf:/etc/coturn/turnserver.conf:ro
+
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        exec turnserver
+        -c /etc/coturn/turnserver.conf
+        --external-ip="$${TURN_EXTERNAL_IP}"
+        --realm="$${TURN_REALM}"
+        --user="$${TURN_USER}:$${TURN_PASSWORD}"

@@ -1,20 +1,49 @@
 {% load i18n %}
 
 <a href="{% url 'core:index' %}"
-   class="flex min-w-0 shrink-0 items-center gap-3">
+   class="group flex min-w-0 shrink-0 items-center gap-3">
 
-    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white">
-        S
+    <!-- Logo mark -->
+    <div class="relative flex h-12 w-12 shrink-0 items-center justify-center
+                rounded-full bg-slate-950
+                shadow-sm transition-transform duration-200
+                group-hover:scale-[1.04]">
+
+        <span class="text-[24px] font-black italic tracking-[-0.08em] text-white">
+            F
+        </span>
+
+        <!-- ON indicator -->
+        <span class="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5
+                     rounded-full border-[3px] border-white bg-emerald-500">
+        </span>
     </div>
 
+    <!-- Brand -->
     <div class="hidden min-w-0 md:block">
-        <h1 class="truncate text-lg font-semibold text-slate-900">
-            Social Network
-        </h1>
 
-        <p class="truncate text-xs text-slate-500">
+        <div class="flex items-baseline whitespace-nowrap leading-none">
+
+            <span class="text-[20px] font-bold tracking-[-0.04em] text-slate-900">
+                fling
+            </span>
+
+            <span class="mx-2 h-4 w-px bg-slate-300"></span>
+
+            <span class="text-[20px] font-black tracking-[-0.04em] text-blue-600">
+                ON
+            </span>
+
+            <span class="ml-0.5 text-[13px] font-semibold text-slate-400">
+                .xyz
+            </span>
+
+        </div>
+
+        <p class="mt-1 truncate text-[11px] font-medium tracking-wide text-slate-500">
             {% trans "Connect with people" %}
         </p>
+
     </div>
 
 </a>
