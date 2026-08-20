@@ -1,9 +1,8 @@
-# src/_config/settings/env.py
-
 import os
 from pathlib import Path
 
 import environ
+
 
 PROJECT_DIR = Path(__file__).resolve().parents[3]
 
@@ -15,5 +14,7 @@ settings_module = os.getenv(
 )
 
 env_file = ".env" if settings_module.endswith(".prod") else ".env.dev"
+env_path = PROJECT_DIR / env_file
 
-env.read_env(PROJECT_DIR / env_file)
+if env_path.exists():
+    env.read_env(env_path)
