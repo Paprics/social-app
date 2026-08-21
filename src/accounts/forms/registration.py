@@ -38,19 +38,19 @@ class UserRegistrationForm(UserCreationForm):
 
     country = forms.ModelChoiceField(
         queryset=Country.objects.all(),
-        required=False,
+        required=True,
         empty_label=None,
     )
 
     region = forms.ModelChoiceField(
         queryset=Region.objects.all(),
-        required=False,
+        required=True,
         empty_label=None,
     )
 
     city = forms.ModelChoiceField(
         queryset=City.objects.all(),
-        required=False,
+        required=True,
         empty_label=None,
     )
 

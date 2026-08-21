@@ -2,167 +2,177 @@
 {% load static i18n %}
 
 {% block title %}
-    {% trans "Anonymous random video chat" %}
+    {% trans "Anonymous random video chat" %} — Flingon.xyz
 {% endblock %}
 
 {% block meta_description %}
-    {% trans "Anonymous random video chat for instant conversations." %}
+    {% trans "Anonymous random video chat for instant conversations on Flingon.xyz." %}
 {% endblock %}
 
 {% block content %}
 
-<div class="min-h-screen bg-gray-950 text-white">
+{# Главный контейнер на весь экран без лишних отступов #}
+<div class="flex h-[100dvh] w-full flex-col bg-gray-950 text-white overflow-hidden">
 
-    <div class="mx-auto flex w-full max-w-7xl flex-col px-3 py-5 sm:px-4 sm:py-7 lg:px-6">
+    {# Центрированная адаптивная шапка с брендом сайта #}
+    <header class="flex shrink-0 flex-col items-center justify-center border-b border-gray-800/80 bg-gray-900/50 px-3 py-2 text-center backdrop-blur-md sm:flex-row sm:gap-2 lg:px-6">
+        <h1 class="text-sm font-bold tracking-tight text-white sm:text-base md:text-lg">
+            <span class="text-indigo-400">Flingon.xyz</span> — {% trans "Anonymous random video chat" %}
+        </h1>
+        <span class="text-[11px] text-gray-400 sm:text-xs">
+            ({% trans "Free & Instant" %})
+        </span>
+    </header>
 
-        <header class="mb-5">
-            <h1 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                {% trans "Anonymous random video chat" %}
-            </h1>
+    {# Основной интерфейс: Grid на десктопе, Flex-col на мобильных #}
+    <main class="flex flex-1 flex-col overflow-hidden p-2 sm:p-3 lg:grid lg:grid-cols-12 lg:gap-4 lg:p-4">
 
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-400 sm:text-base">
-                {% trans "Meet random people by video in Social Network. Your site profile is not shared with the other participant in the current anonymous mode." %}
-            </p>
-        </header>
+        {# Левая секция: ВИДЕО (Занимает максимум пространства) #}
+        <section class="relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-gray-800/80 bg-gray-900 shadow-2xl lg:col-span-8 lg:h-full">
 
-
-
-        <div
-            id="status"
-            class="mb-4 rounded-xl border border-gray-800 bg-gray-900 px-4 py-3 text-center text-sm tracking-wide text-gray-300"
-        >
-            {% trans "Connecting to chat service..." %}
-        </div>
-
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
-
-            <div class="relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg">
+            {# Главный экран: Remote Video (Собеседник) #}
+            <div class="relative flex flex-1 items-center justify-center overflow-hidden bg-black">
                 <video
                     id="remoteVideo"
                     autoplay
                     playsinline
-                    class="aspect-video w-full bg-gray-900 object-cover"
+                    class="h-full w-full object-cover"
                 ></video>
 
-                <div
-                    id="remotePlaceholder"
-                    class="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-gray-500"
-                >
+                {# Заглушка пока нет собеседника #}
+                <div id="remotePlaceholder" class="pointer-events-none absolute inset-0 flex items-center justify-center p-4 text-center text-xs text-gray-400 sm:text-sm">
                     {% trans "Your next conversation partner will appear here." %}
                 </div>
 
-                <span class="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-medium text-gray-100 backdrop-blur-sm">
-                    {% trans "Partner" %}
-                </span>
-            </div>
+                {# Статус и Акцентный Таймер (Центр верхнего края видео) #}
+                <div class="pointer-events-none absolute inset-x-3 top-3 flex flex-col items-center justify-center z-10 gap-2">
 
-            <div class="relative overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg">
-                <video
-                    id="localVideo"
-                    autoplay
-                    muted
-                    playsinline
-                    class="aspect-video w-full bg-gray-900 object-cover"
-                ></video>
-
-                <div
-                    id="localPlaceholder"
-                    class="pointer-events-none absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-gray-500"
-                >
-                    {% trans "Your camera will turn on after you press Start." %}
-                </div>
-
-                <span class="absolute bottom-2 left-2 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-medium text-gray-100 backdrop-blur-sm">
-                    {% trans "You" %}
-                </span>
-            </div>
-
-        </div>
-
-        <section
-            id="videoChatSettings"
-            class="mt-3 rounded-xl border border-gray-800 bg-gray-900 p-4 shadow-lg"
-        >
-            <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-
-                <fieldset class="max-w-2xl">
-                    <legend class="mb-2 block text-sm font-medium text-gray-200">
-                        {% trans "Your gender in video chat" %}
-                    </legend>
-
-                    <div class="flex flex-wrap gap-2">
-                        {% for value, label in gender_choices %}
-                            <label class="cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="chatGender"
-                                    value="{{ value }}"
-                                    class="peer sr-only"
-                                >
-                                <span class="inline-flex min-h-10 items-center rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-gray-200 transition hover:border-gray-600 peer-checked:border-indigo-500 peer-checked:bg-indigo-600/20 peer-checked:text-indigo-200 peer-focus-visible:ring-2 peer-focus-visible:ring-indigo-500 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">
-                                    {{ label }}
-                                </span>
-                            </label>
-                        {% endfor %}
+                    {# Обычный текстовый статус #}
+                    <div id="status" class="max-w-[90%] rounded-full border border-gray-700/80 bg-gray-950/80 px-4 py-1.5 text-center text-xs font-medium tracking-wide text-gray-200 shadow-md backdrop-blur-md transition-all">
+                        {% trans "Choose your gender and press Start." %}
                     </div>
 
-                    <p class="mt-2 text-xs leading-5 text-gray-500">
-                        {% trans "This choice applies only to the current video chat session and does not change the gender in your site profile." %}
-                    </p>
-                </fieldset>
+                    {# Блок Крупного Таймера / Отсчета #}
+                    <div id="cooldownContainer" class="hidden flex-col items-center justify-center rounded-2xl border border-indigo-500/40 bg-gray-950/90 px-5 py-2.5 text-center shadow-2xl backdrop-blur-md">
+                        <span class="text-[11px] font-semibold uppercase tracking-wider text-indigo-400">
+                            {% trans "Next search starts automatically" %}
+                        </span>
+                        <div class="mt-0.5 flex items-center justify-center gap-1.5">
+                            <span class="text-xs text-gray-300">{% trans "Next partner in" %}:</span>
+                            <span id="cooldownTimer" class="text-2xl font-black text-indigo-400 font-mono tracking-tight">3</span>
+                            <span class="text-xs text-gray-300">{% trans "sec" %}</span>
+                        </div>
+                    </div>
 
-                <div class="flex flex-wrap items-center gap-2 sm:justify-end">
-                    <button
-                        id="btnStart"
-                        type="button"
-                        disabled
-                        class="inline-flex min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-400"
-                    >
-                        {% trans "Start" %}
-                    </button>
-
-                    <button
-                        id="btnStop"
-                        type="button"
-                        class="hidden min-h-11 items-center justify-center rounded-xl border border-gray-700 bg-gray-800 px-8 py-3 text-sm font-semibold text-gray-200 transition hover:border-red-500/60 hover:bg-red-950/40 hover:text-red-200"
-                    >
-                        {% trans "Stop" %}
-                    </button>
                 </div>
 
+                <span class="absolute bottom-3 left-3 z-10 rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-gray-200 backdrop-blur-sm">
+                    {% trans "Partner" %}
+                </span>
+
+                {# Local Video (Ваша камера): PiP картинка в картинке #}
+                <div class="absolute bottom-3 right-3 z-20 h-28 w-20 overflow-hidden rounded-xl border border-gray-700/80 bg-gray-950 shadow-xl transition-all sm:h-36 sm:w-28 lg:h-40 lg:w-32">
+                    <video
+                        id="localVideo"
+                        autoplay
+                        muted
+                        playsinline
+                        class="h-full w-full object-cover"
+                    ></video>
+
+                    <div id="localPlaceholder" class="pointer-events-none absolute inset-0 flex items-center justify-center p-1 text-center text-[9px] text-gray-500 leading-tight">
+                        {% trans "Your camera will turn on after you press Start." %}
+                    </div>
+
+                    <span class="absolute bottom-1 left-1 rounded bg-black/70 px-1.5 py-0.5 text-[9px] font-medium text-gray-200">
+                        {% trans "You" %}
+                    </span>
+                </div>
+            </div>
+
+            {# Нижняя панель управления: Гендер + Кнопки Start/Next/Stop #}
+            <div id="videoChatSettings" class="relative flex shrink-0 items-center justify-center border-t border-gray-800/80 bg-gray-900/95 p-2.5 backdrop-blur-md">
+
+                {# Всплывающее уведомление об ошибке выбора гендера #}
+                <div id="genderRequiredNotice" class="absolute bottom-full mb-2 hidden rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-gray-950 shadow-xl" role="alert" aria-live="polite">
+                    {% trans "Choose your gender before starting." %}
+                </div>
+
+                <div class="flex w-full max-w-xl flex-wrap items-center justify-center gap-2 sm:gap-3">
+
+                    {# Компактный блок гендера слева от кнопки Start #}
+                    <fieldset id="genderFieldset" class="flex shrink-0 items-center gap-1.5 rounded-xl border border-gray-800 bg-gray-950/70 px-2.5 py-2 transition-all">
+                        <legend class="sr-only">{% trans "Your gender in video chat" %}</legend>
+                        <span class="text-[11px] text-gray-400 font-medium mr-0.5">{% trans "Gender" %}:</span>
+
+                        <div class="flex items-center gap-2">
+                            {% for value, label in gender_choices %}
+                                <label class="group inline-flex cursor-pointer items-center gap-1">
+                                    <input type="radio" name="chatGender" value="{{ value }}" class="peer sr-only">
+                                    <span class="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-gray-600 bg-gray-800 transition group-hover:border-gray-400 peer-checked:border-indigo-500 peer-checked:bg-indigo-600">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-white opacity-0 transition peer-checked:opacity-100"></span>
+                                    </span>
+                                    <span class="text-xs text-gray-300 transition group-hover:text-white peer-checked:font-bold peer-checked:text-indigo-300">
+                                        {{ label }}
+                                    </span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+
+                    {# Кнопки управления #}
+                    <div class="flex items-center gap-2 flex-1 sm:flex-initial">
+                        <button
+                            id="btnStart"
+                            type="button"
+                            class="inline-flex min-h-11 min-w-[110px] flex-1 items-center justify-center rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-500 active:scale-95 sm:flex-initial"
+                        >
+                            {% trans "Start" %}
+                        </button>
+
+                        <button
+                            id="btnNext"
+                            type="button"
+                            class="hidden min-h-11 min-w-[110px] flex-1 items-center justify-center rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-500 active:scale-95 sm:flex-initial"
+                        >
+                            {% trans "Next" %}
+                            <span aria-hidden="true" class="ml-1.5">→</span>
+                        </button>
+
+                        <button
+                            id="btnStop"
+                            type="button"
+                            class="hidden min-h-11 items-center justify-center rounded-xl border border-red-500/50 bg-red-600/90 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-red-500 active:scale-95"
+                        >
+                            <svg class="mr-1.5 h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <rect x="5" y="5" width="10" height="10" rx="1.5"></rect>
+                            </svg>
+                            {% trans "Stop" %}
+                        </button>
+                    </div>
+
+                </div>
             </div>
         </section>
 
-        <div class="flex flex-wrap items-center justify-center gap-3 py-3">
-            <button
-                id="btnNext"
-                type="button"
-                class="hidden min-h-11 items-center justify-center rounded-xl bg-indigo-600 px-8 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 active:bg-indigo-700"
-            >
-                {% trans "Next" %} →
-            </button>
+        {# Правая секция: ЧАТ #}
+        <section class="mt-2 flex h-44 shrink-0 flex-col overflow-hidden rounded-2xl border border-gray-800/80 bg-gray-900 shadow-2xl lg:col-span-4 lg:mt-0 lg:h-full">
 
-        </div>
-
-        <div class="mx-auto flex h-72 w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-lg sm:h-80">
-
-            <div class="flex items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3">
-                <span class="text-xs font-medium uppercase tracking-widest text-gray-400">
+            <div class="flex items-center justify-between border-b border-gray-800/80 bg-gray-900/50 px-3 py-2">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-gray-400">
                     {% trans "Chat" %}
                 </span>
-
-                <span id="chatHint" class="text-xs text-gray-600">
+                <span id="chatHint" class="text-[11px] text-gray-500">
                     {% trans "Available after connection" %}
                 </span>
             </div>
 
             <div
                 id="chatMessages"
-                class="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto p-3 text-sm sm:p-4"
+                class="flex flex-1 flex-col gap-2 overflow-y-auto p-3 text-xs sm:text-sm"
             ></div>
 
-            <div class="flex items-center gap-2 border-t border-gray-800 bg-gray-950/40 p-2 sm:p-3">
-
+            <div class="flex items-center gap-2 border-t border-gray-800/80 bg-gray-950/60 p-2">
                 <input
                     id="chatInput"
                     type="text"
@@ -170,21 +180,21 @@
                     autocomplete="off"
                     disabled
                     placeholder="{% trans 'Chat is available after connection' %}"
-                    class="min-w-0 flex-1 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-gray-100 outline-none transition placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="min-w-0 flex-1 rounded-xl border border-gray-700/60 bg-gray-800/80 px-3 py-2 text-xs text-gray-100 outline-none transition placeholder:text-gray-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
                 >
 
                 <button
                     id="btnSend"
                     type="button"
                     disabled
-                    class="inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-gray-700 disabled:text-gray-500"
+                    class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 px-3.5 text-xs font-semibold text-white transition hover:bg-indigo-500 active:scale-95 disabled:cursor-not-allowed disabled:bg-gray-800 disabled:text-gray-600"
                 >
                     {% trans "Send" %}
                 </button>
-
             </div>
-        </div>
-    </div>
+        </section>
+
+    </main>
 </div>
 
 {% translate "Choose your gender and press Start." as msg_idle %}
@@ -225,7 +235,85 @@ window.videoChatConfig = {
         chatHintEnabled: "{{ msg_chat_hint_enabled|escapejs }}",
     },
 };
+
+document.addEventListener("DOMContentLoaded", () => {
+    const startButton = document.getElementById("btnStart");
+    const fieldset = document.getElementById("genderFieldset");
+    const notice = document.getElementById("genderRequiredNotice");
+    const status = document.getElementById("status");
+    const radios = document.querySelectorAll('input[name="chatGender"]');
+
+    if (!startButton || !fieldset || !notice || !status || !radios.length) {
+        return;
+    }
+
+    const clearGenderError = () => {
+        notice.classList.add("hidden");
+        fieldset.classList.remove("ring-2", "ring-amber-500", "border-amber-500");
+
+        status.classList.remove(
+            "border-amber-500/50",
+            "bg-amber-950/80",
+            "text-amber-100"
+        );
+        status.classList.add(
+            "border-gray-700/80",
+            "bg-gray-950/80",
+            "text-gray-200"
+        );
+    };
+
+    const showGenderError = () => {
+        notice.classList.remove("hidden");
+        fieldset.classList.add(
+            "ring-2",
+            "ring-amber-500",
+            "border-amber-500"
+        );
+
+        status.textContent = window.videoChatConfig.i18n.genderRequired;
+        status.classList.remove(
+            "border-gray-700/80",
+            "bg-gray-950/80",
+            "text-gray-200"
+        );
+        status.classList.add(
+            "border-amber-500/50",
+            "bg-amber-950/80",
+            "text-amber-100"
+        );
+
+        fieldset.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+        });
+    };
+
+    radios.forEach((radio) => {
+        radio.addEventListener("change", clearGenderError);
+    });
+
+    startButton.addEventListener(
+        "click",
+        (event) => {
+            const selectedGender = document.querySelector(
+                'input[name="chatGender"]:checked'
+            );
+
+            if (selectedGender) {
+                clearGenderError();
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            showGenderError();
+        },
+        true
+    );
+});
 </script>
+
 <script src="{% static 'video_chat/js/room.js' %}" defer></script>
 {% endblock %}
 
