@@ -1,4 +1,11 @@
 # src/_config/settings/test.py
+"""
+Test-specific Django settings.
+
+Do not delete this module. It is used to isolate the test environment from
+development and production settings, so tests can safely override database,
+Celery, email, cache, logging, and other runtime configuration when needed.
+"""
 
 from .dev import *  # noqa: F403
 
@@ -53,4 +60,3 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
-
