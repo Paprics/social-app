@@ -30,26 +30,34 @@
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="min-h-screen bg-[#f9faf9]"
+<body class="flex min-h-screen flex-col bg-[#f9faf9]"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-<!--    {% include "layouts/header.html" %}-->
-    {% include "layouts/site_header_alt/header.html" %}
+    {% include "layouts/site_header/header.html" %}
 
-    <main>
+
+    <main class="flex-1">
+
         {% block content %}
             {% block page %}{% endblock %}
         {% endblock %}
+
     </main>
+
+
+    {% include "layouts/site_footer/footer.html" %}
+
 
     <!-- Глобальные модалки авторизации -->
     {% include "accounts/modals/login_modal.html" %}
     {% include "accounts/modals/register_modal.html" %}
     {% include "accounts/modals/reset_modal.html" %}
 
+
     <script type="module" src="{% static 'js/main.js' %}"></script>
     <script src="{% static 'gallery/js/safe_media_mode.js' %}" defer></script>
 
     {% block extra_js %}{% endblock %}
+
 </body>
 </html>

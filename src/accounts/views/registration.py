@@ -90,7 +90,7 @@ class RegisterView(CreateView):
 
         return render(
             self.request,
-            "index.html",
+            "core/index.html",
             {
                 "register_form": form,
                 "open_register_modal": True,
