@@ -47,6 +47,10 @@
 
     {% include "layouts/site_footer/footer.html" %}
 
+    {% if user.is_authenticated %}
+        {% include "components/_mobile_dock.html" %}
+    {% endif %}
+
 
     <!-- Глобальные модалки авторизации -->
     {% include "accounts/modals/login_modal.html" %}

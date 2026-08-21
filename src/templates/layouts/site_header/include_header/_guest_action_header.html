@@ -1,0 +1,277 @@
+{% load i18n %}
+
+<div class="text-white">
+
+    {# ============================================================= #}
+    {# Action bar                                                     #}
+    {# ============================================================= #}
+
+    <div class="bg-[#24325f]">
+
+        <div class="mx-auto flex h-12 max-w-7xl items-stretch px-3 sm:px-6 lg:px-8">
+
+            {# Mobile menu button #}
+
+            <button type="button"
+                    id="mobile-menu-button"
+                    aria-controls="mobile-menu"
+                    aria-expanded="false"
+                    aria-label="{% trans 'Open menu' %}"
+                    class="flex items-center gap-2 px-3 text-sm font-medium
+                           text-indigo-100 transition hover:bg-white/10
+                           xl:hidden">
+
+                <svg data-mobile-menu-open-icon
+                     xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     class="h-5 w-5"
+                     aria-hidden="true">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M4 6h16M4 12h16M4 18h16"/>
+
+                </svg>
+
+                <svg data-mobile-menu-close-icon
+                     xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     class="hidden h-5 w-5"
+                     aria-hidden="true">
+
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M6 18 18 6M6 6l12 12"/>
+
+                </svg>
+
+                <span>
+                    {% trans "Menu" %}
+                </span>
+
+            </button>
+
+
+            {# ========================================================= #}
+            {# Desktop navigation                                        #}
+            {# ========================================================= #}
+
+            <nav class="hidden min-w-0 flex-1 items-center justify-center gap-6 xl:flex">
+
+                <a href="{% url 'core:index' %}"
+                   class="whitespace-nowrap text-sm font-medium text-indigo-100
+                          transition hover:text-white">
+                    {% trans "Home" %}
+                </a>
+
+                <a href="{% url 'search:users' %}"
+                   class="whitespace-nowrap text-sm font-medium text-indigo-100
+                          transition hover:text-white">
+                    {% trans "People" %}
+                </a>
+
+                <a href="{% url 'chat:chat_view' %}"
+                   class="whitespace-nowrap text-sm font-medium text-indigo-100
+                          transition hover:text-white">
+                    {% trans "VideoChat" %}
+                </a>
+
+                <a href="#"
+                   class="whitespace-nowrap text-sm font-medium text-indigo-100
+                          transition hover:text-white">
+                    {% trans "About" %}
+                </a>
+
+                <a href="#"
+                   class="whitespace-nowrap text-sm font-medium text-indigo-100
+                          transition hover:text-white">
+                    {% trans "Contact" %}
+                </a>
+
+
+                {# More #}
+
+                <div class="relative">
+
+                    <button type="button"
+                            data-dropdown-button="guest-more-menu"
+                            aria-controls="guest-more-menu"
+                            aria-expanded="false"
+                            class="flex items-center gap-1 whitespace-nowrap
+                                   text-sm font-medium text-indigo-100
+                                   transition hover:text-white">
+
+                        {% trans "More" %}
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke-width="2"
+                             stroke="currentColor"
+                             class="h-4 w-4"
+                             aria-hidden="true">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+
+                        </svg>
+
+                    </button>
+
+                    <div id="guest-more-menu"
+                         data-dropdown
+                         class="absolute left-0 top-full z-50 mt-2 hidden w-56
+                                overflow-hidden rounded-xl border border-slate-200
+                                bg-white text-slate-700 shadow-lg">
+
+                        <div class="py-2">
+
+                            <a href="#"
+                               class="block px-5 py-3 text-sm transition hover:bg-slate-100">
+                                {% trans "About us" %}
+                            </a>
+
+                            <a href="#"
+                               class="block px-5 py-3 text-sm transition hover:bg-slate-100">
+                                {% trans "Safety" %}
+                            </a>
+
+                            <a href="#"
+                               class="block px-5 py-3 text-sm transition hover:bg-slate-100">
+                                {% trans "Help" %}
+                            </a>
+
+                            <a href="#"
+                               class="block px-5 py-3 text-sm transition hover:bg-slate-100">
+                                {% trans "Terms" %}
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <button type="button"
+                        data-modal-open="login-modal"
+                        class="whitespace-nowrap rounded-lg border border-white/20
+                               px-3 py-1.5 text-sm font-semibold text-white
+                               transition hover:bg-white/10">
+
+                    {% trans "Log in" %}
+
+                </button>
+
+            </nav>
+
+        </div>
+
+    </div>
+
+
+    {# ============================================================= #}
+    {# Mobile navigation                                              #}
+    {# ============================================================= #}
+
+    <div id="mobile-menu"
+         class="hidden w-full max-w-md overflow-hidden
+                rounded-br-2xl
+                border-r border-b border-white/10
+                bg-[#1d294f]
+                shadow-2xl
+                xl:hidden">
+
+        <nav class="space-y-1 px-4 py-4">
+
+            <a href="{% url 'core:index' %}"
+               class="block rounded-lg px-4 py-2.5 text-sm font-medium
+                      text-indigo-100 transition hover:bg-white/10 hover:text-white">
+                {% trans "Home" %}
+            </a>
+
+            <a href="{% url 'search:users' %}"
+               class="block rounded-lg px-4 py-2.5 text-sm font-medium
+                      text-indigo-100 transition hover:bg-white/10 hover:text-white">
+                {% trans "People" %}
+            </a>
+
+            <a href="{% url 'chat:chat_view' %}"
+               class="block rounded-lg px-4 py-2.5 text-sm font-medium
+                      text-indigo-100 transition hover:bg-white/10 hover:text-white">
+                {% trans "VideoChat" %}
+            </a>
+
+            <a href="#"
+               class="block rounded-lg px-4 py-2.5 text-sm font-medium
+                      text-indigo-100 transition hover:bg-white/10 hover:text-white">
+                {% trans "About" %}
+            </a>
+
+            <a href="#"
+               class="block rounded-lg px-4 py-2.5 text-sm font-medium
+                      text-indigo-100 transition hover:bg-white/10 hover:text-white">
+                {% trans "Contact" %}
+            </a>
+
+
+            <hr class="my-3 border-white/10">
+
+
+            <a href="#"
+               class="block rounded-lg px-4 py-2.5 text-sm text-indigo-200
+                      transition hover:bg-white/10 hover:text-white">
+                {% trans "Safety" %}
+            </a>
+
+            <a href="#"
+               class="block rounded-lg px-4 py-2.5 text-sm text-indigo-200
+                      transition hover:bg-white/10 hover:text-white">
+                {% trans "Help" %}
+            </a>
+
+            <a href="#"
+               class="block rounded-lg px-4 py-2.5 text-sm text-indigo-200
+                      transition hover:bg-white/10 hover:text-white">
+                {% trans "Terms" %}
+            </a>
+
+
+            {# Auth actions #}
+
+            <div class="grid gap-2 pt-3">
+
+                <button type="button"
+                        data-modal-open="login-modal"
+                        class="flex w-full items-center justify-center rounded-lg
+                               bg-white px-4 py-2.5 text-sm font-semibold
+                               text-[#24325f] transition hover:bg-slate-100">
+
+                    {% trans "Log in" %}
+
+                </button>
+
+                <button type="button"
+                        data-modal-open="register-modal"
+                        class="flex w-full items-center justify-center rounded-lg
+                               bg-white px-4 py-2.5 text-sm font-semibold
+                               text-[#24325f] transition hover:bg-slate-100">
+
+                    {% trans "Register" %}
+
+                </button>
+
+            </div>
+
+        </nav>
+
+    </div>
+
+</div>

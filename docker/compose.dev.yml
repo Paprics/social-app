@@ -104,5 +104,4 @@ services:
 
 volumes:
   postgres_dev_data:
-    external: true
     name: social-network_postgres_dev_data
