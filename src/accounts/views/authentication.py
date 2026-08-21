@@ -142,59 +142,104 @@ class EmailVerificationView(View):
 
 class LoginView(View):
     """
-    GET  — редирект на главную (модалка открывается на фронте).
-    POST — валидация, аутентификация, вход.
+    GET  — редирект на главную.
+    POST — валидация, аутентификация и вход.
+
+    login_source:
+        modal — форма отправлена из модального окна;
+        page  — форма отправлена со страницы.
     """
+
+    template_name = "core/index.html"
 
     def get(self, request):
         return redirect("core:index")
 
     def post(self, request):
         form = LoginForm(request.POST)
+        source = request.POST.get("login_source", "page")
+
+        if source not in {"modal", "page"}:
+            source = "page"
+
         if not form.is_valid():
-            logger.debug("LoginView: invalid form errors=%s", form.errors)
-            return render(
-                request,
-                "core/index.html",
-                {
-                    "login_form": form,
-                    "open_login_modal": True,
-                },
+            logger.debug(
+                "LoginView: invalid form errors=%s",
+                form.errors,
             )
+            return self._render_error(request, form, source)
 
         username = form.cleaned_data["username"]
         password = form.cleaned_data["password"]
-        user = authenticate(request, username=username, password=password)
+
+        user = authenticate(
+            request,
+            username=username,
+            password=password,
+        )
 
         if user is None:
-            # Попробуем найти по email
             try:
                 user_obj = User.objects.get(email=username)
-                user = authenticate(request, username=user_obj.username, password=password)
             except User.DoesNotExist:
-                pass
+                user_obj = None
+
+            if user_obj is not None:
+                user = authenticate(
+                    request,
+                    username=user_obj.username,
+                    password=password,
+                )
 
         if user is None:
-            logger.info("LoginView: failed login for username=%s", username)
-            form.add_error(None, "Неверный логин или пароль.")
-            return render(
-                request,
-                "core/index.html",  # <-- Слэш вместо двоеточия
-                {"login_form": form, "open_login_modal": True},
+            logger.info(
+                "LoginView: failed login for username=%s",
+                username,
             )
+
+            form.add_error(
+                None,
+                "Неверный логин или пароль.",
+            )
+
+            return self._render_error(request, form, source)
 
         if not user.is_active:
-            logger.info("LoginView: inactive user=%s", user.pk)
-            form.add_error(None, "Аккаунт не активирован. Проверьте почту.")
-            return render(
-                request,
-                "index.html",
-                {"login_form": form, "open_login_modal": True},
+            logger.info(
+                "LoginView: inactive user=%s",
+                user.pk,
             )
 
+            form.add_error(
+                None,
+                "Аккаунт не активирован. Проверьте почту.",
+            )
+
+            return self._render_error(request, form, source)
+
         login(request, user)
-        logger.info("LoginView: success user=%s", user.pk)
+
+        logger.info(
+            "LoginView: success user=%s",
+            user.pk,
+        )
+
         return redirect("core:index")
+
+    def _render_error(self, request, form, source):
+        context = {}
+
+        if source == "modal":
+            context["modal_login_form"] = form
+            context["open_login_modal"] = True
+        else:
+            context["page_login_form"] = form
+
+        return render(
+            request,
+            self.template_name,
+            context,
+        )
 
 
 # ─────────────────────────────────────────────
