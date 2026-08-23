@@ -130,7 +130,6 @@ class PhotoService:
             photo = Photo.objects.create(
                 album=album,
                 image=processed,
-                title=Path(file.name).name[:100],
             )
 
             saved.append(
@@ -152,17 +151,17 @@ class PhotoService:
         updates,
     ) -> bool:
         """
-        Update titles and visibility for photos inside one user album.
+        Update descriptions and visibility for photos inside one user album.
 
         Expected structure:
 
             {
                 10: {
-                    "title": "Beach",
+                    "description": "Beach",
                     "is_visible": True,
                 },
                 11: {
-                    "title": "",
+                    "description": "",
                     "is_visible": False,
                 },
             }
@@ -200,12 +199,12 @@ class PhotoService:
                 {},
             )
 
-            photo.title = cls._normalize_title(
+            photo.description = str(
                 data.get(
-                    "title",
+                    "description",
                     "",
                 )
-            )
+            ).strip()[:150]
 
             photo.is_visible = bool(
                 data.get(
@@ -218,7 +217,7 @@ class PhotoService:
             Photo.objects.bulk_update(
                 photos,
                 [
-                    "title",
+                    "description",
                     "is_visible",
                 ],
             )

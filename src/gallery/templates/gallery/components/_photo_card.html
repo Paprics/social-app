@@ -5,8 +5,8 @@
 <div
     class="photo-thumb block aspect-square w-full cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-slate-100 transition hover:opacity-80"
     data-photo-url="{{ photo.image.url }}"
-    data-photo-title="{{ photo.title|default:'' }}"
+    data-photo-description="{{ photo.description|default:'' }}"
     data-photo-id="{{ photo.pk }}"
 >
-    {% render_image photo.image variant="photo_preview" alt=photo.title reveal=True css_class="media-image--compact aspect-square w-full object-cover" %}
+    {% render_image photo.image variant="photo_preview" alt=photo.description reveal=True css_class="media-image--compact aspect-square w-full object-cover" %}
 </div>

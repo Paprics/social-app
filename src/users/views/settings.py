@@ -1,6 +1,6 @@
 # accounts/views/settings_views.py
 import json
-
+from datetime import date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -90,7 +90,33 @@ class SettingsPageView(LoginRequiredMixin, View):
         countries = Country.objects.filter(code2__in=settings.GEO_ALLOWED_COUNTRIES).order_by("name_en")
 
         regions = Region.objects.filter(country_id=country_id).order_by("name_en") if country_id else []
+
         cities = City.objects.filter(region_id=region_id).order_by("-population", "name_en") if region_id else []
+
+        current_year = date.today().year
+
+        birth_days = range(1, 32)
+
+        birth_months = (
+            (1, _("January")),
+            (2, _("February")),
+            (3, _("March")),
+            (4, _("April")),
+            (5, _("May")),
+            (6, _("June")),
+            (7, _("July")),
+            (8, _("August")),
+            (9, _("September")),
+            (10, _("October")),
+            (11, _("November")),
+            (12, _("December")),
+        )
+
+        birth_years = range(
+            current_year - 18,
+            1899,
+            -1,
+        )
 
         return render(
             request,
@@ -104,6 +130,9 @@ class SettingsPageView(LoginRequiredMixin, View):
                 "languages": settings.LANGUAGES,
                 "gender_choices": Profile.Gender.choices,
                 "access_level_choices": UserSettings.AccessLevel.choices,
+                "birth_days": birth_days,
+                "birth_months": birth_months,
+                "birth_years": birth_years,
             },
         )
 

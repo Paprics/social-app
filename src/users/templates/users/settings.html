@@ -5,10 +5,6 @@
 
 {% block title %}{% trans "Settings" %} — Social Network{% endblock %}
 
-{% block extra_head %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
-{% endblock %}
-
 {% block page %}
 <div class="bg-slate-50 min-h-screen">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -511,18 +507,122 @@
               <p class="mt-1 text-xs text-slate-400">{% trans "To change your email go to Security section." %}</p>
             </div>
 
-            <!-- Date of birth — Flatpickr -->
+            <!-- Date of birth -->
             <div>
-              <label class="block text-sm font-medium text-slate-700 mb-1.5">{% trans "Date of birth" %}</label>
-              <input type="text"
-                     id="birth-date-picker"
-                     name="birth_date"
-                     value="{{ user.profile.birth_date|date:'Y-m-d' }}"
-                     placeholder="{% trans 'Select date…' %}"
-                     autocomplete="off"
-                     readonly
-                     class="w-full max-w-xs px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition duration-200 cursor-pointer">
-              <p class="mt-1 text-xs text-slate-400">{% trans "You must be at least 18 years old." %}</p>
+
+                <label class="mb-1.5 block text-sm font-medium text-slate-700">
+                    {% trans "Date of birth" %}
+                </label>
+
+                <div class="grid max-w-md grid-cols-[72px_minmax(0,1fr)_92px] gap-2">
+
+                    <!-- Day -->
+                    <div>
+                        <label
+                            for="birth-day"
+                            class="mb-1 block text-xs text-slate-500"
+                        >
+                            {% trans "Day" %}
+                        </label>
+
+                        <select
+                            id="birth-day"
+                            name="birth_day"
+                            required
+                            class="w-full rounded-xl border border-slate-300
+                                   bg-white px-2 py-2.5
+                                   text-sm text-slate-900
+                                   transition duration-200
+                                   focus:border-transparent
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-blue-600"
+                        >
+                            {% for day in birth_days %}
+                                <option
+                                    value="{{ day }}"
+                                    {% if user.profile.birth_date.day == day %}selected{% endif %}
+                                >
+                                    {{ day }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+
+                    <!-- Month -->
+                    <div>
+                        <label
+                            for="birth-month"
+                            class="mb-1 block text-xs text-slate-500"
+                        >
+                            {% trans "Month" %}
+                        </label>
+
+                        <select
+                            id="birth-month"
+                            name="birth_month"
+                            required
+                            class="w-full rounded-xl border border-slate-300
+                                   bg-white px-2 py-2.5
+                                   text-sm text-slate-900
+                                   transition duration-200
+                                   focus:border-transparent
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-blue-600"
+                        >
+                            {% for value, label in birth_months %}
+                                <option
+                                    value="{{ value }}"
+                                    {% if user.profile.birth_date.month == value %}selected{% endif %}
+                                >
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+
+                    <!-- Year -->
+                    <div>
+                        <label
+                            for="birth-year"
+                            class="mb-1 block text-xs text-slate-500"
+                        >
+                            {% trans "Year" %}
+                        </label>
+
+                        <select
+                            id="birth-year"
+                            name="birth_year"
+                            required
+                            class="w-full rounded-xl border border-slate-300
+                                   bg-white px-2 py-2.5
+                                   text-sm text-slate-900
+                                   transition duration-200
+                                   focus:border-transparent
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-blue-600"
+                        >
+                            {% for year in birth_years %}
+                                <option
+                                    value="{{ year }}"
+                                    {% if user.profile.birth_date.year == year %}selected{% endif %}
+                                >
+                                    {{ year }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                </div>
+
+                <p class="mt-1.5 text-xs text-slate-400">
+                    {% trans "You must be at least 18 years old." %}
+                </p>
+
             </div>
 
             <div class="flex justify-end pt-2 border-t border-slate-100">
@@ -1114,17 +1214,11 @@
 .toggle-switch input:checked + .toggle-track::after { transform: translateX(20px); }
 .toggle-switch input:focus-visible + .toggle-track { outline: 2px solid #2563eb; outline-offset: 2px; }
 .settings-nav-link.is-active { background: white; color: #0f172a; font-weight: 600; }
-.flatpickr-calendar { border-radius: 12px !important; box-shadow: 0 4px 24px rgba(0,0,0,.1) !important; border: 1px solid #e2e8f0 !important; }
-.flatpickr-day.selected { background: #2563eb !important; border-color: #2563eb !important; }
-.flatpickr-day:hover { background: #eff6ff !important; }
 </style>
 
 {% endblock %}
 
 {% block extra_js %}
-<!-- Flatpickr JS — ОБЯЗАТЕЛЬНО до settings.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-<!-- settings.js — без type="module", чтобы видел глобальный flatpickr -->
 <script src="{% static 'js/settings.js' %}"></script>
 <script src="{% static 'users/js/profile/avatar.js' %}"></script>
 {% endblock %}

@@ -47,7 +47,7 @@ def render_image(
     """
     request = context.get("request")
 
-    should_blur = bool(request and request.user.is_authenticated and request.user.settings.blur_media)
+    should_blur = bool(image and request and request.user.is_authenticated and request.user.settings.blur_media)
 
     if image:
         thumbnail = get_thumbnailer(image)[variant]

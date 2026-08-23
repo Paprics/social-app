@@ -1,17 +1,23 @@
-"""Persistence models for user galleries and system-managed photo albums."""
-
 # src/gallery/models.py
+
+"""Persistence models for user galleries and system-managed photo albums."""
 
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+import uuid
+from pathlib import Path
 
 
 def photo_upload_path(instance, filename):
     """Build the storage path for a photo inside a user album."""
-    return f"photos/users/{instance.album.user_id}/{instance.album_id}/{filename}"
+    extension = Path(filename).suffix.lower()
+
+    random_name = uuid.uuid4().hex[:12]
+
+    return f"photos/users/" f"{instance.album.user_id}/" f"{instance.album_id}/" f"{random_name}{extension}"
 
 
 class UserAlbum(models.Model):
@@ -154,17 +160,11 @@ class Photo(models.Model):
         verbose_name=_("Image"),
     )
 
-    title = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name=_("Title"),
-        help_text=_("Optional photo title."),
-    )
-
-    description = models.TextField(
+    description = models.CharField(
+        max_length=150,
         blank=True,
         verbose_name=_("Description"),
-        help_text=_("Optional photo description."),
+        help_text=_("Optional photo caption."),
     )
 
     is_visible = models.BooleanField(
@@ -184,7 +184,10 @@ class Photo(models.Model):
         verbose_name_plural = _("Photos")
 
     def __str__(self):
-        return self.title or f"Photo #{self.pk}"
+        if self.description:
+            return self.description[:40]
+
+        return f"Photo #{self.pk}"
 
 
 class Like(models.Model):

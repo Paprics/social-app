@@ -1,107 +1,241 @@
 {% load static i18n render_image gender_icon %}
 
 <div class="rounded-xl border border-slate-200 bg-[#f5efdf] p-5 shadow-sm">
+
     <div class="space-y-3">
 
         {# Username #}
-        <div class="flex items-baseline gap-3 pb-1 border-b border-slate-100">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Username" %}:</span>
-            <span class="text-lg font-bold text-slate-900 tracking-tight">{{ target_user.username }}</span>
+        <div class="flex items-center gap-3 border-b border-slate-100 pb-1">
+
+            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                {% trans "Username" %}:
+            </span>
+
+            <span class="inline-flex items-center gap-2 text-lg font-bold tracking-tight text-slate-900">
+                {% gender_icon target_user.profile.gender size=22 %}
+                {{ target_user.username }}
+            </span>
+
         </div>
+
 
         {# Пол #}
         <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Gender" %}:</span>
-            <span class="text-base text-slate-800">{{ target_user.profile.gender|default:"—" }}</span>
+
+            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                {% trans "Gender" %}:
+            </span>
+
+            <span class="text-base text-slate-800">
+                {{ target_user.profile.gender|default:"—" }}
+            </span>
+
         </div>
+
 
         {# Возраст #}
         <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Age" %}:</span>
-            <span class="text-base text-slate-800">{% if target_user.profile.age %}{{ target_user.profile.age }}{% else %}—{% endif %}</span>
+
+            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                {% trans "Age" %}:
+            </span>
+
+            <span class="text-base text-slate-800">
+                {% if target_user.profile.age %}
+                    {{ target_user.profile.age }}
+                {% else %}
+                    —
+                {% endif %}
+            </span>
+
         </div>
+
 
         {# Регион / Страна #}
         <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Region" %}:</span>
+
+            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                {% trans "Region" %}:
+            </span>
+
             <span class="text-base text-slate-800">
-                                    {% if target_user.profile.region %}{{ target_user.profile.region.get_name }}{% endif %}
-                                    {% if target_user.profile.country %}{% if target_user.profile.region %}, {% endif %}{{ target_user.profile.country.get_name }}{% endif %}
-                                    {% if not target_user.profile.region and not target_user.profile.country %}—{% endif %}
-                                </span>
+                {% if target_user.profile.region %}
+                    {{ target_user.profile.region.get_name }}
+                {% endif %}
+
+                {% if target_user.profile.country %}
+                    {% if target_user.profile.region %}, {% endif %}
+                    {{ target_user.profile.country.get_name }}
+                {% endif %}
+
+                {% if not target_user.profile.region and not target_user.profile.country %}
+                    —
+                {% endif %}
+            </span>
+
         </div>
+
 
         {# Город #}
         <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "City" %}:</span>
-            <span class="text-base text-slate-800">{{ target_user.profile.city.get_name|default:"—" }}</span>
+
+            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                {% trans "City" %}:
+            </span>
+
+            <span class="text-base text-slate-800">
+                {{ target_user.profile.city.get_name|default:"—" }}
+            </span>
+
         </div>
+
 
         {# Статус страницы #}
         <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Page status" %}:</span>
-            <span class="text-base text-slate-800">{{ target_user.profile.page_status|default:"Active" }}</span>
+
+            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                {% trans "Page status" %}:
+            </span>
+
+            <span class="text-base text-slate-800">
+                {{ target_user.profile.page_status|default:"Active" }}
+            </span>
+
         </div>
+
 
         {# Last seen — только если онлайн-статус публичен #}
         {% if target_user.settings.show_online_status or is_owner %}
-        <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Last seen" %}:</span>
-            <span class="text-base text-slate-800">
-                                        {% if target_user.profile.last_seen %}{{ target_user.profile.last_seen|date:"d.m.Y H:i" }}{% else %}—{% endif %}
-                                    </span>
-        </div>
+
+            <div class="flex items-baseline gap-3">
+
+                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                    {% trans "Last seen" %}:
+                </span>
+
+                <span class="text-base text-slate-800">
+                    {% if target_user.profile.last_seen %}
+                        {{ target_user.profile.last_seen|date:"d.m.Y H:i" }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </span>
+
+            </div>
+
         {% endif %}
 
-        {# Статус профиля #}
+
+        {# Пользовательский статус #}
         {% if target_user.profile.status %}
-        <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Status" %}:</span>
-            <span class="text-base italic text-slate-700 whitespace-pre-line">«{{ target_user.profile.status }}»</span>
-        </div>
+
+            <div class="flex items-baseline gap-3">
+
+                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                    {% trans "Status" %}:
+                </span>
+
+                <span class="whitespace-pre-line text-base italic text-slate-700">
+                    «{{ target_user.profile.status }}»
+                </span>
+
+            </div>
+
         {% endif %}
+
 
         {# Цель знакомства #}
         <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "Looking to meet" %}:</span>
+
+            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                {% trans "Looking to meet" %}:
+            </span>
+
             <span class="text-base text-slate-800">
-                                    {% if target_user.profile.looking_for_labels %}{{ target_user.profile.looking_for_labels|join:", " }}{% else %}—{% endif %}
-                                </span>
+                {% if target_user.profile.looking_for_labels %}
+                    {{ target_user.profile.looking_for_labels|join:", " }}
+                {% else %}
+                    —
+                {% endif %}
+            </span>
+
         </div>
+
 
         {# О себе #}
         {% if target_user.profile.bio %}
-        <div class="flex items-baseline gap-3">
-            <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">{% trans "About" %}:</span>
-            <span class="text-base text-slate-800 whitespace-pre-line">{{ target_user.profile.bio }}</span>
-        </div>
+
+            <div class="flex items-baseline gap-3">
+
+                <span class="w-1/3 shrink-0 text-right text-sm font-medium text-slate-500">
+                    {% trans "About" %}:
+                </span>
+
+                <span class="whitespace-pre-line text-base text-slate-800">
+                    {{ target_user.profile.bio }}
+                </span>
+
+            </div>
+
         {% endif %}
+
 
         {# Особые метки #}
         {% if target_user.profile.open_to_gifts or target_user.profile.financial_meetings_only %}
-        <div class="pt-2 border-t border-slate-100 flex flex-wrap gap-2 justify-end">
-            {% if target_user.profile.open_to_gifts %}
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-700 border border-pink-200 shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-pink-500"
-                                                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-                                            </svg>
-                                            {% trans "Open to receiving gifts" %}
-                                        </span>
-            {% endif %}
-            {% if target_user.profile.financial_meetings_only %}
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 border border-amber-200 shadow-sm">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-amber-600"
-                                                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            {% trans "Sponsorship / Financial support" %}
-                                        </span>
-            {% endif %}
-        </div>
+
+            <div class="flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-2">
+
+                {% if target_user.profile.open_to_gifts %}
+
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-700 shadow-sm">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-3.5 w-3.5 text-pink-500"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor"
+                             stroke-width="2">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
+
+                        </svg>
+
+                        {% trans "Open to receiving gifts" %}
+
+                    </span>
+
+                {% endif %}
+
+
+                {% if target_user.profile.financial_meetings_only %}
+
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 shadow-sm">
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-3.5 w-3.5 text-amber-600"
+                             fill="none"
+                             viewBox="0 0 24 24"
+                             stroke="currentColor"
+                             stroke-width="2">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+
+                        </svg>
+
+                        {% trans "Sponsorship / Financial support" %}
+
+                    </span>
+
+                {% endif %}
+
+            </div>
+
         {% endif %}
 
     </div>
+
 </div>

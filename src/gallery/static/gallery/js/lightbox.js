@@ -12,6 +12,8 @@ function initLightbox() {
         return;
     }
 
+    const scrollContainer = document.getElementById('lb-scroll');
+
     const image = document.getElementById('lb-img');
     const counter = document.getElementById('lb-counter');
 
@@ -21,6 +23,8 @@ function initLightbox() {
     const prevButton = document.getElementById('lb-prev');
     const nextButton = document.getElementById('lb-next');
 
+    const photoStage = document.getElementById('lb-photo-stage');
+
     const detailContainer = document.getElementById(
         'lb-photo-detail',
     );
@@ -28,6 +32,11 @@ function initLightbox() {
     let photos = [];
     let currentIndex = 0;
     let detailRequestController = null;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const SWIPE_THRESHOLD = 50;
 
 
     function getPhotoElements(trigger) {
@@ -50,7 +59,7 @@ function initLightbox() {
             return {
                 id: element.dataset.photoId || '',
                 url: element.dataset.photoUrl || '',
-                title: element.dataset.photoTitle || '',
+                description: element.dataset.photoDescription || '',
             };
         });
 
@@ -123,9 +132,9 @@ function initLightbox() {
             );
 
             /*
-             * Some lightbox photos (for example system-managed post
-             * attachments) are intentionally outside the regular gallery
-             * detail endpoint for now. Keep the lightbox usable anyway.
+             * Some lightbox photos may intentionally be outside
+             * the regular gallery detail endpoint.
+             * Keep the lightbox usable anyway.
              */
             if (!response.ok) {
                 showDetailPlaceholder();
@@ -148,8 +157,7 @@ function initLightbox() {
             detailContainer.innerHTML = html;
 
             /*
-             * Future comment partials will contain HTMX attributes.
-             * Process dynamically inserted markup when HTMX is available.
+             * Process dynamically inserted HTMX markup when available.
              */
             window.htmx?.process(
                 detailContainer,
@@ -170,6 +178,18 @@ function initLightbox() {
     }
 
 
+    function scrollToTop() {
+        if (!scrollContainer) {
+            return;
+        }
+
+        scrollContainer.scrollTo({
+            top: 0,
+            behavior: 'auto',
+        });
+    }
+
+
     function render() {
         const photo = photos[currentIndex];
 
@@ -181,12 +201,7 @@ function initLightbox() {
 
         if (image) {
             image.src = photo.url;
-
-            /*
-             * Title is kept only for image alt text.
-             * It is not displayed in the lightbox UI.
-             */
-            image.alt = photo.title;
+            image.alt = photo.description;
         }
 
         if (counter) {
@@ -223,9 +238,12 @@ function initLightbox() {
         render();
 
         lightbox.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
 
-        lightbox.scrollTop = 0;
+        document.body.classList.add(
+            'overflow-hidden',
+        );
+
+        scrollToTop();
     }
 
 
@@ -265,11 +283,7 @@ function initLightbox() {
         ) % photos.length;
 
         render();
-
-        lightbox.scrollTo({
-            top: 0,
-            behavior: 'instant',
-        });
+        scrollToTop();
     }
 
 
@@ -283,11 +297,7 @@ function initLightbox() {
         ) % photos.length;
 
         render();
-
-        lightbox.scrollTo({
-            top: 0,
-            behavior: 'instant',
-        });
+        scrollToTop();
     }
 
 
@@ -345,6 +355,70 @@ function initLightbox() {
         next,
     );
 
+
+    // ─── Touch swipe navigation ────────────────────────────────
+
+    photoStage?.addEventListener(
+        'touchstart',
+        (event) => {
+            if (event.touches.length !== 1) {
+                return;
+            }
+
+            const touch = event.touches[0];
+
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        },
+        {
+            passive: true,
+        },
+    );
+
+
+    photoStage?.addEventListener(
+        'touchend',
+        (event) => {
+            if (
+                !touchStartX
+                || event.changedTouches.length !== 1
+            ) {
+                return;
+            }
+
+            const touch = event.changedTouches[0];
+
+            const deltaX = touch.clientX - touchStartX;
+            const deltaY = touch.clientY - touchStartY;
+
+            touchStartX = 0;
+            touchStartY = 0;
+
+            /*
+             * Ignore short gestures and predominantly vertical movement.
+             * Vertical gestures remain available for normal scrolling.
+             */
+            if (
+                Math.abs(deltaX) < SWIPE_THRESHOLD
+                || Math.abs(deltaX) <= Math.abs(deltaY)
+            ) {
+                return;
+            }
+
+            if (deltaX < 0) {
+                next();
+                return;
+            }
+
+            previous();
+        },
+        {
+            passive: true,
+        },
+    );
+
+
+    // ─── Keyboard navigation ───────────────────────────────────
 
     document.addEventListener('keydown', (event) => {
         if (

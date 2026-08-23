@@ -207,9 +207,9 @@ class AlbumSettingsView(LoginRequiredMixin, View):
     ):
         updates = {}
 
-        prefix = "photo_title_"
+        prefix = "photo_description_"
 
-        for key, title in request.POST.items():
+        for key, description in request.POST.items():
             if not key.startswith(prefix):
                 continue
 
@@ -221,22 +221,15 @@ class AlbumSettingsView(LoginRequiredMixin, View):
             photo_id = int(photo_id)
 
             updates[photo_id] = {
-                "title": title,
+                "description": description.strip()[:150],
                 "is_visible": bool(request.POST.get(f"photo_visible_{photo_id}")),
             }
 
-        try:
-            updated = PhotoService.update_album_photos(
-                user=request.user,
-                album_id=album.pk,
-                updates=updates,
-            )
-
-        except InvalidPhotoTitleError as error:
-            return HttpResponse(
-                str(error),
-                status=422,
-            )
+        updated = PhotoService.update_album_photos(
+            user=request.user,
+            album_id=album.pk,
+            updates=updates,
+        )
 
         if not updated:
             raise Http404

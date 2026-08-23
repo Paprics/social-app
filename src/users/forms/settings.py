@@ -23,11 +23,25 @@ class AccountSettingsForm(forms.Form):
         validators=[UnicodeUsernameValidator()],
     )
 
-    birth_date = forms.DateField()
+    birth_day = forms.IntegerField(
+        min_value=1,
+        max_value=31,
+    )
+
+    birth_month = forms.IntegerField(
+        min_value=1,
+        max_value=12,
+    )
+
+    birth_year = forms.IntegerField(
+        min_value=1900,
+    )
 
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+
+        self.fields["birth_year"].max_value = date.today().year - 18
 
     def clean_username(self):
         username = self.cleaned_data["username"].strip()
@@ -37,16 +51,35 @@ class AccountSettingsForm(forms.Form):
 
         return username
 
-    def clean_birth_date(self):
-        birth_date = self.cleaned_data["birth_date"]
+    def clean(self):
+        cleaned_data = super().clean()
+
+        day = cleaned_data.get("birth_day")
+        month = cleaned_data.get("birth_month")
+        year = cleaned_data.get("birth_year")
+
+        if day is None or month is None or year is None:
+            return cleaned_data
+
+        try:
+            birth_date = date(
+                year=year,
+                month=month,
+                day=day,
+            )
+        except ValueError:
+            raise forms.ValidationError(_("Enter a valid date of birth."))
 
         today = date.today()
+
         age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
         if age < 18:
             raise forms.ValidationError(_("You must be at least 18 years old to use this service."))
 
-        return birth_date
+        cleaned_data["birth_date"] = birth_date
+
+        return cleaned_data
 
     def save(self):
         self.user.username = self.cleaned_data["username"]

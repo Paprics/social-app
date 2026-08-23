@@ -101,3 +101,24 @@
         </p>
     </div>
 {% endif %}
+
+<script>
+document.addEventListener("htmx:afterSwap", (event) => {
+    const target = event.detail.target;
+
+    if (!target || target.id !== "search-results") {
+        return;
+    }
+
+    if (window.matchMedia("(max-width: 1023px)").matches) {
+        const results = document.getElementById("search-results");
+
+        if (results) {
+            results.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }
+    }
+});
+</script>
