@@ -62,6 +62,7 @@ TEMPLATES = [
                 "django.template.context_processors.i18n",
                 "users.context_processors.user_settings",
                 "notifications.context_processor.notifications_context",
+                "core.context_processors.site_settings",
             ],
         },
     },
@@ -254,6 +255,8 @@ THUMBNAIL_ALIASES = {
         },
     },
 }
+
+GOOGLE_SITE_VERIFICATION = env("GOOGLE_SITE_VERIFICATION", default="")
 
 # Gallery
 # Posts
