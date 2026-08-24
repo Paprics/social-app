@@ -4,14 +4,16 @@
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TMKL9LSHNK"></script>
+    <script src="{% static 'js/google_analytics.js' %}"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    {% if GOOGLE_SITE_VERIFICATION %}
-        <meta name="google-site-verification" content="{{ GOOGLE_SITE_VERIFICATION }}">
-    {% endif %}
-
-    <meta name="google-site-verification" content="vY8ExX2Zg1T6KVXMetxN87mu8h4Sbnx9rwCgLm5zo0o" />
+    <!-- Google Search Console -->
+    <meta name="google-site-verification"
+          content="vY8ExX2Zg1T6KVXMetxN87mu8h4Sbnx9rwCgLm5zo0o" />
 
     <title>{% block title %}Social Network{% endblock %}</title>
 
@@ -38,6 +40,10 @@
 
 <body class="flex min-h-screen flex-col bg-[#f9faf9]"
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    {% if user.is_authenticated %}
+        {% include "layouts/site_header/_beta_banner.html" %}
+    {% endif %}
 
     {% include "layouts/site_header/header.html" %}
 

@@ -1,0 +1,52 @@
+{% load i18n %}
+
+<div id="beta-banner"
+     class="hidden relative bg-amber-50 px-10 py-2 text-center text-xs font-medium text-amber-900 sm:text-sm"
+     role="status">
+
+    <span>
+        {% trans "Beta mode — testing in progress. Some errors may occur." %}
+    </span>
+
+    <button type="button"
+            id="beta-banner-close"
+            class="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1
+                   text-amber-700 transition hover:bg-amber-100 hover:text-amber-950"
+            aria-label="{% trans 'Close' %}">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             viewBox="0 0 24 24"
+             fill="none"
+             stroke="currentColor"
+             stroke-width="2"
+             class="h-4 w-4"
+             aria-hidden="true">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 18 18 6M6 6l12 12"/>
+        </svg>
+
+    </button>
+
+</div>
+
+<script>
+    (() => {
+        const storageKey = "beta_banner_v1";
+        const banner = document.getElementById("beta-banner");
+        const closeButton = document.getElementById("beta-banner-close");
+
+        if (!banner || !closeButton) {
+            return;
+        }
+
+        if (localStorage.getItem(storageKey) !== "true") {
+            banner.classList.remove("hidden");
+        }
+
+        closeButton.addEventListener("click", () => {
+            banner.classList.add("hidden");
+            localStorage.setItem(storageKey, "true");
+        });
+    })();
+</script>

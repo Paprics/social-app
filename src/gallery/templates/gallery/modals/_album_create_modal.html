@@ -13,8 +13,17 @@
             aria-label="{% trans 'Close' %}">
     </button>
 
-    <div class="pointer-events-none relative z-10 flex min-h-full items-end justify-center sm:items-center sm:p-4">
-        <div class="pointer-events-auto relative max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl bg-white p-5 shadow-xl sm:max-w-md sm:rounded-2xl">
+    <div class="pointer-events-none relative z-10 flex min-h-full items-center justify-center p-4">
+
+        <div class="pointer-events-auto relative
+                    max-h-[calc(100dvh-2rem)]
+                    w-full
+                    max-w-md
+                    overflow-y-auto
+                    rounded-2xl
+                    bg-white
+                    p-5
+                    shadow-xl">
 
             <h2 id="album-modal-title"
                 class="text-lg font-semibold text-slate-900">
@@ -25,6 +34,7 @@
                   action="{% url 'gallery:photo_album_create' %}"
                   data-album-create-form
                   class="mt-5 space-y-4">
+
                 {% csrf_token %}
 
                 <div data-form-general-errors
@@ -45,7 +55,9 @@
                            maxlength="100"
                            autocomplete="off"
                            aria-describedby="album-title-error"
-                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                           class="w-full rounded-lg border border-slate-300 px-3 py-2
+                                  text-slate-900 outline-none transition
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
 
                     <p id="album-title-error"
                        data-field-error="title"
@@ -65,7 +77,9 @@
                                 name="visibility"
                                 required
                                 aria-describedby="album-visibility-error"
-                                class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+                                class="w-full rounded-lg border border-slate-300 bg-white
+                                       px-3 py-2 text-slate-900 outline-none transition
+                                       focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
 
                             {% for value, label in album_create_form.fields.visibility.choices %}
                                 <option value="{{ value }}"
@@ -73,6 +87,7 @@
                                     {{ label }}
                                 </option>
                             {% endfor %}
+
                         </select>
                     {% endwith %}
 
@@ -84,19 +99,28 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-1">
+
                     <button type="button"
                             data-album-modal-close
-                            class="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">
+                            class="rounded-lg px-4 py-2 text-sm font-medium
+                                   text-slate-600 transition hover:bg-slate-100">
                         {% trans "Cancel" %}
                     </button>
 
                     <button type="submit"
                             data-album-submit
-                            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60">
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-sm
+                                   font-medium text-white transition hover:bg-blue-700
+                                   disabled:cursor-wait disabled:opacity-60">
                         {% trans "Create album" %}
                     </button>
+
                 </div>
+
             </form>
+
         </div>
+
     </div>
+
 </div>

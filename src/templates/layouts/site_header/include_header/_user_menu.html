@@ -59,6 +59,8 @@
 
         <div class="py-2">
 
+            {# Profile #}
+
             <a href="{% url 'users:profile' user.pk %}"
                class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
 
@@ -77,6 +79,53 @@
 
             </a>
 
+
+            {# Profile details #}
+
+            <a href="{% url 'users:profile_explore' user.pk %}"
+               class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
+
+                <svg class="h-5 w-5 shrink-0"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.5"
+                     viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9 6.75h6M9 10.5h6M9 14.25h3.75M6.75 3.75h10.5A2.25 2.25 0 0119.5 6v12a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 18V6a2.25 2.25 0 012.25-2.25z"/>
+                </svg>
+
+                {% trans "Profile details" %}
+
+            </a>
+
+
+            {# Gallery #}
+
+            <a href="{% url 'gallery:gallery' user.pk %}"
+               class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
+
+                <svg class="h-5 w-5 shrink-0"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="1.5"
+                     viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 19.5h16.5A2.25 2.25 0 0022.5 17.25V6.75A2.25 2.25 0 0020.25 4.5H3.75A2.25 2.25 0 001.5 6.75v10.5a2.25 2.25 0 002.25 2.25z"/>
+                    <path stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M15.75 8.25h.008v.008h-.008V8.25z"/>
+                </svg>
+
+                {% trans "Gallery" %}
+
+            </a>
+
+
+            {# Account Center #}
 
             <a href="{% url 'users:account_center' %}"
                class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
@@ -99,6 +148,8 @@
 
             </a>
 
+
+            {# Settings #}
 
             <a href="{% url 'users:settings' %}"
                class="flex items-center gap-2.5 px-5 py-3 text-sm text-slate-700 transition hover:bg-slate-100">
