@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-21 13:12+0300\n"
+"POT-Creation-Date: 2026-08-24 16:18+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,133 +17,3013 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: .\src\_config\settings\base.py:107
+
+#: .\src\_config\settings\base.py:148
 msgid "English"
 msgstr ""
 
-#: .\src\_config\settings\base.py:108
+#: .\src\_config\settings\base.py:149
 msgid "Russian"
 msgstr ""
 
-#: .\src\_config\settings\base.py:109
+#: .\src\_config\settings\base.py:150
 msgid "Ukrainian"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:16
+#: .\src\accounts\emails.py:41
+msgid "Confirm your email"
+msgstr ""
+
+#: .\src\accounts\emails.py:88
+msgid "Reset your password"
+msgstr ""
+
+#: .\src\accounts\forms\registration.py:30
+#: .\src\accounts\templates\accounts\modals\register_modal.html:133
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:149
+#: .\src\users\models\profile.py:17
+#: .\src\users\templates\users\settings.html:255
 msgid "Male"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:17
+#: .\src\accounts\forms\registration.py:31
+#: .\src\accounts\templates\accounts\modals\register_modal.html:134
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:150
+#: .\src\users\models\profile.py:18
+#: .\src\users\templates\users\settings.html:264
 msgid "Female"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:18
+#: .\src\accounts\forms\registration.py:32
+#: .\src\accounts\templates\accounts\modals\register_modal.html:135
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:151
+#: .\src\users\models\profile.py:19
+#: .\src\users\templates\users\settings.html:273
 msgid "Couple"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:19
+#: .\src\accounts\forms\registration.py:33
+#: .\src\accounts\templates\accounts\modals\register_modal.html:136
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:152
+#: .\src\users\models\profile.py:20
+#: .\src\users\templates\users\settings.html:282
 msgid "Non-binary"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:25
-msgid "The user account associated with this profile."
+#: .\src\accounts\forms\registration.py:64
+msgid "A user with this email already exists."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:30
-msgid "Indicates whether the user's identity has been verified."
+#: .\src\accounts\forms\registration.py:71
+msgid "A user with this username already exists."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:35
-msgid "Soft-delete flag. Deleted profiles remain in the database."
+#: .\src\accounts\forms\registration.py:78
+msgid "Please enter your date of birth."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:40
-msgid "Indicates whether the profile has been banned by moderators."
+#: .\src\accounts\forms\registration.py:84
+msgid "You must be at least 18 years old to register."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:48
-msgid "Unique Telegram user ID linked to this account."
+#: .\src\accounts\forms\registration.py:87
+msgid "Please enter a valid date of birth."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:54
-msgid "Cached Telegram profile data received during authentication."
+#: .\src\accounts\forms\registration.py:95
+msgid "Please select your gender."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:61
-msgid "Profile picture displayed to other users."
+#: .\src\accounts\forms\registration.py:107
+msgid "This field is required."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:68
-msgid "Short personal description displayed on the profile."
+#: .\src\accounts\forms\registration.py:113
+msgid "Password must be at least 6 characters."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:75
-msgid "User's gender or profile type."
+#: .\src\accounts\forms\registration.py:118
+#: .\src\accounts\templates\accounts\modals\register_modal.html:60
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:60
+#: .\src\users\templates\users\settings.html:504
+msgid "Email"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:85
-msgid "Profiles the user is interested in meeting."
+#: .\src\accounts\forms\registration.py:130
+msgid "Current password"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:89
-msgid "User's date of birth."
+#: .\src\accounts\forms\registration.py:131
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:38
+msgid "New password"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:121
-msgid "Premium subscription expiration date and time."
+#: .\src\accounts\forms\registration.py:132
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:54
+msgid "Confirm new password"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:126
-msgid "Last recorded online activity."
+#: .\src\accounts\forms\registration.py:141
+msgid "Current password is incorrect."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:132
-msgid "Current online status."
+#: .\src\accounts\forms\registration.py:149
+msgid "Passwords do not match."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:137
-msgid "Total number of profile views."
+#: .\src\accounts\templates\accounts\check_email.html:4
+#: .\src\accounts\templates\accounts\check_email.html:19
+#: .\src\accounts\templates\accounts\password_reset_sent.html:18
+msgid "Check your email"
 msgstr ""
 
-#: .\src\accounts\models\profile.py:142
-msgid "Date and time when the profile was created."
+#: .\src\accounts\templates\accounts\check_email.html:22
+msgid "We've sent a verification link to your email address."
 msgstr ""
 
-#: .\src\accounts\models\profile.py:147
-msgid "Date and time when the profile was last updated."
+#: .\src\accounts\templates\accounts\check_email.html:25
+msgid ""
+"The link expires in 24 hours. Check your spam folder if you don't see it."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\check_email.html:29
+msgid "Didn't receive the email?"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\check_email.html:31
+msgid "Check your spam or junk folder"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\check_email.html:32
+msgid "Make sure you entered the correct email"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\check_email.html:33
+msgid "Wait a few minutes and try again"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\check_email.html:39
+#: .\src\accounts\templates\accounts\email_verification_invalid.html:27
+#: .\src\accounts\templates\accounts\password_reset_sent.html:29
+msgid "Back to home"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\email_verification_invalid.html:4
+#: .\src\accounts\templates\accounts\password_reset_invalid.html:4
+msgid "Link expired"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\email_verification_invalid.html:19
+#: .\src\accounts\templates\accounts\password_reset_invalid.html:18
+msgid "Link is invalid or expired"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\email_verification_invalid.html:22
+msgid ""
+"The verification link has expired or already been used. Register again to "
+"get a new one."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\email_verified.html:4
+msgid "Email verified"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\email_verified.html:18
+msgid "Email confirmed!"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\email_verified.html:21
+msgid "Your account is now active. You can sign in."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\email_verified.html:29
+#: .\src\accounts\templates\accounts\modals\login_modal.html:39
+#: .\src\accounts\templates\accounts\modals\login_modal.html:124
+#: .\src\accounts\templates\accounts\modals\register_modal.html:289
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:288
+#: .\src\accounts\templates\accounts\password_reset_complete.html:27
+msgid "Sign in"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\login_modal.html:74
+#: .\src\accounts\templates\accounts\modals\register_modal.html:76
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:79
+#: .\src\core\templates\core\index.html:86
+#: .\src\users\templates\users\profile\_profile_details.html:11
+#: .\src\users\templates\users\settings.html:496
+msgid "Username"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\login_modal.html:84
+#: .\src\core\templates\core\index.html:96
+msgid "Enter email or username"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\login_modal.html:101
+#: .\src\accounts\templates\accounts\modals\register_modal.html:99
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:105
+#: .\src\core\templates\core\index.html:114
+#: .\src\users\templates\users\settings.html:653
+msgid "Password"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\login_modal.html:110
+#: .\src\core\templates\core\index.html:123
+msgid "Enter password"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\login_modal.html:138
+#: .\src\core\templates\core\index.html:154
+msgid "Forgot password?"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\login_modal.html:148
+#: .\src\core\templates\core\index.html:167
+msgid "Don't have an account?"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\login_modal.html:156
+#: .\src\accounts\templates\accounts\modals\register_modal.html:27
+#: .\src\accounts\templates\accounts\modals\register_modal.html:275
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:27
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:273
+#: .\src\core\templates\core\index.html:174
+msgid "Create account"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:29
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:29
+msgid "It's free. No credit card required."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:34
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:34
+#: .\src\gallery\templates\gallery\components\lightbox.html:25
+#: .\src\gallery\templates\gallery\modals\_album_create_modal.html:13
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:29
+#: .\src\templates\layouts\site_header\_beta_banner.html:15
+#: .\src\users\templates\users\partials\avatar_modal.html:28
+msgid "Close"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:66
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:69
+msgid "Enter your email"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:82
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:88
+msgid "Choose a username"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:104
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:113
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:45
+msgid "Min 8 characters"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:112
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:121
+msgid "Confirm password"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:117
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:129
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:61
+msgid "Repeat password"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:128
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:141
+#: .\src\search\templates\search\partials\filters.html:51
+#: .\src\users\templates\users\profile\_profile_details.html:26
+#: .\src\users\templates\users\settings.html:215
+#: .\src\video_chat\templates\chat\room.html:106
+msgid "Gender"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:132
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:148
+msgid "Select gender"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:147
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:160
+#: .\src\users\templates\users\settings.html:514
+msgid "Date of birth"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:152
+#: .\src\accounts\templates\accounts\modals\register_modal.html:154
+#: .\src\users\templates\users\settings.html:525
+msgid "Day"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:156
+#: .\src\accounts\templates\accounts\modals\register_modal.html:158
+#: .\src\users\templates\users\settings.html:559
+msgid "Month"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:159
+#: .\src\users\views\settings.py:101
+msgid "January"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:160
+#: .\src\users\views\settings.py:102
+msgid "February"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:161
+#: .\src\users\views\settings.py:103
+msgid "March"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:162
+#: .\src\users\views\settings.py:104
+msgid "April"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:163
+#: .\src\users\views\settings.py:105
+msgid "May"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:164
+#: .\src\users\views\settings.py:106
+msgid "June"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:165
+#: .\src\users\views\settings.py:107
+msgid "July"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:166
+#: .\src\users\views\settings.py:108
+msgid "August"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:167
+#: .\src\users\views\settings.py:109
+msgid "September"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:168
+#: .\src\users\views\settings.py:110
+msgid "October"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:169
+#: .\src\users\views\settings.py:111
+msgid "November"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:170
+#: .\src\users\views\settings.py:112
+msgid "December"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:172
+#: .\src\accounts\templates\accounts\modals\register_modal.html:174
+#: .\src\users\templates\users\settings.html:593
+msgid "Year"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:189
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:187
+#: .\src\search\templates\search\partials\filters.html:155
+#: .\src\users\templates\users\settings.html:350
+msgid "Location"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:197
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:195
+#: .\src\geo\templates\geo\partials\location_fields.html:8
+#: .\src\search\templates\search\partials\filters.html:167
+#: .\src\users\templates\users\settings.html:365
+msgid "Country"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:207
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:205
+#: .\src\geo\templates\geo\partials\location_fields.html:15
+msgid "Select country"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:225
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:222
+#: .\src\geo\templates\geo\partials\location_fields.html:27
+#: .\src\search\templates\search\partials\filters.html:203
+#: .\src\users\templates\users\profile\_profile_details.html:58
+#: .\src\users\templates\users\profile_explore\_details_card.html:27
+#: .\src\users\templates\users\settings.html:398
+msgid "Region"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:236
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:234
+#: .\src\geo\templates\geo\partials\location_fields.html:35
+#: .\src\geo\templates\geo\partials\regions_options.html:2
+msgid "Select region"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:251
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:248
+#: .\src\geo\templates\geo\partials\location_fields.html:41
+#: .\src\geo\templates\geo\partials\location_fields.html:54
+#: .\src\search\templates\search\partials\filters.html:230
+#: .\src\users\templates\users\profile\_profile_details.html:83
+#: .\src\users\templates\users\settings.html:426
+msgid "City"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:257
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:255
+#: .\src\geo\templates\geo\partials\cities_options.html:2
+#: .\src\geo\templates\geo\partials\location_fields.html:45
+msgid "Select city"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\register_modal.html:284
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:282
+msgid "Already have an account?"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\modals\reset_modal.html:171
+msgid "Select date"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_changed.html:4
+msgid "Password changed"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_changed.html:17
+msgid "Password changed!"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_changed.html:20
+msgid "Your password has been updated. Please sign in again to continue."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_changed.html:27
+msgid "Sign in again"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_complete.html:4
+msgid "Password updated"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_complete.html:17
+msgid "Password updated!"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_complete.html:20
+msgid ""
+"Your password has been changed. You can now sign in with your new password."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:4
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:20
+msgid "Set new password"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:21
+msgid "Choose a strong password for your account."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_confirm.html:71
+msgid "Save new password"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_invalid.html:21
+msgid "Password reset links expire after 1 hour and can only be used once."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_invalid.html:29
+msgid "Request a new link"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_sent.html:4
+msgid "Reset link sent"
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_sent.html:21
+msgid "If an account with that email exists, we've sent a password reset link."
+msgstr ""
+
+#: .\src\accounts\templates\accounts\password_reset_sent.html:24
+msgid "The link expires in 1 hour."
+msgstr ""
+
+#: .\src\core\templates\core\components\media\thumbnail_image.html:29
+msgid "Show"
+msgstr ""
+
+#: .\src\core\templates\core\index.html:5
+msgid "Welcome"
+msgstr ""
+
+#: .\src\core\templates\core\index.html:9
+msgid "Connect with people around the world."
+msgstr ""
+
+#: .\src\core\templates\core\index.html:139
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:159
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:233
+#: .\src\templates\layouts\site_header\include_header\_top_header.html:35
+msgid "Log in"
+msgstr ""
+
+#: .\src\gallery\forms\gallery.py:21
+msgid "No photos were uploaded."
+msgstr ""
+
+#: .\src\gallery\forms\gallery.py:55
+msgid "Enter an album title."
+msgstr ""
+
+#: .\src\gallery\models.py:27 .\src\gallery\models.py:183
+#: .\src\gallery\models.py:207 .\src\notifications\models.py:51
+msgid "Photo"
+msgstr ""
+
+#: .\src\gallery\models.py:28
+msgid "Video"
+msgstr ""
+
+#: .\src\gallery\models.py:31
+#: .\src\gallery\templates\gallery\album_settings.html:124
+#: .\src\gallery\templates\gallery\includes\_album_info.html:68
+msgid "Public"
+msgstr ""
+
+#: .\src\gallery\models.py:32
+#: .\src\gallery\templates\gallery\album_settings.html:129
+#: .\src\gallery\templates\gallery\includes\_album_info.html:70
+#: .\src\users\models\preferences.py:15
+msgid "Friends only"
+msgstr ""
+
+#: .\src\gallery\models.py:33 .\src\users\models\preferences.py:16
+msgid "Only me"
+msgstr ""
+
+#: .\src\gallery\models.py:38
+msgid "User album"
+msgstr ""
+
+#: .\src\gallery\models.py:39
+msgid "Profile photos"
+msgstr ""
+
+#: .\src\gallery\models.py:40
+msgid "Post photos"
+msgstr ""
+
+#: .\src\gallery\models.py:46 .\src\gallery\models.py:200
+msgid "User"
+msgstr ""
+
+#: .\src\gallery\models.py:53
+msgid "Album type"
+msgstr ""
+
+#: .\src\gallery\models.py:54
+msgid "Media type stored in this album."
+msgstr ""
+
+#: .\src\gallery\models.py:64
+msgid "Purpose"
+msgstr ""
+
+#: .\src\gallery\models.py:65
+msgid "Internal purpose of this album."
+msgstr ""
+
+#: .\src\gallery\models.py:70
+#: .\src\gallery\templates\gallery\album_settings.html:86
+#: .\src\messenger\models\dialog.py:51
+msgid "Title"
+msgstr ""
+
+#: .\src\gallery\models.py:71
+msgid "Album title."
+msgstr ""
+
+#: .\src\gallery\models.py:76
+msgid "Slug"
+msgstr ""
+
+#: .\src\gallery\models.py:77
+msgid "Unique album identifier."
+msgstr ""
+
+#: .\src\gallery\models.py:82 .\src\gallery\models.py:166
+#: .\src\gallery\templates\gallery\album_settings.html:102
+msgid "Description"
+msgstr ""
+
+#: .\src\gallery\models.py:83
+msgid "Optional album description."
+msgstr ""
+
+#: .\src\gallery\models.py:92
+#: .\src\gallery\templates\gallery\album_settings.html:116
+msgid "Visibility"
+msgstr ""
+
+#: .\src\gallery\models.py:93
+msgid "Who can view this album."
+msgstr ""
+
+#: .\src\gallery\models.py:98 .\src\gallery\models.py:172
+#: .\src\gallery\templates\gallery\album_settings.html:252
+msgid "Visible"
+msgstr ""
+
+#: .\src\gallery\models.py:99
+msgid "Whether this album is visible."
+msgstr ""
+
+#: .\src\gallery\models.py:104 .\src\gallery\models.py:178
+#: .\src\gallery\models.py:212 .\src\messenger\models\dialog.py:84
+#: .\src\notifications\models.py:71
+msgid "Created"
+msgstr ""
+
+#: .\src\gallery\models.py:109 .\src\messenger\models\dialog.py:89
+msgid "Updated"
+msgstr ""
+
+#: .\src\gallery\models.py:114
+msgid "Photo album"
+msgstr ""
+
+#: .\src\gallery\models.py:115
+#: .\src\users\templates\users\profile\_albums.html:10
+#: .\src\users\templates\users\settings.html:767
+msgid "Photo albums"
+msgstr ""
+
+#: .\src\gallery\models.py:155
+msgid "Album"
+msgstr ""
+
+#: .\src\gallery\models.py:160
+msgid "Image"
+msgstr ""
+
+#: .\src\gallery\models.py:167
+msgid "Optional photo caption."
+msgstr ""
+
+#: .\src\gallery\models.py:173
+msgid "Whether this photo is visible."
+msgstr ""
+
+#: .\src\gallery\models.py:184
+#: .\src\gallery\templates\gallery\album_detail.html:34
+#: .\src\gallery\templates\gallery\album_settings.html:20
+#: .\src\gallery\templates\gallery\album_settings.html:193
+#: .\src\gallery\templates\gallery\gallery.html:5
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:23
+#: .\src\users\templates\users\profile_explore.html:118
+msgid "Photos"
+msgstr ""
+
+#: .\src\gallery\models.py:217
+#: .\src\gallery\templates\gallery\partials\likes\_button.html:21
+msgid "Like"
+msgstr ""
+
+#: .\src\gallery\models.py:218
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:211
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:35
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:69
+msgid "Likes"
+msgstr ""
+
+#: .\src\gallery\services\albums.py:77 .\src\gallery\services\albums.py:262
+msgid "You already have an album with this title."
+msgstr ""
+
+#: .\src\gallery\services\albums.py:195
+msgid "Album title is required."
+msgstr ""
+
+#: .\src\gallery\services\albums.py:198
+msgid "Album title is too long."
+msgstr ""
+
+#: .\src\gallery\services\albums.py:212
+msgid "Invalid album type."
+msgstr ""
+
+#: .\src\gallery\services\albums.py:223
+msgid "This album type is not available yet."
+msgstr ""
+
+#: .\src\gallery\services\albums.py:237
+msgid "Invalid album visibility."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_detail.html:84
+#: .\src\users\templates\users\profile\_albums.html:34
+#: .\src\users\templates\users\profile\_wall_post_form.html:104
+msgid "Add photos"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_detail.html:110
+#: .\src\gallery\templates\gallery\album_settings.html:5
+#: .\src\gallery\templates\gallery\album_settings.html:62
+msgid "Album settings"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_detail.html:117
+msgid "Delete this album and all its photos?"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_detail.html:137
+msgid "Delete album"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_detail.html:161
+#: .\src\gallery\templates\gallery\components\_album_card.html:21
+#: .\src\gallery\templates\gallery\includes\_album_info.html:48
+msgid "photos"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_detail.html:209
+msgid "No photos in this album yet."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_detail.html:217
+msgid "Add first photo"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:49
+#: .\src\templates\components\_mobile_dock.html:206
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:168
+#: .\src\users\templates\users\settings.html:6
+#: .\src\users\templates\users\settings.html:13
+msgid "Settings"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:66
+msgid "Title, description and visibility"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:160
+msgid "Album is visible"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:170
+#: .\src\gallery\templates\gallery\partials\comments\_edit_form.html:28
+#: .\src\messenger\templates\messenger\partials\dialog\message_edit_form.html:86
+#: .\src\posts\templates\posts\partials\comment_edit_form.html:34
+#: .\src\posts\templates\posts\partials\post_edit_form.html:33
+msgid "Save"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:175
+#: .\src\gallery\templates\gallery\modals\_album_create_modal.html:107
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:132
+#: .\src\gallery\templates\gallery\partials\comments\_edit_form.html:36
+#: .\src\messenger\templates\messenger\partials\dialog\message_edit_form.html:64
+#: .\src\posts\templates\posts\partials\comment_edit_form.html:42
+#: .\src\posts\templates\posts\partials\post_edit_form.html:42
+#: .\src\users\templates\users\partials\avatar_modal.html:156
+msgid "Cancel"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:197
+#, python-format
+msgid ""
+"\n"
+"                                %(n)s photos in this album\n"
+"                            "
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:233
+msgid "Add a caption..."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\album_settings.html:304
+#: .\src\users\templates\users\settings.html:466
+#: .\src\users\templates\users\settings.html:632
+#: .\src\users\templates\users\settings.html:897
+#: .\src\users\templates\users\settings.html:1025
+msgid "Save changes"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\components\lightbox.html:51
+msgid "Previous photo"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\components\lightbox.html:73
+msgid "Next photo"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\components\lightbox.html:123
+msgid "Loading photo details..."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\gallery.html:28
+#: .\src\users\templates\users\profile_explore.html:26
+msgid "Back to profile"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\gallery.html:45
+msgid "Storage"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\gallery.html:87
+#: .\src\gallery\templates\gallery\modals\_album_create_modal.html:115
+msgid "Create album"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\gallery.html:110
+#: .\src\gallery\templates\gallery\includes\_profile_summary.html:46
+#: .\src\users\templates\users\profile_explore.html:107
+msgid "Albums"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\gallery.html:124
+#: .\src\gallery\templates\gallery\includes\_profile_summary.html:56
+msgid "All photos"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\gallery.html:162
+#: .\src\gallery\templates\gallery\partials\likes\_button.html:60
+#: .\src\gallery\templates\gallery\partials\likes\_users_page.html:29
+#: .\src\users\templates\users\partials\account_center\friends_section.html:72
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:129
+#: .\src\users\templates\users\partials\account_center\profile_visits_section.html:31
+#: .\src\users\templates\users\profile_explore.html:181
+msgid "Loading..."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\includes\_album_info.html:72
+#: .\src\messenger\models\dialog.py:22
+msgid "Private"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\includes\_album_info.html:92
+msgid "Album enabled"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\includes\_album_info.html:109
+msgid "Album disabled"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\includes\_profile_summary.html:29
+msgid "No status"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\includes\_profile_summary.html:67
+msgid "Free slots"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\includes\_safe_mode_checbox.html:15
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:184
+#: .\src\users\templates\users\settings.html:857
+msgid "Safe Media Mode"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\includes\_safe_mode_checbox.html:19
+msgid "Blur sensitive media"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_album_create_modal.html:30
+msgid "Create photo album"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_album_create_modal.html:48
+msgid "Album title"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_album_create_modal.html:72
+msgid "Who can see this album"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:16
+msgid "Upload photos"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:20
+#, python-format
+msgid ""
+"\n"
+"                        %(remaining)s of %(total)s slots available\n"
+"                    "
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:61
+msgid "Photo limit reached"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:65
+#, python-format
+msgid ""
+"\n"
+"                            You have used all %(total)s available photo "
+"slots.\n"
+"                        "
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:89
+msgid "Drag & drop photos here"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:93
+msgid "or click to browse"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:110
+msgid "Selected:"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\modals\_photo_upload_modal.html:140
+msgid "Upload"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_albums_page.html:12
+msgid "Albums pagination"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_albums_page.html:20
+#: .\src\gallery\templates\gallery\partials\_photos_page.html:23
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:148
+#: .\src\search\templates\search\partials\pagination.html:34
+#: .\src\users\templates\users\partials\account_center\_blacklist_pagination.html:20
+#: .\src\users\templates\users\partials\account_center\_favorites_pagination.html:14
+#: .\src\users\templates\users\partials\account_center\_friendship_pagination.html:14
+#: .\src\users\templates\users\partials\avatar_photo_page.html:37
+msgid "Previous"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_albums_page.html:25
+#: .\src\gallery\templates\gallery\partials\_photos_page.html:28
+#, python-format
+msgid ""
+"\n"
+"                    Page %(current)s of %(total)s\n"
+"                "
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_albums_page.html:36
+#: .\src\gallery\templates\gallery\partials\_photos_page.html:39
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:176
+#: .\src\search\templates\search\partials\pagination.html:62
+#: .\src\users\templates\users\partials\account_center\_blacklist_pagination.html:30
+#: .\src\users\templates\users\partials\account_center\_favorites_pagination.html:30
+#: .\src\users\templates\users\partials\account_center\_friendship_pagination.html:32
+#: .\src\users\templates\users\partials\avatar_photo_page.html:53
+#: .\src\video_chat\templates\chat\room.html:138
+msgid "Next"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_albums_page.html:56
+#: .\src\users\templates\users\partials\explore\albums.html:17
+#: .\src\users\templates\users\profile\_albums.html:174
+msgid "No albums yet."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_lightbox_photo_detail.html:15
+msgid "Uploaded"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_lightbox_photo_detail.html:29
+msgid "Views"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_lightbox_photo_detail.html:76
+#: .\src\posts\templates\posts\partials\post.html:229
+msgid "Loading comments..."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_lightbox_photo_detail.html:97
+msgid "Comments are disabled for this photo."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_photos_page.html:15
+msgid "Photos pagination"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\_photos_page.html:59
+#: .\src\gallery\templates\gallery\partials\photo_upload_result.html:101
+#: .\src\users\templates\users\partials\explore\photos.html:17
+msgid "No photos uploaded yet."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_comment.html:41
+msgid "Edit"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_comment.html:50
+msgid "Delete this comment?"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_comment.html:52
+msgid "Delete"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_comment.html:71
+#: .\src\gallery\templates\gallery\partials\comments\_reply_form.html:30
+msgid "Reply"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_delete_result.html:14
+#: .\src\gallery\templates\gallery\partials\comments\_list.html:51
+#: .\src\posts\templates\posts\partials\comment_page.html:16
+msgid "No comments yet."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_form.html:30
+msgid "Add a comment..."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_form.html:35
+#: .\src\users\templates\users\profile\_wall_post_form.html:122
+msgid "Post"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_list.html:9
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:255
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:92
+#: .\src\users\templates\users\settings.html:954
+msgid "Comments"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_list.html:36
+#: .\src\posts\templates\posts\partials\comment_list.html:63
+msgid "Comments are disabled."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_list.html:40
+#: .\src\posts\templates\posts\partials\comment_list.html:67
+msgid "Only you can see existing comments."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_list.html:71
+#: .\src\gallery\templates\gallery\partials\comments\_page.html:18
+msgid "Show more comments"
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\comments\_reply_form.html:25
+msgid "Write a reply..."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\likes\_users_page.html:18
+msgid "No likes yet."
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\photo_upload_result.html:27
+#, python-format
+msgid ""
+"\n"
+"                    %(n)s photo(s) uploaded successfully.\n"
+"                "
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\photo_upload_result.html:32
+#, python-format
+msgid ""
+"\n"
+"                        %(k)s skipped (limit reached).\n"
+"                    "
+msgstr ""
+
+#: .\src\gallery\templates\gallery\partials\photo_upload_result.html:109
+#: .\src\users\templates\users\profile\_albums.html:183
+msgid "Upload your first photo"
+msgstr ""
+
+#: .\src\gallery\validators\image.py:28
+msgid "The uploaded file is empty."
+msgstr ""
+
+#: .\src\gallery\validators\image.py:33
+msgid "The image exceeds the maximum allowed size."
+msgstr ""
+
+#: .\src\gallery\validators\image.py:38
+msgid "Unsupported image format."
+msgstr ""
+
+#: .\src\gallery\validators\image.py:46
+msgid "The uploaded file is not a valid image."
 msgstr ""
 
 #: .\src\geo\templates\geo\partials\autocomplete_results.html:18
 msgid "Nothing found"
 msgstr ""
 
-#: .\src\geo\templates\geo\partials\cities_options.html:1
-#: .\src\geo\templates\geo\partials\location_fields.html:45
-msgid "Select city"
-msgstr ""
-
-#: .\src\geo\templates\geo\partials\location_fields.html:8
-msgid "Country"
-msgstr ""
-
-#: .\src\geo\templates\geo\partials\location_fields.html:15
-msgid "Select country"
-msgstr ""
-
-#: .\src\geo\templates\geo\partials\location_fields.html:27
-msgid "Region"
-msgstr ""
-
-#: .\src\geo\templates\geo\partials\location_fields.html:35
-#: .\src\geo\templates\geo\partials\regions_options.html:2
-msgid "Select region"
-msgstr ""
-
-#: .\src\geo\templates\geo\partials\location_fields.html:41
-#: .\src\geo\templates\geo\partials\location_fields.html:54
-msgid "City"
-msgstr ""
-
 #: .\src\geo\templates\geo\partials\location_fields.html:62
 msgid "Start typing city name..."
+msgstr ""
+
+#: .\src\messenger\forms\message.py:42
+msgid "Message cannot be empty."
+msgstr ""
+
+#: .\src\messenger\models\dialog.py:23
+msgid "Group"
+msgstr ""
+
+#: .\src\messenger\models\dialog.py:44
+msgid "Dialog type"
+msgstr ""
+
+#: .\src\messenger\models\dialog.py:61
+msgid "Owner"
+msgstr ""
+
+#: .\src\messenger\models\dialog.py:72
+msgid "Last message"
+msgstr ""
+
+#: .\src\messenger\models\dialog.py:79
+msgid "Last activity"
+msgstr ""
+
+#: .\src\messenger\models\dialog.py:93
+#: .\src\messenger\templates\messenger\partials\dialog\header.html:87
+msgid "Dialog"
+msgstr ""
+
+#: .\src\messenger\models\dialog.py:94
+msgid "Dialogs"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\outgoing.html:92
+#: .\src\messenger\templates\messenger\outgoing.html:93
+msgid "Delete message"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\header.html:44
+msgid "Back to dialogs"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\header.html:110
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:23
+#: .\src\users\templates\users\profile\_header.html:60
+#: .\src\users\templates\users\profile_explore\_summary_card.html:48
+msgid "Online"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\header.html:116
+#: .\src\users\templates\users\profile\_header.html:67
+#: .\src\users\templates\users\profile\_profile_details.html:113
+#: .\src\users\templates\users\profile_explore\_summary_card.html:53
+msgid "Last seen"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\header.html:118
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:75
+#: .\src\users\templates\users\profile\_header.html:69
+msgid "ago"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\header.html:122
+msgid "Status unavailable"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\header.html:131
+#: .\src\users\templates\users\profile\_header.html:80
+msgid "Status hidden"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\message_form.html:42
+msgid "Enter a message..."
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\message_form.html:91
+#: .\src\posts\templates\posts\partials\comment_list.html:34
+#: .\src\video_chat\templates\chat\room.html:192
+msgid "Send"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog\message_list.html:30
+msgid "No messages yet."
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog_item.html:108
+msgid "Group chat"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog_item.html:166
+msgid "No messages yet"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\dialog_item.html:233
+#: .\src\messenger\templates\messenger\partials\dialog_item.html:234
+msgid "Delete dialog"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\sidebar.html:30
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:107
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:208
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:171
+msgid "Messages"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\sidebar_content.html:11
+msgid "No dialogs"
+msgstr ""
+
+#: .\src\messenger\templates\messenger\partials\sidebar_content.html:11
+msgid "Start a conversation with another user."
+msgstr ""
+
+#: .\src\notifications\models.py:19
+msgid "Photo like"
+msgstr ""
+
+#: .\src\notifications\models.py:20
+msgid "Photo comment"
+msgstr ""
+
+#: .\src\notifications\models.py:26
+msgid "Recipient"
+msgstr ""
+
+#: .\src\notifications\models.py:35
+msgid "Actor"
+msgstr ""
+
+#: .\src\notifications\models.py:42
+msgid "Type"
+msgstr ""
+
+#: .\src\notifications\models.py:60
+msgid "Comment"
+msgstr ""
+
+#: .\src\notifications\models.py:66
+msgid "Read"
+msgstr ""
+
+#: .\src\notifications\models.py:77
+msgid "Last triggered"
+msgstr ""
+
+#: .\src\notifications\models.py:86
+msgid "Notification"
+msgstr ""
+
+#: .\src\notifications\models.py:87
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:7
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:56
+#: .\src\users\templates\users\account_center.html:31
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:8
+msgid "Notifications"
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:47
+msgid "Deleted user"
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:55
+msgid "liked your photo"
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:61
+msgid "replied to your comment"
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:65
+msgid "commented on your photo"
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:105
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:106
+msgid "Mark as read"
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:123
+msgid "No notifications yet."
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:157
+msgid "Page"
+msgstr ""
+
+#: .\src\notifications\templates\notifications\partials\_notification_page.html:159
+msgid "of"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\comment.html:45
+msgid "Edit comment"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\comment.html:68
+msgid "Are you sure you want to delete this comment?"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\comment.html:70
+msgid "Delete comment"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\comment_list.html:28
+msgid "Write a comment..."
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\comment_page.html:29
+msgid "Loading more comments..."
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post.html:51
+msgid "Edit post"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post.html:76
+msgid "Are you sure you want to delete this post?"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post.html:78
+msgid "Delete post"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post.html:118
+msgid "Empty post"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post.html:252
+msgid "Comments are disabled for this post."
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post_list.html:20
+msgid "Loading more posts..."
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post_list.html:46
+msgid "No posts yet"
+msgstr ""
+
+#: .\src\posts\templates\posts\partials\post_list.html:50
+msgid "This user has not published any posts yet."
+msgstr ""
+
+#: .\src\search\forms.py:13
+#: .\src\search\templates\search\partials\filters.html:60
+#: .\src\search\templates\search\partials\filters.html:100
+#: .\src\search\templates\search\partials\filters.html:131
+msgid "Any"
+msgstr ""
+
+#: .\src\search\forms.py:50
+msgid "Maximum age cannot be less than minimum age."
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:29
+msgid "Filters"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:36
+msgid "Reset"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:80
+#: .\src\users\templates\users\profile\_profile_details.html:40
+#: .\src\users\templates\users\profile_explore\_details_card.html:16
+msgid "Age"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:91
+msgid "From"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:122
+msgid "To"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:180
+msgid "Any country"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:216
+msgid "Any region"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:239
+msgid "Any city"
+msgstr ""
+
+#: .\src\search\templates\search\partials\filters.html:295
+#: .\src\templates\components\_mobile_dock.html:103
+#: .\src\users\templates\users\settings.html:1140
+msgid "Search"
+msgstr ""
+
+#: .\src\search\templates\search\partials\pagination.html:8
+msgid "Search results pagination"
+msgstr ""
+
+#: .\src\search\templates\search\partials\pagination.html:22
+msgid "First"
+msgstr ""
+
+#: .\src\search\templates\search\partials\pagination.html:44
+#, python-format
+msgid ""
+"\n"
+"                        Page %(current)s of %(total)s\n"
+"                    "
+msgstr ""
+
+#: .\src\search\templates\search\partials\pagination.html:74
+msgid "Last"
+msgstr ""
+
+#: .\src\search\templates\search\partials\results.html:5
+msgid "Results"
+msgstr ""
+
+#: .\src\search\templates\search\partials\results.html:10
+#, python-format
+msgid ""
+"\n"
+"                %(count)s user found\n"
+"            "
+msgid_plural ""
+"\n"
+"                %(count)s users found\n"
+"            "
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\src\search\templates\search\partials\results.html:54
+msgid "No bio yet."
+msgstr ""
+
+#: .\src\search\templates\search\partials\results.html:60
+#: .\src\users\templates\users\settings.html:246
+msgid "Looking for"
+msgstr ""
+
+#: .\src\search\templates\search\partials\results.html:66
+msgid "Not specified"
+msgstr ""
+
+#: .\src\search\templates\search\partials\results.html:96
+msgid "No users found"
+msgstr ""
+
+#: .\src\search\templates\search\partials\results.html:100
+msgid "Try changing or clearing some filters to see more people."
+msgstr ""
+
+#: .\src\search\templates\search\search.html:4
+#: .\src\search\templates\search\search.html:11
+msgid "Search users"
+msgstr ""
+
+#: .\src\search\templates\search\search.html:14
+msgid "Find people by profile details and location."
+msgstr ""
+
+#: .\src\templates\components\_mobile_dock.html:4
+msgid "Mobile navigation"
+msgstr ""
+
+#: .\src\templates\components\_mobile_dock.html:58
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:78
+#: .\src\users\templates\users\settings.html:32
+#: .\src\users\templates\users\settings.html:80
+msgid "Profile"
+msgstr ""
+
+#: .\src\templates\components\_mobile_dock.html:148
+msgid "Chats"
+msgstr ""
+
+#: .\src\templates\layouts\site_footer\footer.html:23
+msgid "Connect, meet and discover new people."
+msgstr ""
+
+#: .\src\templates\layouts\site_footer\footer.html:34
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:88
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:205
+#: .\src\users\templates\users\profile\_profile_details.html:171
+#: .\src\users\templates\users\profile_explore\_about_card.html:25
+msgid "About"
+msgstr ""
+
+#: .\src\templates\layouts\site_footer\footer.html:39
+msgid "Safety"
+msgstr ""
+
+#: .\src\templates\layouts\site_footer\footer.html:44
+msgid "Terms"
+msgstr ""
+
+#: .\src\templates\layouts\site_footer\footer.html:49
+#: .\src\users\templates\users\settings.html:47
+#: .\src\users\templates\users\settings.html:693
+#: .\src\users\templates\users\settings.html:1118
+msgid "Privacy"
+msgstr ""
+
+#: .\src\templates\layouts\site_footer\footer.html:54
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:94
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:211
+msgid "Contact"
+msgstr ""
+
+#: .\src\templates\layouts\site_footer\footer.html:71
+msgid "For adults only"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\_beta_banner.html:8
+msgid "Beta mode — testing in progress. Some errors may occur."
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:19
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:19
+msgid "Open menu"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:55
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:55
+msgid "Menu"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:70
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:190
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:70
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:187
+msgid "Home"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:76
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:196
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:76
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:193
+#: .\src\users\templates\users\components\users_carousel.html:12
+msgid "People"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:99
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:202
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:82
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:199
+#: .\src\templates\layouts\site_header\include_header\_top_navigation.html:25
+msgid "VideoChat"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:113
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:214
+#: .\src\templates\layouts\site_header\include_header\_top_navigation.html:36
+msgid "Shop"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:129
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:110
+msgid "More"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:157
+#: .\src\templates\layouts\site_header\include_header\_authenticated_action_header.html:224
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:143
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:220
+msgid "Help"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:138
+msgid "About us"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_guest_action_header.html:243
+msgid "Register"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:63
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:132
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:216
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:260
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:304
+msgid "new"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:86
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:28
+msgid "Mark all as read"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:127
+#: .\src\users\forms\settings.py:228
+msgid "Friend requests"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:176
+msgid "unread"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:299
+#: .\src\users\templates\users\account_center.html:71
+#: .\src\users\templates\users\partials\account_center\gifts_section.html:9
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:108
+#: .\src\users\templates\users\profile\_gifts_block.html:8
+msgid "Gifts"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:334
+msgid "No new notifications"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_notifications_menu.html:351
+msgid "View all notifications"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:99
+#: .\src\users\templates\users\profile_explore\_details_card.html:8
+msgid "Profile details"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:123
+#: .\src\users\templates\users\profile\_actions_buttons.html:65
+msgid "Gallery"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:147
+#: .\src\users\templates\users\profile\_actions_buttons.html:85
+msgid "Account Center"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:188
+msgid "Blur sensitive images."
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:232
+msgid "Language"
+msgstr ""
+
+#: .\src\templates\layouts\site_header\include_header\_user_menu.html:284
+msgid "Sign out"
+msgstr ""
+
+#: .\src\users\forms\settings.py:50
+msgid "This username is already taken."
+msgstr ""
+
+#: .\src\users\forms\settings.py:71
+msgid "Enter a valid date of birth."
+msgstr ""
+
+#: .\src\users\forms\settings.py:78
+msgid "You must be at least 18 years old to use this service."
+msgstr ""
+
+#: .\src\users\forms\settings.py:227
+msgid "New messages"
+msgstr ""
+
+#: .\src\users\forms\settings.py:229
+msgid "Email notifications"
+msgstr ""
+
+#: .\src\users\forms\settings.py:251
+msgid "Interface language"
+msgstr ""
+
+#: .\src\users\models\preferences.py:14
+msgid "Everyone"
+msgstr ""
+
+#: .\src\users\models\preferences.py:73
+msgid "Comments enabled"
+msgstr ""
+
+#: .\src\users\models\preferences.py:75
+msgid "Enable comments on the user's content."
+msgstr ""
+
+#: .\src\users\models\profile.py:26
+msgid "The user account associated with this profile."
+msgstr ""
+
+#: .\src\users\models\profile.py:31
+msgid "Indicates whether the user's identity has been verified."
+msgstr ""
+
+#: .\src\users\models\profile.py:36
+msgid "Soft-delete flag. Deleted profiles remain in the database."
+msgstr ""
+
+#: .\src\users\models\profile.py:41
+msgid "Indicates whether the profile has been banned by moderators."
+msgstr ""
+
+#: .\src\users\models\profile.py:49
+msgid "Unique Telegram user ID linked to this account."
+msgstr ""
+
+#: .\src\users\models\profile.py:55
+msgid "Cached Telegram profile data received during authentication."
+msgstr ""
+
+#: .\src\users\models\profile.py:64
+msgid "Avatar"
+msgstr ""
+
+#: .\src\users\models\profile.py:65
+msgid "Selected profile avatar."
+msgstr ""
+
+#: .\src\users\models\profile.py:72
+msgid "Short personal description displayed on the profile."
+msgstr ""
+
+#: .\src\users\models\profile.py:79
+msgid "A short status displayed on your profile (up to 150 characters)."
+msgstr ""
+
+#: .\src\users\models\profile.py:86
+msgid "User's gender or profile type."
+msgstr ""
+
+#: .\src\users\models\profile.py:96
+msgid "Profiles the user is interested in meeting."
+msgstr ""
+
+#: .\src\users\models\profile.py:100
+msgid ""
+"Open to dating where gifts or financial support may be part of the "
+"relationship."
+msgstr ""
+
+#: .\src\users\models\profile.py:105
+#: .\src\users\templates\users\settings.html:328
+msgid "The user is interested only in meetings on a financial basis."
+msgstr ""
+
+#: .\src\users\models\profile.py:111
+msgid "User's date of birth."
+msgstr ""
+
+#: .\src\users\models\profile.py:143
+msgid "Premium subscription expiration date and time."
+msgstr ""
+
+#: .\src\users\models\profile.py:149
+msgid "Last recorded online activity."
+msgstr ""
+
+#: .\src\users\models\profile.py:154
+msgid "Total number of profile views."
+msgstr ""
+
+#: .\src\users\models\profile.py:159
+msgid "Date and time when the profile was created."
+msgstr ""
+
+#: .\src\users\models\profile.py:164
+msgid "Date and time when the profile was last updated."
+msgstr ""
+
+#: .\src\users\templates\users\account_center.html:41
+#: .\src\users\templates\users\partials\account_center\friends_list_tab.html:11
+#: .\src\users\templates\users\partials\account_center\friends_section.html:9
+#: .\src\users\templates\users\partials\account_center\friends_section.html:28
+#: .\src\users\templates\users\partials\account_center\statistics_content.html:63
+#: .\src\users\templates\users\profile\_friends.html:9
+#: .\src\users\templates\users\profile_explore.html:129
+msgid "Friends"
+msgstr ""
+
+#: .\src\users\templates\users\account_center.html:51
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:8
+msgid "Favorites"
+msgstr ""
+
+#: .\src\users\templates\users\account_center.html:61
+#: .\src\users\templates\users\partials\account_center\blacklist_section.html:11
+msgid "Blacklist"
+msgstr ""
+
+#: .\src\users\templates\users\account_center.html:81
+#: .\src\users\templates\users\partials\account_center\statistics_section.html:9
+msgid "Statistics"
+msgstr ""
+
+#: .\src\users\templates\users\account_center.html:92
+#: .\src\users\templates\users\partials\account_center\profile_visits_section.html:16
+msgid "Profile Visits"
+msgstr ""
+
+#: .\src\users\templates\users\account_center.html:103
+msgid "Premium History"
+msgstr ""
+
+#: .\src\users\templates\users\components\profile_banner.html:17
+msgid "Announcement"
+msgstr ""
+
+#: .\src\users\templates\users\components\profile_banner.html:19
+msgid "Site news or promotions will be displayed here."
+msgstr ""
+
+#: .\src\users\templates\users\components\profile_banner.html:22
+msgid "Stay tuned!"
+msgstr ""
+
+#: .\src\users\templates\users\components\profile_banner.html:30
+#: .\src\users\templates\users\components\sidebar_ad.html:30
+msgid "Your banner here"
+msgstr ""
+
+#: .\src\users\templates\users\components\profile_banner.html:40
+#: .\src\users\templates\users\components\regional_leader_block.html:33
+#: .\src\users\templates\users\partials\account_center\gifts_section.html:72
+#: .\src\users\templates\users\profile\_gifts_block.html:53
+#: .\src\users\templates\users\settings.html:1091
+msgid "Under development"
+msgstr ""
+
+#: .\src\users\templates\users\components\profile_banner.html:41
+#: .\src\users\templates\users\components\regional_leader_block.html:34
+#: .\src\users\templates\users\partials\account_center\gifts_section.html:73
+#: .\src\users\templates\users\profile\_gifts_block.html:54
+#: .\src\users\templates\users\settings.html:1092
+msgid "Will be available soon"
+msgstr ""
+
+#: .\src\users\templates\users\components\regional_leader_block.html:6
+msgid "Regional Leader"
+msgstr ""
+
+#: .\src\users\templates\users\components\regional_leader_block.html:17
+msgid "Top member of your city"
+msgstr ""
+
+#: .\src\users\templates\users\components\regional_leader_block.html:23
+msgid "Claim the top spot"
+msgstr ""
+
+#: .\src\users\templates\users\components\sidebar_ad.html:17
+msgid "Advertisement"
+msgstr ""
+
+#: .\src\users\templates\users\components\sidebar_ad.html:19
+msgid "Promote your product or service here."
+msgstr ""
+
+#: .\src\users\templates\users\components\sidebar_ad.html:22
+msgid "Contact us for details."
+msgstr ""
+
+#: .\src\users\templates\users\components\users_carousel.html:34
+msgid "I want in"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\_blacklist_pagination.html:8
+#: .\src\users\templates\users\partials\account_center\_friendship_pagination.html:20
+#, python-format
+msgid ""
+"\n"
+"                Page %(current)s of %(total)s\n"
+"            "
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\blacklist_list.html:26
+#, python-format
+msgid ""
+"\n"
+"                                    Blocked on %(blocked_at)s\n"
+"                                "
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\blacklist_list.html:42
+msgid "Unblock"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\blacklist_list.html:50
+msgid "Your blacklist is empty."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\blacklist_section.html:15
+msgid "Users you have blocked."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\blacklist_section.html:21
+msgid "Blocked by you"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\blacklist_section.html:29
+#: .\src\users\templates\users\partials\account_center\statistics_content.html:217
+msgid "Blocked you"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\blacklist_section.html:43
+msgid "Loading blacklist..."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorite_photos_list.html:20
+#: .\src\users\templates\users\partials\account_center\favorite_photos_list.html:21
+#: .\src\users\templates\users\partials\account_center\favorite_profiles_list.html:30
+#: .\src\users\templates\users\partials\account_center\favorite_profiles_list.html:31
+#: .\src\users\templates\users\partials\favorite_button.html:18
+#: .\src\users\templates\users\partials\photo_favorite_button.html:13
+#: .\src\users\templates\users\partials\photo_favorite_button.html:30
+msgid "Remove from favorites"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorite_photos_list.html:45
+msgid "You have no favorite photos yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorite_profiles_list.html:55
+msgid "You have no favorite profiles yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:12
+msgid "Your saved and liked photos and profiles."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:29
+msgid "Profiles"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:50
+msgid "Loading favorite photos..."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:62
+msgid "Loading favorite profiles..."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\favorites_section.html:74
+msgid "Loading liked photos..."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\friends_list_tab.html:54
+#: .\src\users\templates\users\partials\account_center\friends_list_tab.html:88
+msgid "Remove"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\friends_list_tab.html:100
+msgid "You don't have any friends yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\friends_section.html:13
+msgid "Manage your friends and friend requests."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\friends_section.html:42
+msgid "Incoming Requests"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\friends_section.html:56
+msgid "Outgoing Requests"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\gifts_section.html:10
+msgid "Gifts you have received."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\gifts_section.html:13
+msgid "Soon"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\gifts_section.html:62
+msgid "Gifts will appear here soon"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\incoming_requests_tab.html:11
+msgid "Incoming friend requests"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\incoming_requests_tab.html:53
+msgid "Accept"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\incoming_requests_tab.html:67
+msgid "Decline"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\incoming_requests_tab.html:79
+msgid "No incoming friend requests."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\liked_photos_list.html:20
+#: .\src\users\templates\users\partials\account_center\liked_photos_list.html:21
+msgid "Unlike"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\liked_photos_list.html:43
+msgid "You have not liked any photos yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:11
+msgid "Your recent activity and alerts."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:52
+msgid "All"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\notifications_section.html:117
+msgid "System"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\outgoing_requests_tab.html:11
+msgid "Outgoing friend requests"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\outgoing_requests_tab.html:52
+msgid "Cancel request"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\outgoing_requests_tab.html:62
+msgid "No outgoing friend requests."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\premium_history_section.html:5
+msgid "Premium Purchase History"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\profile_visits_list.html:38
+msgid "Pagination"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\profile_visits_list.html:94
+msgid "Detailed visitor list is a Premium feature."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\profile_visits_list.html:104
+msgid "No profile visits yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\profile_visits_section.html:20
+msgid "Who has viewed your profile recently."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\statistics_content.html:33
+msgid "Registration date"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\statistics_content.html:97
+msgid "Profile views"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\statistics_content.html:125
+msgid "Saved to favorites"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\statistics_content.html:157
+msgid "Saved your profile"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\statistics_content.html:187
+msgid "Gifts received"
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\statistics_section.html:13
+msgid "Your account activity at a glance."
+msgstr ""
+
+#: .\src\users\templates\users\partials\account_center\statistics_section.html:25
+msgid "Loading statistics..."
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:20
+#: .\src\users\templates\users\profile\_actions_buttons.html:45
+msgid "Change profile photo"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:22
+#: .\src\users\templates\users\profile\_actions_buttons.html:47
+msgid "Add profile photo"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:67
+msgid "Upload new photo"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:82
+msgid "Selected photo preview"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:92
+msgid "Selected photo"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:108
+msgid "or choose from your photos"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:142
+msgid "Remove profile photo"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_modal.html:167
+msgid "Set as profile photo"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_photo_page.html:14
+msgid "Select photo"
+msgstr ""
+
+#: .\src\users\templates\users\partials\avatar_photo_page.html:67
+msgid "No photos yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\block_button.html:12
+msgid "Unblock user"
+msgstr ""
+
+#: .\src\users\templates\users\partials\block_button.html:21
+msgid "Block user"
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\albums.html:9
+msgid "Photo albums are not available."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\albums.html:43
+msgid "Show more albums"
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\friends.html:9
+msgid "Friends list is not available."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\friends.html:17
+#: .\src\users\templates\users\profile\_friends.html:48
+msgid "This user has no friends yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\friends.html:43
+msgid "Show more friends"
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\mutual_friends.html:9
+msgid "Mutual friends are not available."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\mutual_friends.html:17
+msgid "No mutual friends."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\mutual_friends.html:43
+msgid "Show more mutual friends"
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\photos.html:9
+msgid "Photos are not available."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\photos.html:44
+msgid "Show more photos"
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\posts.html:9
+msgid "Posts are not available."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\posts.html:17
+msgid "This user has no posts yet."
+msgstr ""
+
+#: .\src\users\templates\users\partials\explore\posts.html:40
+msgid "Show more posts"
+msgstr ""
+
+#: .\src\users\templates\users\partials\favorite_button.html:30
+#: .\src\users\templates\users\partials\photo_favorite_button.html:13
+#: .\src\users\templates\users\partials\photo_favorite_button.html:32
+msgid "Add to favorites"
+msgstr ""
+
+#: .\src\users\templates\users\partials\friendship_actions.html:29
+msgid "Remove from friends"
+msgstr ""
+
+#: .\src\users\templates\users\partials\friendship_actions.html:57
+msgid "Cancel friend request"
+msgstr ""
+
+#: .\src\users\templates\users\partials\friendship_actions.html:85
+msgid "Accept friend request"
+msgstr ""
+
+#: .\src\users\templates\users\partials\friendship_actions.html:112
+msgid "Decline friend request"
+msgstr ""
+
+#: .\src\users\templates\users\partials\friendship_actions.html:140
+msgid "Add to friends"
+msgstr ""
+
+#: .\src\users\templates\users\profile.html:11
+msgid "User profile page."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_actions_buttons.html:21
+msgid "Edit profile"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_actions_buttons.html:100
+msgid "Premium coming soon"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_actions_buttons.html:120
+#: .\src\users\templates\users\profile\_actions_buttons.html:146
+msgid "Explore Profile"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_actions_buttons.html:165
+msgid "Send message"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_actions_buttons.html:191
+#: .\src\users\templates\users\profile\_gifts_block.html:43
+msgid "Send a gift"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_albums.html:42
+msgid "All albums"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_albums.html:80
+#, python-format
+msgid ""
+"\n"
+"                                        %(counter)s photo\n"
+"                                    "
+msgid_plural ""
+"\n"
+"                                        %(counter)s photos\n"
+"                                    "
+msgstr[0] ""
+msgstr[1] ""
+
+#: .\src\users\templates\users\profile\_albums.html:93
+#: .\src\users\templates\users\profile\_albums.html:119
+msgid "View album"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_albums.html:133
+msgid "This album has no photos yet."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_albums.html:150
+msgid "View all albums"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_albums.html:176
+msgid "No albums available."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_friends.html:43
+msgid "View all friends"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_friends.html:71
+msgid "Friends list is hidden by privacy settings."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_header.html:40
+msgid "My Page"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_header.html:48
+msgid "Report page"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_header.html:71
+msgid "Recently seen"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_mutual_friends.html:11
+#: .\src\users\templates\users\profile_explore.html:142
+msgid "Mutual friends"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_mutual_friends.html:34
+msgid "Default avatar"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_private_profile_notice.html:13
+#: .\src\users\templates\users\profile_explore.html:216
+msgid "This profile is private"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_private_profile_notice.html:15
+msgid ""
+"The owner has restricted access to this page through privacy settings. Only "
+"certain users can view the full profile."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_private_profile_notice.html:21
+msgid "Sign in to continue"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_profile_details.html:97
+#: .\src\users\templates\users\profile_explore\_details_card.html:49
+msgid "Page status"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_profile_details.html:135
+#: .\src\users\templates\users\profile_explore\_about_card.html:11
+#: .\src\users\templates\users\settings.html:188
+msgid "Status"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_profile_details.html:151
+#: .\src\users\templates\users\profile_explore\_details_card.html:60
+msgid "Looking to meet"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_profile_details.html:205
+msgid "Open to receiving gifts"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_profile_details.html:229
+msgid "Sponsorship / Financial support"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall.html:5
+msgid "Wall"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall.html:20
+msgid "Loading posts..."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall_post_form.html:10
+msgid "You can attach up to 10 photos."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall_post_form.html:11
+msgid "The selected file is not an image."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall_post_form.html:12
+msgid "The selected photo is larger than 5 MB."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall_post_form.html:34
+msgid "Write something on the wall..."
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall_post_form.html:52
+msgid "Clear photos"
+msgstr ""
+
+#: .\src\users\templates\users\profile\_wall_post_form.html:58
+msgid "Remove photo"
+msgstr ""
+
+#: .\src\users\templates\users\profile_blocked.html:7
+#: .\src\users\templates\users\profile_blocked.html:37
+msgid "Profile unavailable"
+msgstr ""
+
+#: .\src\users\templates\users\profile_blocked.html:12
+msgid "This profile is unavailable to you."
+msgstr ""
+
+#: .\src\users\templates\users\profile_blocked.html:41
+msgid ""
+"This user has blocked you. You cannot view this profile or interact with "
+"this user."
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore.html:4
+msgid "Explore"
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore.html:74
+msgid "Profile information is hidden by the user's privacy settings."
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore.html:159
+msgid "Posts"
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore.html:168
+msgid "Videos"
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore.html:220
+msgid ""
+"The user has restricted access to profile information in their privacy "
+"settings."
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore\_details_card.html:79
+#: .\src\users\templates\users\settings.html:299
+msgid "Open to gifts"
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore\_details_card.html:85
+msgid "Financial meetings"
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore\_summary_card.html:59
+msgid "Offline"
+msgstr ""
+
+#: .\src\users\templates\users\profile_explore\_summary_card.html:66
+msgid "Online status hidden"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:14
+msgid "Manage your account, privacy and notification preferences."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:37
+#: .\src\users\templates\users\settings.html:485
+msgid "Account"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:42
+#: .\src\users\templates\users\settings.html:644
+msgid "Security"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:52
+#: .\src\users\templates\users\settings.html:906
+msgid "Communication"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:58
+msgid "Premium"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:83
+msgid "What other users see on your public profile."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:137
+msgid "Change photo"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:139
+msgid "Upload photo"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:145
+msgid "Choose an existing photo or upload a new one."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:155
+msgid "Bio"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:161
+msgid "Tell something about yourself…"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:167
+#: .\src\users\templates\users\settings.html:200
+msgid "characters"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:195
+msgid "Your current status…"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:302
+msgid "Indicate you're open to relationships with financial support or gifts."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:325
+msgid "Financial meetings only"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:470
+msgid "Saving..."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:486
+msgid "Your login credentials and personal data."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:499
+msgid "Letters, digits and underscores only."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:507
+msgid "To change your email go to Security section."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:623
+msgid "You must be at least 18 years old."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:645
+msgid "Manage your password and email address."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:654
+msgid "Use a strong password you don't use elsewhere."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:662
+msgid "Change password"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:671
+msgid "Email address"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:673
+msgid "Current:"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:682
+msgid "Change email"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:695
+msgid "Control who can see your profile and activity."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:715
+msgid "Profile visibility"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:718
+msgid "Who can view your profile page."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:741
+msgid "Friends list"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:744
+msgid "Who can see your friends list."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:770
+msgid "Who can view your photos."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:793
+msgid "Show online status"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:796
+msgid "Let others see when you're active."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:814
+msgid "Enable wall"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:817
+msgid "Show the public wall section on your profile."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:835
+msgid "Enable comments"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:839
+msgid "Allow comments on your content."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:860
+msgid "Blur images, videos, and avatars until revealed."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:908
+msgid "Control who can contact and interact with you."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:928
+msgid "Private messages"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:931
+msgid "Who can send you direct messages."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:957
+msgid "Who can leave comments on your content."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:980
+msgid "Wall posts"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:983
+msgid "Who can publish posts on your wall."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1050
+msgid "Unlock all features"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1056
+msgid "1 day"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1058
+msgid "Try it out"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1061
+msgid "Most popular"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1062
+msgid "1 week"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1064
+#: .\src\users\templates\users\settings.html:1069
+msgid "day"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1067
+msgid "1 month"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1079
+msgid "Coming soon"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1104
+msgid "Premium settings"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1110
+msgid "Exclusive features available with an active Premium subscription."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1120
+msgid "Incognito mode"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1120
+msgid "Browse profiles without appearing in visitors lists."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1121
+msgid "Anonymous profile views"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1121
+msgid "Hide your visits from profile visit history."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1122
+msgid "Hide online status from everyone"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1122
+msgid "No one sees when you're active."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1128
+msgid "Random Chat"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1130
+msgid "Gender filter"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1130
+msgid "Match only with people of a specific gender."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1131
+msgid "Country filter"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1131
+msgid "Match only with users from a selected country."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1132
+msgid "Language filter"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1132
+msgid "Match only with users who speak your language."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1133
+msgid "Age filter"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1133
+msgid "Set an age range for random chat matches."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1134
+msgid "Priority matching"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1134
+msgid "Get matched faster in the chat queue."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1142
+msgid "Advanced filters"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1142
+msgid "Filter search results by detailed criteria."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1143
+msgid "Unlimited search radius"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1143
+msgid "Remove distance limitations from search."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1149
+msgid "Video & Messaging"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1151
+msgid "HD video calls"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1151
+msgid "Enable high-definition video quality."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1152
+msgid "Unsend messages"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1152
+msgid "Delete sent messages from both sides."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1153
+msgid "Schedule messages"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1153
+msgid "Send messages at a chosen time."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1154
+msgid "Extended editing window"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1154
+msgid "Edit your messages longer after sending."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1160
+msgid "Profile appearance"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1162
+msgid "Custom profile theme"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1162
+msgid "Choose a unique look for your profile page."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1163
+msgid "Animated badge"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1163
+msgid "Show an animated Premium badge on your profile."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1164
+msgid "Accent color"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1164
+msgid "Pick a custom accent color for your profile."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1170
+msgid "Analytics"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1172
+msgid "Profile statistics"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1172
+msgid "See detailed charts about your profile activity."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1173
+msgid "Profile visitors"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1173
+msgid "See a list of who visited your profile."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1184
+msgid "Danger zone"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1185
+msgid "Irreversible and destructive actions."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1189
+msgid "Delete account"
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1190
+msgid "Permanently remove your account and all associated data."
+msgstr ""
+
+#: .\src\users\templates\users\settings.html:1195
+msgid "Delete my account"
+msgstr ""
+
+#: .\src\users\views\settings.py:66
+msgid "Changes saved."
+msgstr ""
+
+#: .\src\users\views\settings.py:70
+msgid "Invalid data."
+msgstr ""
+
+#: .\src\users\views\settings.py:153
+msgid "Account updated."
+msgstr ""
+
+#: .\src\users\views\settings.py:171
+msgid "Profile updated."
+msgstr ""
+
+#: .\src\users\views\settings.py:190
+msgid "Privacy settings saved."
+msgstr ""
+
+#: .\src\users\views\settings.py:200
+msgid "Communication settings saved."
+msgstr ""
+
+#: .\src\users\views\settings.py:208
+msgid "Premium settings saved."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\moderator_room.html:57
+#: .\src\video_chat\templates\chat\moderator_room.html:95
+#: .\src\video_chat\templates\chat\partials\room_list.html:35
+#: .\src\video_chat\templates\chat\partials\room_list.html:70
+msgid "Profile gender"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\moderator_room.html:60
+#: .\src\video_chat\templates\chat\moderator_room.html:98
+#: .\src\video_chat\templates\chat\partials\room_list.html:42
+#: .\src\video_chat\templates\chat\partials\room_list.html:77
+msgid "Anonymous user"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\moderator_room.html:63
+#: .\src\video_chat\templates\chat\moderator_room.html:101
+#: .\src\video_chat\templates\chat\partials\room_list.html:47
+#: .\src\video_chat\templates\chat\partials\room_list.html:82
+msgid "Chat gender"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\partials\room_list.html:22
+msgid "Caller"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\partials\room_list.html:57
+msgid "Callee"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\partials\room_list.html:97
+msgid "Open room"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\partials\room_list.html:105
+msgid "No active rooms."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:5
+#: .\src\video_chat\templates\chat\room.html:20
+msgid "Anonymous random video chat"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:9
+msgid "Anonymous random video chat for instant conversations on Flingon.xyz."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:23
+msgid "Free & Instant"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:44
+msgid "Your next conversation partner will appear here."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:52
+#: .\src\video_chat\templates\chat\room.html:204
+msgid "Choose your gender and press Start."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:58
+#: .\src\video_chat\templates\chat\room.html:209
+msgid "Next search starts automatically"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:61
+msgid "Next partner in"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:63
+msgid "sec"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:70
+msgid "Partner"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:84
+msgid "Your camera will turn on after you press Start."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:88
+msgid "You"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:98
+msgid "Choose your gender before starting."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:105
+msgid "Your gender in video chat"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:130
+msgid "Start"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:150
+msgid "Stop"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:163
+msgid "Chat"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:166
+#: .\src\video_chat\templates\chat\room.html:217
+msgid "Available after connection"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:182
+#: .\src\video_chat\templates\chat\room.html:215
+msgid "Chat is available after connection"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:205
+msgid "Getting access to camera and microphone..."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:206
+msgid "Searching for a conversation partner..."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:207
+msgid "Partner found. Connecting..."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:208
+#: .\src\video_chat\templates\chat\room.html:218
+msgid "Connected"
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:210
+msgid "Video chat stopped."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:211
+msgid "Connection was closed by a moderator."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:212
+msgid "Chat service connection was closed. Reload the page."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:213
+msgid "Select your gender before starting."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:214
+msgid "Could not access camera or microphone."
+msgstr ""
+
+#: .\src\video_chat\templates\chat\room.html:216
+msgid "Write a message..."
 msgstr ""

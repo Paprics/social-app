@@ -13,3 +13,12 @@ class UserData(models.Model):
     username = models.CharField(max_length=250, blank=True, default="")
     data_1 = models.CharField(max_length=250, blank=True, default="")
     data_2 = models.CharField(max_length=250, blank=True, default="")
+
+    def __str__(self):
+        if self.username:
+            return self.username
+
+        if self.user:
+            return self.user.get_username()
+
+        return f"UserData #{self.pk}"
