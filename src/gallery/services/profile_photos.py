@@ -1,5 +1,3 @@
-# src/gallery/services/profile_photos.py
-
 from gallery.models import Photo, UserAlbum
 from gallery.services.gallery import get_remaining_slots
 from gallery.services.photo_service import process_image
@@ -54,7 +52,6 @@ class ProfilePhotoService:
         photo = Photo(
             album=album,
             image=processed_image,
-            title=file.name,
         )
         photo.save()
 

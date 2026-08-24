@@ -104,7 +104,6 @@ def gallery_photo(gallery_album):
     return Photo.objects.create(
         album=gallery_album,
         image="photos/tests/test-photo.jpg",
-        title="Test photo",
         description="Test photo description",
         is_visible=True,
     )

@@ -1,4 +1,3 @@
-# src/gallery/services/post_photos.py
 """Services for photos uploaded specifically as post attachments."""
 
 from gallery.models import Photo, UserAlbum
@@ -68,7 +67,6 @@ class PostPhotoService:
         photo = Photo(
             album=album,
             image=processed_image,
-            title=file.name,
         )
         photo.save()
 

@@ -167,3 +167,4 @@ cython_debug/
 /src/geo/data/
 /src/media/
 /dev_data/
+.prod_data/
