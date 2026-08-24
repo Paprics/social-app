@@ -3,7 +3,7 @@ from pathlib import Path
 
 from django.utils.translation import gettext_lazy as _
 from celery.schedules import crontab
-
+from .tinymce_config import BASE_TINYMCE_CONFIG
 from .env import env
 
 BASE_DIR = Path(__file__).resolve().parents[2]  # src/
@@ -157,6 +157,8 @@ USE_TZ = True
 LOCALE_PATHS = [
     BASE_DIR / "locale",
 ]
+
+TINYMCE_DEFAULT_CONFIG = BASE_TINYMCE_CONFIG
 
 # Email — backend переопределяется в dev.py
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

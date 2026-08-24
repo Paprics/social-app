@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-    {% trans "Welcome" %} — Social Network
+    {% trans "Welcome" %} — Flingon
 {% endblock %}
 
 {% block meta_description %}
@@ -16,16 +16,14 @@
     <!-- Левая колонка: контент из БД -->
     <div class="w-full max-w-lg shrink-0 text-center lg:text-left">
 
-        <div class="flex items-center justify-center gap-3 lg:justify-start">
-
-            <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
-                S
+        <div class="text-center lg:text-left">
+            <div class="text-4xl font-black tracking-tight text-slate-900 lg:text-5xl">
+                Flingon
             </div>
 
-            <span class="text-2xl font-semibold text-slate-900">
-                Social Network
-            </span>
-
+            <p class="mt-1 text-sm font-medium tracking-wide text-slate-500 lg:text-base">
+                Your desires. Your people.
+            </p>
         </div>
 
         {% if content %}
@@ -36,12 +34,8 @@
 
         {% else %}
 
-            <h2 class="mt-8 text-3xl font-semibold leading-snug text-slate-900 lg:text-4xl">
-                {% trans "Connect with friends and the world around you." %}
-            </h2>
-
-            <p class="mt-4 text-lg text-slate-500">
-                {% trans "Share moments, discover people, and stay in touch with the people who matter most." %}
+            <p class="mt-8 text-lg text-slate-600">
+                Find your people.
             </p>
 
         {% endif %}

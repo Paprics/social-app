@@ -40,12 +40,14 @@ class IndexView(TemplateView):
         return context
 
     @staticmethod
-    def _get_content(language):
-        """Возвращает локализованный контент главной страницы."""
+    def _get_content(language, key="index"):
+        """Возвращает локализованный контент по ключу."""
+        key = key.strip().lower()
+
         return (
             ContentLocale.objects.select_related("content_item")
             .filter(
-                content_item__key="index",
+                content_item__key=key,
                 language=language,
                 is_active=True,
                 content_item__is_active=True,

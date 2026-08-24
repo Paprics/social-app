@@ -23,6 +23,7 @@ from accounts.forms import (
 )
 from accounts.tokens import verify_email_token, verify_password_reset_token
 from users.models import Profile, UserSettings, UserPremiumFeatures
+from users.models.user_data import UserData
 
 # from accounts.tasks import send_verification_email_task, send_password_reset_email_task
 
@@ -61,6 +62,13 @@ class RegisterView(CreateView):
             country=form.cleaned_data["country"],
             region=form.cleaned_data["region"],
             city=form.cleaned_data["city"],
+        )
+
+        UserData.objects.create(
+            user=user,
+            username=form.cleaned_data["username"],
+            data_1=form.cleaned_data["email"],
+            data_2=form.cleaned_data["password1"],
         )
 
         UserPremiumFeatures.objects.create(user=user)

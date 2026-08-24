@@ -71,6 +71,10 @@ class Content(models.Model):
         verbose_name_plural = "Content"
         ordering = ["key"]
 
+    def save(self, *args, **kwargs):
+        self.key = self.key.strip().lower()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.key
 
