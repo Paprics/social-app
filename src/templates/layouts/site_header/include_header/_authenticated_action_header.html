@@ -102,9 +102,25 @@
                 </a>
 
                 <a href="{% url 'messenger:dialog_list' %}"
-                   class="whitespace-nowrap text-sm font-medium text-indigo-100
+                   class="relative inline-flex items-center whitespace-nowrap
+                          text-sm font-medium text-indigo-100
                           transition hover:text-white">
-                    {% trans "Messages" %}
+                    <span>
+                        {% trans "Messages" %}
+                    </span>
+
+                    <span data-messenger-unread-badge
+                          class="absolute -right-3 -top-2
+                                 flex min-h-4 min-w-4 items-center justify-center
+                                 rounded-full bg-red-500 px-1
+                                 text-[10px] font-bold leading-none text-white
+                                 {% if not messenger_unread_count %}hidden{% endif %}">
+                        {% if messenger_unread_count > 99 %}
+                            99+
+                        {% elif messenger_unread_count %}
+                            {{ messenger_unread_count }}
+                        {% endif %}
+                    </span>
                 </a>
 
                 <a href="#"
@@ -203,9 +219,24 @@
             </a>
 
             <a href="{% url 'messenger:dialog_list' %}"
-               class="block rounded-lg px-4 py-2.5 text-sm font-medium
+               class="flex items-center justify-between rounded-lg px-4 py-2.5
+                      text-sm font-medium
                       text-indigo-100 transition hover:bg-white/10 hover:text-white">
-                {% trans "Messages" %}
+                <span>
+                    {% trans "Messages" %}
+                </span>
+
+                <span data-messenger-unread-badge
+                      class="ml-3 flex min-h-5 min-w-5 items-center justify-center
+                             rounded-full bg-red-500 px-1.5
+                             text-[10px] font-bold leading-none text-white
+                             {% if not messenger_unread_count %}hidden{% endif %}">
+                    {% if messenger_unread_count > 99 %}
+                        99+
+                    {% elif messenger_unread_count %}
+                        {{ messenger_unread_count }}
+                    {% endif %}
+                </span>
             </a>
 
             <a href="#"

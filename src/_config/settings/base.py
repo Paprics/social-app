@@ -61,6 +61,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
                 "users.context_processors.user_settings",
+                "messenger.context_processors.messenger_context",
                 "notifications.context_processor.notifications_context",
             ],
         },

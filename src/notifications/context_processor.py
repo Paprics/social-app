@@ -32,17 +32,15 @@ def notifications_context(request):
     )
 
     # TODO: connect when their notification types are implemented.
-    unread_messages = 0
     gifts = 0
 
-    notifications_count = friend_requests + unread_messages + activity + gifts
+    notifications_count = friend_requests + activity + gifts
 
     return {
         "notifications": {
             "has_notifications": notifications_count > 0,
             "count": notifications_count,
             "friend_requests": friend_requests,
-            "messages": unread_messages,
             "likes": likes,
             "comments": comments,
             "gifts": gifts,

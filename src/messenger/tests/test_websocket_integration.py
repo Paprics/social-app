@@ -1,14 +1,13 @@
+import pytest
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
 from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth.models import AnonymousUser
-import pytest
 
 import messenger.routing
-from messenger.models import Dialog, Message, Participant
+from messenger.models import Message, Participant
 from messenger.services.dialog import DialogService
-
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -321,6 +320,39 @@ def test_inbox_consumer_forwards_invalidation(websocket_state):
         assert event == {
             "type": "inbox.changed",
             "reason": "message.created",
+            "unread_count": 1,
+        }
+
+        await communicator.disconnect()
+
+    async_to_sync(scenario)()
+
+
+def test_inbox_consumer_sync_returns_current_unread_count(
+    websocket_state,
+):
+    reader = websocket_state["reader"]
+
+    async def scenario():
+        communicator = WebsocketCommunicator(
+            websocket_application(reader),
+            "/ws/messenger/inbox/",
+        )
+
+        assert (await communicator.connect())[0] is True
+
+        await communicator.send_json_to(
+            {
+                "type": "inbox.sync",
+            }
+        )
+
+        event = await communicator.receive_json_from(timeout=1)
+
+        assert event == {
+            "type": "inbox.changed",
+            "reason": "sync",
+            "unread_count": 1,
         }
 
         await communicator.disconnect()

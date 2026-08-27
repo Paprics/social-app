@@ -1,4 +1,5 @@
 import "./components/image_blur.js";
+import "./components/messenger_unread_badge.js";
 
 // main.js — точка входа для глобальных скриптов
 // Импортируем модуль авторизации (модалки, дропдауны, мобильное меню)

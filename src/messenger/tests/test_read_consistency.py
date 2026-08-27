@@ -299,6 +299,9 @@ def test_explicit_message_read_event_marks_message():
 def test_inbox_consumer_forwards_invalidation_event():
     consumer = InboxConsumer()
     consumer.send_json = AsyncMock()
+    consumer._get_unread_messages_count = AsyncMock(
+        return_value=3,
+    )
 
     async_to_sync(
         consumer.inbox_changed,
@@ -313,6 +316,7 @@ def test_inbox_consumer_forwards_invalidation_event():
         {
             "type": "inbox.changed",
             "reason": "message.created",
+            "unread_count": 3,
         }
     )
 

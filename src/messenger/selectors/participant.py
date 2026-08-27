@@ -7,7 +7,7 @@ Selectors для работы с участниками диалогов.
 """
 
 from django.contrib.auth import get_user_model
-from django.db.models import QuerySet
+from django.db.models import Count, F, Q, QuerySet
 
 from messenger.models import Participant
 
@@ -52,6 +52,36 @@ def get_user_participation(
         user=user,
         is_active=True,
     )
+
+
+def get_unread_messages_count(user: User) -> int:
+    """Возвращает общее количество непрочитанных входящих сообщений."""
+
+    result = (
+        Participant.objects.filter(
+            user=user,
+            is_active=True,
+            is_archived=False,
+        )
+        .aggregate(
+            unread_count=Count(
+                "dialog__messages",
+                filter=(
+                    ~Q(dialog__messages__sender=user)
+                    & (
+                        Q(last_read_message_id__isnull=True)
+                        | Q(
+                            dialog__messages__id__gt=F(
+                                "last_read_message_id",
+                            )
+                        )
+                    )
+                ),
+            )
+        )
+    )
+
+    return result["unread_count"] or 0
 
 
 def is_user_participant(

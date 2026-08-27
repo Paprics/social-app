@@ -246,7 +246,6 @@ def _create_photos(user: "User", profile: "Profile", entry: dict, photos_root: P
         photo = Photo.objects.create(
             album=album,
             image=file_data,
-            title=photo_path.stem,
         )
 
         is_avatar = idx == 0

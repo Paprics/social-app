@@ -1,6 +1,7 @@
-# src/messenger/consumers/inbox_consumer.py
-
+from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+
+from messenger.selectors.participant import get_unread_messages_count
 
 
 class InboxConsumer(AsyncJsonWebsocketConsumer):
@@ -27,10 +28,39 @@ class InboxConsumer(AsyncJsonWebsocketConsumer):
                 self.channel_name,
             )
 
+    async def receive_json(self, content, **kwargs):
+        if content.get("type") != "inbox.sync":
+            return
+
+        await self.send_inbox_state(
+            reason="sync",
+        )
+
     async def inbox_changed(self, event):
+        await self.send_inbox_state(
+            reason=event.get(
+                "reason",
+                "unknown",
+            ),
+        )
+
+    async def send_inbox_state(
+        self,
+        *,
+        reason: str,
+    ) -> None:
+        unread_count = await self._get_unread_messages_count()
+
         await self.send_json(
             {
                 "type": "inbox.changed",
-                "reason": event.get("reason", "unknown"),
+                "reason": reason,
+                "unread_count": unread_count,
             }
+        )
+
+    @database_sync_to_async
+    def _get_unread_messages_count(self) -> int:
+        return get_unread_messages_count(
+            self.scope["user"],
         )

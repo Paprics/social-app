@@ -148,14 +148,18 @@
                 {% trans "Chats" %}
             </span>
 
-            {% if notifications.messages %}
-                <span class="absolute right-3 top-0
-                             flex min-h-4 min-w-4 items-center justify-center
-                             rounded-full bg-red-500 px-1
-                             text-[10px] font-bold leading-none text-white">
-                    {{ notifications.messages }}
-                </span>
-            {% endif %}
+            <span data-messenger-unread-badge
+                  class="absolute right-3 top-0
+                         flex min-h-4 min-w-4 items-center justify-center
+                         rounded-full bg-red-500 px-1
+                         text-[10px] font-bold leading-none text-white
+                         {% if not messenger_unread_count %}hidden{% endif %}">
+                {% if messenger_unread_count > 99 %}
+                    99+
+                {% elif messenger_unread_count %}
+                    {{ messenger_unread_count }}
+                {% endif %}
+            </span>
 
         </a>
 
