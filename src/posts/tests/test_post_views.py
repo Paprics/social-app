@@ -9,7 +9,7 @@ from users.models.preferences import UserSettings
 
 @pytest.mark.django_db
 class TestWallPostsView:
-    def test_wall_requires_authentication(
+    def test_anonymous_wall_returns_forbidden(
         self,
         client,
         owner,
@@ -21,7 +21,7 @@ class TestWallPostsView:
             )
         )
 
-        assert response.status_code == 302
+        assert response.status_code == 403
 
     def test_authenticated_user_can_view_public_wall(
         self,

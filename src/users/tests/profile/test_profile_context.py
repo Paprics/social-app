@@ -419,3 +419,5 @@ class TestAnonymousProfileContext:
         assert context["access"]["can_view_profile"] is True
         assert context["access"]["can_view_friends"] is True
         assert context["access"]["can_send_message"] is False
+        assert context["access"]["can_view_wall"] is False
+        assert context["access"]["can_post_on_wall"] is False

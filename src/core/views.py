@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from cms.models import ContentLocale
+from core.selectors import get_homepage_carousel_profiles
 from geo.models import Country
 
 
@@ -33,6 +34,7 @@ class IndexView(TemplateView):
             content = self._get_content(settings.LANGUAGE_CODE)
 
         context["content"] = content
+        context["homepage_carousel_profiles"] = get_homepage_carousel_profiles()
         context["countries"] = Country.objects.filter(
             code2__in=settings.GEO_ALLOWED_COUNTRIES,
         )

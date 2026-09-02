@@ -1,6 +1,7 @@
 # src/posts/tests/test_access.py
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
 
 from posts.services.access.comment import CommentAccessService
 from posts.services.access.post import PostAccessService
@@ -21,6 +22,18 @@ class TestPostAccessService:
         )
 
         assert access.can_view_wall() is True
+
+    def test_wall_is_hidden_for_anonymous_user(
+        self,
+        owner,
+    ):
+        access = PostAccessService(
+            viewer=AnonymousUser(),
+            target=owner,
+            can_view_profile=True,
+        )
+
+        assert access.can_view_wall() is False
 
     def test_wall_is_hidden_when_profile_is_not_visible(
         self,

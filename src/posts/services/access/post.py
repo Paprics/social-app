@@ -50,6 +50,9 @@ class PostAccessService:
     def can_view_wall(self) -> bool:
         """Return whether viewer may access the target user's wall."""
 
+        if not self.is_authenticated:
+            return False
+
         if not self.can_view_profile:
             return False
 

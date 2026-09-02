@@ -96,6 +96,7 @@ def _exception_error_message(error):
 class WallPostsView(LoginRequiredMixin, View):
     """Display one paginated page of wall posts."""
 
+    raise_exception = True
     template_name = "posts/partials/post_list.html"
     PAGE_SIZE = 10
 

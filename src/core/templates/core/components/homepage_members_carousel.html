@@ -1,0 +1,55 @@
+{% load i18n render_image %}
+
+{% if profiles %}
+<section
+    class="homepage-members mt-8"
+    aria-labelledby="homepage-members-title"
+>
+    <h2
+        id="homepage-members-title"
+        class="mb-3 text-center text-lg font-semibold text-slate-800 lg:text-left"
+    >
+        {% trans "Our members" %}
+    </h2>
+
+    <div class="homepage-members-carousel">
+        <div class="homepage-members-carousel__track">
+
+            <div class="homepage-members-carousel__group">
+                {% for profile in profiles %}
+                    {# href="{% url 'users:profile' pk=profile.user_id %}" #}
+                    <a
+                        href="#"
+                        class="homepage-members-carousel__link"
+                        aria-label="{{ profile.user.username }}"
+                        title="{{ profile.user.username }}"
+                    >
+                        <span class="homepage-members-carousel__avatar">
+                            {% render_image profile.avatar_photo.image variant="avatar_sm" alt=profile.user.username shape="circle" css_class="homepage-members-carousel__image" %}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+
+            <div
+                class="homepage-members-carousel__group"
+                aria-hidden="true"
+            >
+                {% for profile in profiles %}
+                    {# href="{% url 'users:profile' pk=profile.user_id %}" #}
+                    <a
+                        href="#"
+                        class="homepage-members-carousel__link"
+                        tabindex="-1"
+                    >
+                        <span class="homepage-members-carousel__avatar">
+                            {% render_image profile.avatar_photo.image variant="avatar_sm" alt="" shape="circle" css_class="homepage-members-carousel__image" %}
+                        </span>
+                    </a>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endif %}

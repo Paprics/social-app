@@ -81,7 +81,7 @@
 
 
                     {# Profile wall #}
-                    {% if target_user.settings.wall_enabled %}
+                    {% if access.can_view_wall %}
 
                         {# Wall post form #}
                         {% include "users/profile/_wall_post_form.html" %}

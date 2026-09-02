@@ -1,0 +1,102 @@
+.homepage-members-carousel {
+    width: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 3%, #000 97%, transparent);
+}
+
+.homepage-members-carousel__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    animation: homepage-members-carousel-scroll 36s linear infinite;
+}
+
+.homepage-members-carousel__group {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+.homepage-members-carousel__link {
+    display: block;
+    flex: 0 0 auto;
+    border-radius: 9999px;
+    transition: transform 160ms ease;
+}
+
+.homepage-members-carousel__avatar {
+    display: block;
+    width: 5rem;
+    height: 5rem;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: #f1f5f9;
+    box-shadow: 0 0 0 2px #e2e8f0;
+    transition: box-shadow 160ms ease;
+}
+
+.homepage-members-carousel__avatar .media-container {
+    width: 100%;
+    height: 100%;
+}
+
+.homepage-members-carousel__avatar .homepage-members-carousel__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (hover: hover) {
+    .homepage-members-carousel:hover .homepage-members-carousel__track {
+        animation-play-state: paused;
+    }
+
+    .homepage-members-carousel__link:hover {
+        transform: scale(1.06);
+    }
+
+    .homepage-members-carousel__link:hover .homepage-members-carousel__avatar {
+        box-shadow: 0 0 0 2px #dc2626;
+    }
+}
+
+@media (max-width: 640px) {
+    .homepage-members-carousel__track {
+        animation-duration: 30s;
+    }
+
+    .homepage-members-carousel__group {
+        gap: 0.625rem;
+        padding-right: 0.625rem;
+    }
+
+    .homepage-members-carousel__avatar {
+        width: 4.25rem;
+        height: 4.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .homepage-members-carousel {
+        overflow-x: auto;
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    .homepage-members-carousel__track {
+        animation: none;
+    }
+}
+
+@keyframes homepage-members-carousel-scroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}

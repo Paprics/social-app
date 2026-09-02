@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load static i18n %}
 
 {% block title %}
     {% trans "Welcome" %} — Flingon
@@ -9,22 +9,30 @@
     {% trans "Connect with people around the world." %}
 {% endblock %}
 
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'core/css/homepage_members_carousel.css' %}">
+{% endblock %}
+
 {% block page %}
 
-<section class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col items-center justify-center gap-12 px-4 py-16 lg:flex-row lg:items-center lg:gap-20 lg:py-24">
+<section class="mx-auto min-h-[calc(100vh-4rem)] max-w-7xl px-4 py-16 lg:py-24">
 
-    <!-- Левая колонка: контент из БД -->
-    <div class="w-full max-w-lg shrink-0 text-center lg:text-left">
-
-        <div class="text-center lg:text-left">
-            <div class="text-4xl font-black tracking-tight text-slate-900 lg:text-5xl">
-                Flingon
-            </div>
-
-            <p class="mt-1 text-sm font-medium tracking-wide text-slate-500 lg:text-base">
-                Your desires. Your people.
-            </p>
+    <div class="text-center lg:text-left">
+        <div class="text-4xl font-black tracking-tight text-slate-900 lg:text-5xl">
+            Flingon
         </div>
+
+        <p class="mt-1 text-sm font-medium tracking-wide text-slate-500 lg:text-base">
+            Your desires. Your people.
+        </p>
+    </div>
+
+    {% include "core/components/homepage_members_carousel.html" with profiles=homepage_carousel_profiles %}
+
+    <div class="mt-10 flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-20">
+
+        <!-- Левая колонка: контент из БД -->
+        <div class="w-full max-w-lg shrink-0 text-center lg:text-left">
 
         {% if content %}
 
@@ -177,6 +185,8 @@
             </div>
 
         </div>
+
+    </div>
 
     </div>
 
